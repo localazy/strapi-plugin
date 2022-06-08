@@ -8,6 +8,11 @@ Manage your multilingual content with ease. Upload your content in default langu
 
 This repository contains all the code needed to run the Official Strapi Plugin by Localazy.
 
+### Install plugin via NPM
+
+The plugin is available on [NPM](https://www.npmjs.com/package/@localazy/strapi-plugin).
+You can also follow the installation commands located in your Strapi project Marketplace. This is the recommended approach.
+
 ### Use plugin in a clean project locally
 
 Besides installing the plugin via `npm`, you can also use it in a project locally. Assuming you have a (clean) Strapi project set up, do:
