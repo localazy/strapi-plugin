@@ -7,6 +7,17 @@
     "description": "The official Strapi Plugin by Localazy",
     "kind": "plugin"
   },
+  "keywords": [
+    "strapi",
+    "plugin",
+    "localazy",
+    "javascript",
+    "internationalization",
+    "i18n",
+    "headless",
+    "cms",
+    "l10n"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:localazy/strapi-plugin.git"

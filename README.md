@@ -28,7 +28,7 @@ module.exports = {
     enabled: true,
     resolve: "./src/plugins/localazy",
     config: {
-      default: () => ({}),the user configuration is valid
+      default: () => {},
       validator: () => {},
     },
   },
