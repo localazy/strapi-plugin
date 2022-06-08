@@ -1,8 +1,8 @@
 # The Official Strapi Plugin by Localazy
 
-### Sample development project for Official Strapi Plugin by Localazy's README
+### The Official Strapi Plugin by Localazy
 
-This README file describes main features of Official Strapi Plugin by Localazy. To read more about sample development project for the plugin, check README file located in project root.
+Manage your multilingual content with ease. Upload your content in default language to Localazy. Let us translate your content for you, use machine translation or let your translators do it for you. Download translated content back to Strapi and feel the seamless experience of multilingual content.
 
 ### General information
 
