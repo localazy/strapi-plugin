@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "The official Strapi Plugin by Localazy.",
   "strapi": {
-    "name": "localazy",
+    "name": "Localazy",
     "description": "The official Strapi Plugin by Localazy",
     "kind": "plugin"
   },
