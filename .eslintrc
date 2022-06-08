@@ -1,0 +1,7 @@
+{
+  // "extends": "@strapi-community",
+  "env": {
+    "jest/globals": true
+  },
+  "plugins": ["jest"]
+}
