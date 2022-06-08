@@ -1,11 +1,15 @@
 {
-  "name": "localazy",
-  "version": "0.0.0",
-  "description": "The official Localazy Strapi v4 Plugin.",
+  "name": "@localazy/strapi-plugin",
+  "version": "0.1.0",
+  "description": "The official Strapi Plugin by Localazy.",
   "strapi": {
-    "name": "Localazy",
-    "description": "The official Localazy Strapi v4 Plugin",
+    "name": "localazy",
+    "description": "The official Strapi Plugin by Localazy",
     "kind": "plugin"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:localazy/strapi-plugin.git"
   },
   "scripts": {
     "test": "jest --config ./jest.config.js",
@@ -25,6 +29,9 @@
     "react-i18next": "^11.15.5",
     "styled-components": "^5.3.3"
   },
+  "peerDependencies": {
+    "@strapi/strapi": "^4.0.0"
+  },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.17.7",
     "@strapi-community/eslint-config": "^0.2.0",
@@ -35,12 +42,14 @@
   },
   "author": {
     "name": "David Vaclavek",
-    "email": "david@localazy.com"
+    "email": "david@localazy.com",
+    "url": "https://localazy.com"
   },
   "maintainers": [
     {
       "name": "David Vaclavek",
-      "email": "david@localazy.com"
+      "email": "david@localazy.com",
+      "url": "https://localazy.com"
     }
   ],
   "engines": {
