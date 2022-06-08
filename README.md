@@ -37,4 +37,4 @@ module.exports = {
 
 To run tests, run `npm run test` command. To watch tests, run `npm run test:watch` command.
 
-You might also want to check the README file located in project root for more information on tests debugging.
+In case you have an access, you might also want to check the README file located in development project root for more information on tests debugging.
