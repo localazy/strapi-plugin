@@ -5,6 +5,7 @@ import Initializer from "./components/Initializer";
 import PluginIcon from "./components/PluginIcon";
 
 const name = pluginPkg.strapi.name;
+const upperCaseName = name.charAt(0).toUpperCase() + name.slice(1);
 const SETTINGS_SETUP = [
   {
     sectionId: `${pluginId}-settings`,
@@ -36,7 +37,7 @@ export default {
       icon: PluginIcon,
       intlLabel: {
         id: `${pluginId}.plugin.name`,
-        defaultMessage: name,
+        defaultMessage: upperCaseName,
       },
       Component: async () => {
         const component = await import("./pages/Index");
