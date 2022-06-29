@@ -1,10 +1,6 @@
-# The Official Strapi Localization Plugin by Localazy
-
 ### The Official Strapi Localization Plugin by Localazy
 
 Strapi localization doesn't have to be a headache! Install the Strapi localization plugin and seamlessly translate your content into multiple languages with [Localazy](https://localazy.com).
-
-![The Official Strapi Localization Plugin by Localazy](https://directus9.localazy.com/assets/e08d0418-5669-4255-9c2c-f5cc6e403edd)
 
 ### Manage your multilingual content with ease.
 1. [Sign up](https://localazy.com/register?ref=strapi_marketplace) & Upload your content to Localazy.
