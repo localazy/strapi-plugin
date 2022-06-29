@@ -1,12 +1,21 @@
-# The Official Strapi Plugin by Localazy
+# The Official Strapi Localization Plugin by Localazy
 
-### The Official Strapi Plugin by Localazy
+### The Official Strapi Localization Plugin by Localazy
 
-Manage your multilingual content with ease. Upload your content in default language to Localazy. Let us translate your content for you, use machine translation or let your translators do it for you. Download translated content back to Strapi and feel the seamless experience of multilingual content.
+Strapi localization doesn't have to be a headache! Install the Strapi localization plugin and seamlessly translate your content into multiple languages with [Localazy](https://localazy.com).
+
+![The Official Strapi Localization Plugin by Localazy](https://directus9.localazy.com/assets/e08d0418-5669-4255-9c2c-f5cc6e403edd)
+
+### Manage your multilingual content with ease.
+1. [Sign up](https://localazy.com/register?ref=strapi_marketplace) & Upload your content to Localazy.
+2. Translate your content with machine translation assistance, or let the Localazy Continuous Localization Team translate your content for you. You can also quickly pre-translate everything in bulk or invite your translators.
+3. Download translated content back to Strapi and feel the seamless experience of multilingual content management.
+
+Learn more in the [Strapi + Localazy tutorial](https://localazy.com/blog/how-to-strapi-localization-with-localazy#getting-started-with-strapi-localization).
 
 ### General information
 
-This repository contains all the code needed to run the Official Strapi Plugin by Localazy.
+This repository contains all the code needed to run the Strapi Localization Plugin by Localazy.
 
 ### Install plugin via NPM
 
@@ -33,13 +42,17 @@ module.exports = {
     },
   },
 };
-
 ```
 
-5. Run the project. Plugin will be available in the admin.
+
+5. Run the project. The plugin will be available in the admin.
 
 ### Tests
 
 To run tests, run `npm run test` command. To watch tests, run `npm run test:watch` command.
 
 In case you have an access, you might also want to check the README file located in development project root for more information on tests debugging.
+
+### Support
+- If you encounter any issues or have questions, please contact us at [team@localazy.com](mailto:team@localazy.com).
+- Join the [Localazy Discord](https://discord.gg/CAVhHrh) to discuss all things localization.
