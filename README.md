@@ -1,4 +1,4 @@
-### The Official Strapi Localization Plugin by Localazy
+## The Official Strapi Localization Plugin by Localazy
 
 Strapi localization doesn't have to be a headache! Install the Strapi localization plugin and seamlessly translate your content into multiple languages with [Localazy](https://localazy.com).
 
@@ -9,14 +9,16 @@ Strapi localization doesn't have to be a headache! Install the Strapi localizati
 
 Learn more in the [Strapi + Localazy tutorial](https://localazy.com/blog/how-to-strapi-localization-with-localazy#getting-started-with-strapi-localization).
 
-### General information
-
-This repository contains all the code needed to run the Strapi Localization Plugin by Localazy.
+## Setup
 
 ### Install plugin via NPM
 
 The plugin is available on [NPM](https://www.npmjs.com/package/@localazy/strapi-plugin).
 You can also follow the installation commands located in your Strapi project Marketplace. This is the recommended approach.
+
+```
+npm install @localazy/strapi-plugin
+```
 
 ### Use plugin in a clean project locally
 
@@ -43,12 +45,10 @@ module.exports = {
 
 5. Run the project. The plugin will be available in the admin.
 
-### Tests
+## Tests
 
 To run tests, run `npm run test` command. To watch tests, run `npm run test:watch` command.
 
-In case you have an access, you might also want to check the README file located in development project root for more information on tests debugging.
-
-### Support
+## Support
 - If you encounter any issues or have questions, please contact us at [team@localazy.com](mailto:team@localazy.com).
 - Join the [Localazy Discord](https://discord.gg/CAVhHrh) to discuss all things localization.
