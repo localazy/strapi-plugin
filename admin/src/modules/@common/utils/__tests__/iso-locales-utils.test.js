@@ -1,4 +1,4 @@
-const { isoStrapiToLocalazy, isoLocalazyToStrapi } = require("../iso-locales-utils.js");
+const { isoStrapiToLocalazy, isoLocalazyToStrapi } = require("../iso-locales-utils");
 
 describe("iso-locales-utils.js", () => {
   describe("transform Strapi ISO to Localazy ISO", () => {
