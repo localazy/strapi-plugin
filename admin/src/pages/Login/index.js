@@ -49,11 +49,21 @@ function Login(props) {
       <HeaderLayout
         title={props.title}
         subtitle={props.subtitle}
-        as="h2"
+        as="h1"
       />
       {props.isLoading && (<Loader>{t("common.loading_content")}</Loader>)}
       {!props.isLoading && (
-        <Box paddingLeft={10}>
+        <Box
+          marginLeft={10}
+          marginRight={10}
+          background="neutral0"
+          paddingTop={6}
+          paddingRight={7}
+          paddingBottom={6}
+          paddingLeft={7}
+          hasRadius
+          shadow="tableShadow"
+        >
           <Box>
             <Typography variant="epsilon" textColor="neutral600">
               {t("common.localazy_plugin_description")}

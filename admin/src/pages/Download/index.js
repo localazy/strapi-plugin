@@ -115,7 +115,7 @@ function Download(props) {
             >
               <Divider />
             </Box>
-            <Box marginTop={4}>
+            <Box marginTop={2}>
               <Flex gap="2">
                 <Button variant="secondary" onClick={onTranslateInLocalazyClick}>
                   {t("download.translate_in_localazy")}
