@@ -25,7 +25,9 @@ module.exports = {
       const messageReport = [];
 
       // Strapi Service
-      const StrapiService = strapi.plugin("localazy").service("strapiService");
+      const StrapiService = strapi
+        .plugin("localazy")
+        .service("strapiService");
 
       // Strapi i18n Service
       const StrapiI18nService = strapi

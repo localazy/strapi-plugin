@@ -13,17 +13,18 @@ module.exports = ({ strapi }) => ({
   async createStrapiLocale(ctx, isoLocalazy) {
     try {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
-      const localeName = intlDisplayName(isoLocalazy);
+      let localeName = intlDisplayName(isoStrapi);
 
       if (!localeName || !isoStrapi) {
         throw new Error("Invalid locale");
       }
+      localeName = `${localeName} (${isoStrapi})`;
 
       const newLocaleCtx = { ...ctx };
       newLocaleCtx.request.body = {
         isDefault: false,
         code: isoStrapi,
-        name: localeName,
+        name: localeName.substring(0, 50), // limit name to 50 characters (given by Strapi)
       };
 
       await strapi
@@ -39,7 +40,6 @@ module.exports = ({ strapi }) => ({
   parseLocalazyKey(key) {
     const split = key.split(/\.|\[|\]/);
     const filteredSplit = split.filter((item) => item !== "");
-    // return split;
 
     return {
       uid: `${filteredSplit[0]}.${filteredSplit[1]}`,
