@@ -21,6 +21,8 @@ import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsBut
 import redirectToPluginRoute, {
   PLUGIN_ROUTES,
 } from "../../modules/@common/utils/redirect-to-plugin-route";
+import { getLocalazyIdentity } from "../../state/localazy-identity";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 import "../../i18n";
 
@@ -38,6 +40,7 @@ function Upload(props) {
   const [isUploading, setIsUploading] = useState(false);
   const [strapiDefaultLocale, setStrapiDefaultLocale] = useState(null);
   const [localazySourceLanguage, setLocalazySourceLanguage] = useState(null);
+  const [localazyIdentity] = getLocalazyIdentity();
 
   const onChangeSettingsClick = () => {
     redirectToPluginRoute(PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP);
@@ -49,6 +52,16 @@ function Upload(props) {
     setIsUploading(true);
     const result = await LocalazyUploadService.upload();
     setUploadResult(result);
+
+    // track upload
+    ProductAnalyticsService.trackUploadToLocalazy(
+      localazyIdentity.user.id,
+      localazyIdentity.project,
+      {
+        "Source Language Code": localazySourceLanguage.code,
+      }
+    );
+
     setIsUploading(false);
     setShowUploadFinishedModal(true);
   };
