@@ -17,6 +17,7 @@ import OverviewItemLink from "../../modules/settings/components/OverviewItemLink
 import PrerequisitiesInfo from "../../modules/settings/components/PrerequisitiesInfo";
 import ProjectService from "../../modules/@common/services/project-service";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
+import formatNumber from "../../modules/@common/utils/format-number";
 
 import "../../i18n";
 
@@ -95,7 +96,7 @@ function Settings(props) {
               <OverviewItem
                 label={t("settings.remaining_organization_keys")}
                 value={
-                  connectedProject.organization.availableKeys - connectedProject.organization.usedKeys
+                  formatNumber(connectedProject.organization.availableKeys - connectedProject.organization.usedKeys)
                 }
               />
               <OverviewItemLink
