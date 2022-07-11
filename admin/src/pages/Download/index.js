@@ -17,6 +17,7 @@ import TransferReport from "../../modules/@common/components/TransferReport";
 import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsButton";
 import "../../i18n";
 import { getLocalazyIdentity } from "../../state/localazy-identity";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 function Download(props) {
   const { t } = useTranslation();
@@ -44,6 +45,16 @@ function Download(props) {
     setIsDownloading(true);
     const result = await LocalazyDownloadService.download();
     setDownloadResult(result);
+
+    // track download
+    ProductAnalyticsService.trackDownloadToStrapi(
+      localazyIdentity.user.id,
+      localazyIdentity.project,
+      {
+        "Target Languages Codes": "all",
+      }
+    );
+
     setIsDownloading(false);
     setshowDownloadFinishedModal(true);
   };
