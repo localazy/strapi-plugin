@@ -40,7 +40,7 @@ export default class ProductAnalyticsService {
     }
   }
 
-  static async trackDownloadToFigma(userId, project, params = {}) {
+  static async trackDownloadToStrapi(userId, project, params = {}) {
     try {
       const data = this.buildData(userId, "Strapi Download", project, params);
       await AnalyticsService.trackEvent(data.event, {
