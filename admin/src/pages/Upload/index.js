@@ -9,7 +9,7 @@ import { Button } from "@strapi/design-system/Button";
 import UploadIcon from "@strapi/icons/Upload";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
-import { Loader } from "@strapi/design-system/Loader";
+import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
 import { getStrapiDefaultLocale, getLocalazySourceLanguage } from "../../modules/@common/utils/get-default-locale";
