@@ -16,6 +16,7 @@ import OverviewItem from "../../modules/settings/components/OverviewItem";
 import OverviewItemLink from "../../modules/settings/components/OverviewItemLink";
 import PrerequisitiesInfo from "../../modules/settings/components/PrerequisitiesInfo";
 import ProjectService from "../../modules/@common/services/project-service";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 import "../../i18n";
 
@@ -45,6 +46,12 @@ function Settings(props) {
    * On logout action
    */
   const onLoggedOut = () => {
+    // track user logout
+    ProductAnalyticsService.trackAppDisconnected(
+      localazyIdentity.user.id,
+      localazyIdentity.project,
+    );
+
     redirectToPluginRoute(PLUGIN_ROUTES.LOGIN, history);
   };
 
