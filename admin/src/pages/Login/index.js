@@ -19,6 +19,7 @@ import LoginButton from "../../modules/login/components/LoginButton";
 import redirectToPluginRoute, {
   PLUGIN_ROUTES,
 } from "../../modules/@common/utils/redirect-to-plugin-route";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 import "../../i18n";
 
@@ -40,6 +41,12 @@ function Login(props) {
     setLocalazyIdentity(result);
 
     if (result.accessToken) {
+      // track user login
+      ProductAnalyticsService.trackAppConnected(
+        result.user.id,
+        result.project,
+      );
+
       redirectToPluginRoute(PLUGIN_ROUTES.DOWNLOAD, history);
     }
   };
