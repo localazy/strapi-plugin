@@ -6,19 +6,20 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Loader } from "@strapi/design-system/Loader";
 import { Link } from "@strapi/design-system/Link";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { HeaderLayout } from "@strapi/design-system/Layout";
 import { Box } from "@strapi/design-system/Box";
 import { Typography } from "@strapi/design-system/Typography";
+import Loader from "../../modules/@common/components/PluginPageLoader";
 import { setLocalazyIdentity } from "../../state/localazy-identity";
 import LocalazyUserService from "../../modules/user/services/localazy-user-service";
 import LoginButton from "../../modules/login/components/LoginButton";
 import redirectToPluginRoute, {
   PLUGIN_ROUTES,
 } from "../../modules/@common/utils/redirect-to-plugin-route";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 import "../../i18n";
 
@@ -40,6 +41,12 @@ function Login(props) {
     setLocalazyIdentity(result);
 
     if (result.accessToken) {
+      // track user login
+      ProductAnalyticsService.trackAppConnected(
+        result.user.id,
+        result.project,
+      );
+
       redirectToPluginRoute(PLUGIN_ROUTES.DOWNLOAD, history);
     }
   };

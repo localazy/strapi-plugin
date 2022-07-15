@@ -9,7 +9,7 @@ import { Button } from "@strapi/design-system/Button";
 import UploadIcon from "@strapi/icons/Upload";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
-import { Loader } from "@strapi/design-system/Loader";
+import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
 import { getStrapiDefaultLocale, getLocalazySourceLanguage } from "../../modules/@common/utils/get-default-locale";
@@ -21,6 +21,8 @@ import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsBut
 import redirectToPluginRoute, {
   PLUGIN_ROUTES,
 } from "../../modules/@common/utils/redirect-to-plugin-route";
+import { getLocalazyIdentity } from "../../state/localazy-identity";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 import "../../i18n";
 
@@ -38,6 +40,7 @@ function Upload(props) {
   const [isUploading, setIsUploading] = useState(false);
   const [strapiDefaultLocale, setStrapiDefaultLocale] = useState(null);
   const [localazySourceLanguage, setLocalazySourceLanguage] = useState(null);
+  const [localazyIdentity] = getLocalazyIdentity();
 
   const onChangeSettingsClick = () => {
     redirectToPluginRoute(PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP);
@@ -49,6 +52,16 @@ function Upload(props) {
     setIsUploading(true);
     const result = await LocalazyUploadService.upload();
     setUploadResult(result);
+
+    // track upload
+    ProductAnalyticsService.trackUploadToLocalazy(
+      localazyIdentity.user.id,
+      localazyIdentity.project,
+      {
+        "Source Language Code": localazySourceLanguage.code,
+      }
+    );
+
     setIsUploading(false);
     setShowUploadFinishedModal(true);
   };

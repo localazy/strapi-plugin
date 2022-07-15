@@ -5,11 +5,11 @@ import { Button } from "@strapi/design-system/Button";
 import DownloadIcon from "@strapi/icons/Download";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
-import { Loader } from "@strapi/design-system/Loader";
 import { useTranslation } from "react-i18next";
 import { Flex } from '@strapi/design-system/Flex';
 import { Divider } from '@strapi/design-system/Divider';
 import { Typography } from "@strapi/design-system/Typography";
+import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyDownloadService from "../../modules/localazy-download/services/localazy-download-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
 import hasModelChanged from "../../modules/plugin-settings/functions/has-model-changed";
@@ -17,6 +17,7 @@ import TransferReport from "../../modules/@common/components/TransferReport";
 import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsButton";
 import "../../i18n";
 import { getLocalazyIdentity } from "../../state/localazy-identity";
+import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 function Download(props) {
   const { t } = useTranslation();
@@ -44,6 +45,16 @@ function Download(props) {
     setIsDownloading(true);
     const result = await LocalazyDownloadService.download();
     setDownloadResult(result);
+
+    // track download
+    ProductAnalyticsService.trackDownloadToStrapi(
+      localazyIdentity.user.id,
+      localazyIdentity.project,
+      {
+        "Target Languages Codes": "all",
+      }
+    );
+
     setIsDownloading(false);
     setshowDownloadFinishedModal(true);
   };
