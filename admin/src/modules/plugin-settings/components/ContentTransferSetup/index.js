@@ -257,7 +257,10 @@ function ContentTransferSetup() {
                   key={`box_tree_${index}`}
                   marginBottom={3}
                 >
-                  <Tree onTreeItemClick={onTreeItemClick} objects={tree} />
+                  <Tree
+                    onTreeItemClick={onTreeItemClick}
+                    objects={tree}
+                    initiallyExpanded={index === 0} />
                 </Box>
               );
             })}
