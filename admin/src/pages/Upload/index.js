@@ -23,6 +23,7 @@ import redirectToPluginRoute, {
 } from "../../modules/@common/utils/redirect-to-plugin-route";
 import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
+import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
 import "../../i18n";
 
@@ -78,6 +79,8 @@ function Upload(props) {
        */
       setModelChanged(await hasModelChanged());
       setLocalesIncompatible(!(await areLocalesCompatible(strapiDefaultLocale, localazySourceLanguage)));
+
+      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
 
       setIsLoading(false);
     }

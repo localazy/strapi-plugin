@@ -1,17 +1,20 @@
 "use strict";
 
-const {
-  KEY,
-  emptyContentTransferSetup,
-} = require("../db/model/content-transfer-setup");
+const contentTransferSetupModel = require("../db/model/content-transfer-setup");
+
+const pluginSettingsModel = require("../db/model/plugin-settings");
+// {
+//   KEY,
+//   emptyPluginSettings,
+// } = require("../db/model/plugin-settings");
 const getStrapiStore = require("../db/model/utils/get-strapi-store");
 
 module.exports = ({ strapi }) => ({
   async getContentTransferSetup() {
     const pluginStore = getStrapiStore(strapi);
-    const setup = await pluginStore.get({ key: KEY });
+    const setup = await pluginStore.get({ key: contentTransferSetupModel.KEY });
 
-    return setup || emptyContentTransferSetup;
+    return setup || contentTransferSetupModel.emptyContentTransferSetup;
   },
 
   async updateContentTransferSetup(setup) {
@@ -21,10 +24,28 @@ module.exports = ({ strapi }) => ({
     };
     const pluginStore = getStrapiStore(strapi);
     await pluginStore.set({
-      key: KEY,
+      key: contentTransferSetupModel.KEY,
       value: newSetup,
     });
 
     return newSetup;
+  },
+
+  async getPluginSettings() {
+    const pluginStore = getStrapiStore(strapi);
+    const settings = await pluginStore.get({ key: pluginSettingsModel.KEY });
+
+    return settings || pluginSettingsModel.emptyPluginSettings;
+  },
+
+  async updatePluginSettings(settings) {
+    const newSettings = settings;
+    const pluginStore = getStrapiStore(strapi);
+    await pluginStore.set({
+      key: pluginSettingsModel.KEY,
+      value: newSettings,
+    });
+
+    return newSettings;
   },
 });
