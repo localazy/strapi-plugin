@@ -22,7 +22,7 @@ function ContentTransferSetupEmpty() {
         textColor="neutral600"
         variant="beta"
       >
-        {t("plugin_settings.there_are_no_collections_connected")}
+        {t("plugin_settings.there_is_nothing_to_transfer")}
       </Typography>
       <br />
       <br />
@@ -32,16 +32,8 @@ function ContentTransferSetupEmpty() {
       >
         {t("plugin_settings.please_check_that_you_have_entered_a_valid_collection")}
       </Typography>
-      <br /><br />
-      <Flex alignItems="center">
-        <Typography
-          textColor="neutral600"
-          variant="omega"
-        >
-          {t("plugin_settings.please_enable_localization_for_the_collection_you_want_to_translate")}
-        </Typography>
-      </Flex>
-      <Flex alignItems="center">
+      <br />
+      <Flex marginTop={1} alignItems="center">
         <CustomBullet />
         <Typography
           textColor="neutral600"
@@ -50,7 +42,7 @@ function ContentTransferSetupEmpty() {
           <Trans i18nKey="plugin_settings.step_1" components={{ 1: <Typography variant="omega" fontWeight="semiBold" /> }} />
         </Typography>
       </Flex>
-      <Flex alignItems="center">
+      <Flex marginTop={1} alignItems="center">
         <CustomBullet />
 
         <Typography
@@ -60,13 +52,31 @@ function ContentTransferSetupEmpty() {
           <Trans i18nKey="plugin_settings.step_2" components={{ 1: <Typography variant="omega" fontWeight="semiBold" /> }} />
         </Typography>
       </Flex>
-      <Flex alignItems="center">
+      <Flex marginTop={1} alignItems="center">
         <CustomBullet />
         <Typography
           textColor="neutral600"
           variant="omega"
         >
           <Trans i18nKey="plugin_settings.step_3" components={{ 1: <Typography variant="omega" fontWeight="semiBold" /> }} />
+        </Typography>
+      </Flex>
+      <Flex marginTop={1} alignItems="center">
+        <CustomBullet />
+        <Typography
+          textColor="neutral600"
+          variant="omega"
+        >
+          <Trans i18nKey="plugin_settings.step_4" components={{ 1: <Typography variant="omega" fontWeight="semiBold" /> }} />
+        </Typography>
+      </Flex>
+      <Flex marginTop={1} alignItems="center">
+        <CustomBullet />
+        <Typography
+          textColor="neutral600"
+          variant="omega"
+        >
+          <Trans i18nKey="plugin_settings.step_5" components={{ 1: <Typography variant="omega" fontWeight="semiBold" /> }} />
         </Typography>
       </Flex>
     </div >
