@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { Box } from "@strapi/design-system/Box";
 import { Switch } from '@strapi/design-system/Switch';
@@ -12,6 +12,10 @@ function Tree(props) {
   const onTreeItemClick = (key, currentValue) => {
     props.onTreeItemClick(key, currentValue);
   };
+
+  useEffect(() => {
+    setIsExpanded(props.initiallyExpanded);
+  }, [props.initiallyExpanded]);
 
   const createTree = (name, branch, path = "") => {
     const isBranchObject = typeof branch === "object" && branch !== null;
@@ -115,6 +119,11 @@ function Tree(props) {
 Tree.propTypes = {
   objects: PropTypes.object.isRequired,
   onTreeItemClick: PropTypes.func.isRequired,
+  initiallyExpanded: PropTypes.bool,
+};
+
+Tree.defaultProps = {
+  initiallyExpanded: false,
 };
 
 export default Tree;

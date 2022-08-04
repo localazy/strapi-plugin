@@ -18,6 +18,8 @@ import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsBut
 import "../../i18n";
 import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
+import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
+import { PLUGIN_ROUTES } from "../../modules/@common/utils/redirect-to-plugin-route";
 
 function Download(props) {
   const { t } = useTranslation();
@@ -68,6 +70,8 @@ function Download(props) {
        */
       setModelChanged(await hasModelChanged());
       setLocalesIncompatible(!(await areLocalesCompatible()));
+
+      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
 
       setIsLoading(false);
     }

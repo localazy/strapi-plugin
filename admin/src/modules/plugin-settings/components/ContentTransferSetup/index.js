@@ -21,6 +21,7 @@ import hasModelChanged from "../../functions/has-model-changed";
 import buildContentTransferSetupSchema from "../../functions/build-content-transfer-setup-schema";
 import { getLocalazyIdentity } from "../../../../state/localazy-identity";
 import Tree from "../Tree";
+import ContentTransferSetupEmpty from "../ContentTransferSetupEmpty";
 
 import "../../../../i18n";
 
@@ -28,7 +29,6 @@ function ContentTransferSetup() {
   /**
    * Translation function
    */
-  // eslint-disable-next-line no-unused-vars
   const { t } = useTranslation();
 
   /**
@@ -250,6 +250,10 @@ function ContentTransferSetup() {
             shadow="tableShadow"
             hasRadius
           >
+            {!formModel.length && (
+              // empty state
+              <ContentTransferSetupEmpty />
+            )}
             {formModel.map((tree, index) => {
               return (
                 <Box
@@ -257,30 +261,37 @@ function ContentTransferSetup() {
                   key={`box_tree_${index}`}
                   marginBottom={3}
                 >
-                  <Tree onTreeItemClick={onTreeItemClick} objects={tree} />
+                  <Tree
+                    onTreeItemClick={onTreeItemClick}
+                    objects={tree}
+                    initiallyExpanded={index === 0} />
                 </Box>
               );
             })}
-            <Box
-              paddingTop={6}
-              paddingBottom={6}
-            >
-              <Divider />
-            </Box>
-            <Typography variant="omega">{t("plugin_settings.you_can_upload_download")}</Typography>
-            <Typography variant="omega" fontWeight="semiBold">{t("plugin_settings.only_text_based_content")}</Typography>
-            <br />
-            <br />
-            <Typography variant="omega">{t("plugin_settings.learn_more_in_docs_message_a")}</Typography>
-            <Typography
-              onClick={onReadDocumentationClick}
-              variant="omega"
-              fontWeight="semiBold"
-              textColor="primary600"
-              style={{ cursor: "pointer" }}
-            >
-              {t("plugin_settings.learn_more_in_docs_message_b")}
-            </Typography>
+            {!!formModel.length && (
+              <Box>
+                <Box
+                  paddingTop={6}
+                  paddingBottom={6}
+                >
+                  <Divider />
+                </Box>
+                <Typography variant="omega">{t("plugin_settings.you_can_upload_download")}</Typography>
+                <Typography variant="omega" fontWeight="semiBold">{t("plugin_settings.only_text_based_content")}</Typography>
+                <br />
+                <br />
+                <Typography variant="omega">{t("plugin_settings.learn_more_in_docs_message_a")}</Typography>
+                <Typography
+                  onClick={onReadDocumentationClick}
+                  variant="omega"
+                  fontWeight="semiBold"
+                  textColor="primary600"
+                  style={{ cursor: "pointer" }}
+                >
+                  {t("plugin_settings.learn_more_in_docs_message_b")}
+                </Typography>
+              </Box>
+            )}
           </Box>
         )
         }

@@ -32,6 +32,7 @@ import {
   getLocalazyIdentity,
 } from "../../state/localazy-identity";
 import history from "../../modules/@common/utils/history";
+import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
 import "../../i18n";
 
@@ -89,7 +90,8 @@ function App() {
         if (!hasLocalazyIdentity()) {
           redirectToPluginRoute(PLUGIN_ROUTES.LOGIN);
         } else {
-          redirectToPluginRoute(PLUGIN_ROUTES.DOWNLOAD);
+          const lastRoute = (await PluginSettingsService.getPluginSettings()).defaultRoute || PLUGIN_ROUTES.UPLOAD;
+          redirectToPluginRoute(lastRoute);
         }
       }
     }

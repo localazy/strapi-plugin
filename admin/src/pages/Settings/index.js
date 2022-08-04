@@ -18,6 +18,7 @@ import PrerequisitiesInfo from "../../modules/settings/components/Prerequisities
 import ProjectService from "../../modules/@common/services/project-service";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 import formatNumber from "../../modules/@common/utils/format-number";
+import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
 import "../../i18n";
 
@@ -37,6 +38,9 @@ function Settings(props) {
       setIsLoading(true);
       const project = await ProjectService.getConnectedProject();
       setConnectedProject(project);
+
+      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.SETTINGS });
+
       setIsLoading(false);
     }
 
