@@ -3,7 +3,8 @@
 const pickEntries = (flatten, pickPaths) => {
   const pickedEntries = {};
   Object.keys(flatten).forEach((key) => {
-    const filteredKey = key.replace(/\d|[[\]]+/g, "");
+    const filteredKey = key.replace(/\[\d+\]/g, "");
+    // const filteredKey = key.replace(/\d|[[\]]+/g, "");
     if (pickPaths.includes(filteredKey)) {
       pickedEntries[key] = flatten[key];
     }
