@@ -394,6 +394,7 @@ module.exports = {
                 const createEntry = parsedLocalazyEntryToCreateEntry(
                   strapiContentTypesModels,
                   translatedModel,
+                  baseEntry,
                   uid,
                   isoStrapi
                 );
@@ -432,6 +433,7 @@ module.exports = {
                   strapiContentTypesModels,
                   translatedModel,
                   localizedEntry,
+                  baseEntry,
                   uid
                 );
 

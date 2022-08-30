@@ -8,11 +8,13 @@ const parsedLocalazyEntryToUpdateEntry = (
   allModels,
   localazyEntry,
   currentEntry,
+  baseEntry,
   uid
 ) => {
   const createEntry = parsedLocalazyEntryToCreateEntry(
     allModels,
     localazyEntry,
+    baseEntry,
     uid
   );
   let updateEntry = merge(currentEntry, createEntry);
