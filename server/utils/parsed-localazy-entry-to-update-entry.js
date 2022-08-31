@@ -17,7 +17,9 @@ const parsedLocalazyEntryToUpdateEntry = (
     baseEntry,
     uid
   );
-  let updateEntry = merge(currentEntry, createEntry);
+
+  let updateEntry = {};
+  merge(updateEntry, currentEntry, createEntry);
   updateEntry = omitDeep(updateEntry, [
     "__component",
     "locale",
