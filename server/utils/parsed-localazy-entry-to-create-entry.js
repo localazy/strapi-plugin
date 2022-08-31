@@ -52,8 +52,13 @@ const parsedLocalazyEntryToCreateEntry = (
               repeatableComponentsKeystoFilter.push(prefix);
             }
             const baseEntryRepeatableItemId = parseInt(baseEntryItemId);
-            const localizedEntryRepeatableItemPosition = get(baseEntry, prefix).findIndex((repeatableItem) => repeatableItem.id === baseEntryRepeatableItemId);
-            toCreateEntry(value, model, baseEntry, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
+            const baseEntryRepeateableGroup = get(baseEntry, prefix);
+            if (baseEntryRepeateableGroup !== undefined) {
+              const localizedEntryRepeatableItemPosition = baseEntryRepeateableGroup.findIndex((repeatableItem) => !!repeatableItem && repeatableItem.id === baseEntryRepeatableItemId);
+              if (localizedEntryRepeatableItemPosition > -1) {
+                toCreateEntry(value, model, baseEntry, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
+              }
+            }
           }
 
           if (component && !isRepeatableComponent) {
