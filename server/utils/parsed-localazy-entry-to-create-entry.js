@@ -1,6 +1,8 @@
 "use strict";
 
 const set = require("lodash/set");
+const get = require("lodash/get");
+const resetArrayKeysDeep = require("./reset-array-keys-deep");
 
 const getAttribute = (model, attribute) => {
   const attributeObj = model.attributes[attribute];
@@ -23,14 +25,17 @@ const findModel = (models, uid) => {
 const parsedLocalazyEntryToCreateEntry = (
   models,
   parsedLocalazyEntry,
+  baseEntry,
   uid,
   locale = ""
 ) => {
   const createEntry = {};
+  const repeatableComponentsKeystoFilter = [];
 
   const toCreateEntry = (
     entry,
     model,
+    baseEntry,
     // eslint-disable-next-line no-unused-vars
     key = "",
     prefix = "",
@@ -39,16 +44,25 @@ const parsedLocalazyEntryToCreateEntry = (
   ) => {
     if (Array.isArray(entry)) {
       // is array
-      let i = 0;
-      Object.entries(entry).forEach(([, value]) => {
+      Object.entries(entry).forEach(([baseEntryItemId, value]) => {
         if (value !== null) {
           if (component && isRepeatableComponent) {
-            toCreateEntry(value, model, i, `${prefix}.${i}`, component);
-            i += 1;
+            // used for indices filtering in repeatable components
+            if (!repeatableComponentsKeystoFilter.includes(prefix)) {
+              repeatableComponentsKeystoFilter.push(prefix);
+            }
+            const baseEntryRepeatableItemId = parseInt(baseEntryItemId);
+            const baseEntryRepeateableGroup = get(baseEntry, prefix);
+            if (baseEntryRepeateableGroup !== undefined) {
+              const localizedEntryRepeatableItemPosition = baseEntryRepeateableGroup.findIndex((repeatableItem) => !!repeatableItem && repeatableItem.id === baseEntryRepeatableItemId);
+              if (localizedEntryRepeatableItemPosition > -1) {
+                toCreateEntry(value, model, baseEntry, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
+              }
+            }
           }
 
           if (component && !isRepeatableComponent) {
-            toCreateEntry(value, model, `${prefix}`, `${prefix}`);
+            toCreateEntry(value, model, baseEntry, `${prefix}`, `${prefix}`);
           }
         }
       });
@@ -70,6 +84,7 @@ const parsedLocalazyEntryToCreateEntry = (
             toCreateEntry(
               value,
               componentModel,
+              baseEntry,
               objectKey,
               newPrefix,
               component,
@@ -84,6 +99,7 @@ const parsedLocalazyEntryToCreateEntry = (
             toCreateEntry(
               value,
               componentModel,
+              baseEntry,
               objectKey,
               newPrefix,
               component,
@@ -104,11 +120,12 @@ const parsedLocalazyEntryToCreateEntry = (
   };
 
   const model = findModel(models, uid);
-  toCreateEntry(parsedLocalazyEntry, model);
+  toCreateEntry(parsedLocalazyEntry, model, baseEntry);
   if (locale) {
     createEntry.locale = locale;
   }
 
+  resetArrayKeysDeep(createEntry, repeatableComponentsKeystoFilter);
   return createEntry;
 };
 

@@ -17,6 +17,7 @@ const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry
 const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
 const set = require("lodash/set");
 const merge = require("lodash/merge");
+const isEmpty = require("lodash/isEmpty");
 
 module.exports = {
   async upload(ctx) {
@@ -367,7 +368,7 @@ module.exports = {
             });
             baseEntry = merge(baseEntry, baseEntryDeep);
 
-            if (!baseEntry) {
+            if (isEmpty(baseEntry)) {
               const message = `Source language entry ${uid}[${id}] does not exist anymore, skipping...`;
               throw new Error(message);
             }
@@ -394,6 +395,7 @@ module.exports = {
                 const createEntry = parsedLocalazyEntryToCreateEntry(
                   strapiContentTypesModels,
                   translatedModel,
+                  baseEntry,
                   uid,
                   isoStrapi
                 );
@@ -419,7 +421,7 @@ module.exports = {
               try {
                 const localizedEntryId =
                   baseEntryCurrentLanguageLocalizationInfo.id;
-                const populate = await StrapiService.getPopulateObject(uid); // not needed anymore here
+                const populate = await StrapiService.getPopulateObject(uid);
                 const localizedEntry = await strapi.entityService.findOne(
                   uid,
                   localizedEntryId,
@@ -432,6 +434,7 @@ module.exports = {
                   strapiContentTypesModels,
                   translatedModel,
                   localizedEntry,
+                  baseEntry,
                   uid
                 );
 
