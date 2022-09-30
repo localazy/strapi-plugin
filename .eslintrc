@@ -1,7 +1,11 @@
 {
   // "extends": "@strapi-community",
   "env": {
-    "jest/globals": true
+    "jest/globals": true,
+    "es6": true
   },
-  "plugins": ["jest"]
+  "plugins": ["jest"],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  }
 }
