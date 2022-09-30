@@ -4,6 +4,7 @@ const set = require("lodash/set");
 const get = require("lodash/get");
 const resetArrayKeysDeep = require("./reset-array-keys-deep");
 
+// TODO: move to external function set
 const getAttribute = (model, attribute) => {
   const attributeObj = model.attributes[attribute];
   return attributeObj;
@@ -17,6 +18,7 @@ const isRepeatable = (attributeObj) => {
   return isComponent(attributeObj) && !!attributeObj.repeatable;
 };
 
+// TODO: use external function from find-model.js
 const findModel = (models, uid) => {
   const model = models.find((model) => model.uid === uid);
   return model;

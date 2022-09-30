@@ -176,6 +176,11 @@ module.exports = {
     const LocalazyDownloadService = strapi
       .plugin("localazy")
       .service("localazyDownloadService");
+    // get content transfer setup
+    const contentTransferSetup = await strapi
+      .plugin("localazy")
+      .service("pluginSettingsService")
+      .getContentTransferSetup();
 
     const user = await LocalazyUserService.getUser();
 
