@@ -10,10 +10,12 @@ const getAttribute = (model, attribute) => {
   return attributeObj;
 };
 
+// TODO: move to external function set
 const isComponent = (attributeObj) => {
   return attributeObj.type === "component";
 };
 
+// TODO: move to external function set
 const isRepeatable = (attributeObj) => {
   return isComponent(attributeObj) && !!attributeObj.repeatable;
 };
