@@ -4,6 +4,7 @@ const cloneDeep = require("lodash/cloneDeep");
 const findModel = require("./find-model");
 const set = require("lodash/set");
 const get = require("lodash/get");
+const isEmpty = require("lodash/isEmpty");
 
 // TODO: move to external function set
 const isComponent = (attributeObj) => {
@@ -21,10 +22,28 @@ const getAttribute = (model, attribute) => {
   return attributeObj;
 };
 
+const doesExistInPopulatedLocalizedEntry = (val) => {
+  if (Array.isArray(val)) {
+    // is array
+    return !!val.length;
+  }
+
+  if (typeof val === "object") {
+    // is object
+    return !isEmpty(val);
+  }
+
+  if (val !== Object(val)) {
+    // is primitive
+    return !!val;
+  }
+}
+
 const populateCreateUpdateEntryWithBaseEntry = (
   models,
   createUpdateEntry,
   baseEntry,
+  populatedLocalizedEntry,
   uid
 ) => {
   const populatedEntry = cloneDeep(createUpdateEntry);
@@ -45,7 +64,12 @@ const populateCreateUpdateEntryWithBaseEntry = (
         const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
         const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
         if (typeof doesExistInCreateUpdateEntry === 'undefined') {
-          set(populatedEntry, newPrefix, partialBaseEntry);
+          const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
+          if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+            set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
+          } else {
+            set(populatedEntry, newPrefix, partialBaseEntry);
+          }
         } else {
           for (const [objectKey, value] of Object.entries(entry)) {
             populateEntry(
@@ -107,8 +131,12 @@ const populateCreateUpdateEntryWithBaseEntry = (
               delete valueToSet.id;
               valueToSet.__component = component;
             }
-            set(populatedEntry, newPrefix, valueToSet);
-            // set(populatedEntry, `${newPrefix}.__component`, component);
+            const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
+            if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+              set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
+            } else {
+              set(populatedEntry, newPrefix, valueToSet);
+            }
           } else {
             populateEntry(
               value,
@@ -123,7 +151,12 @@ const populateCreateUpdateEntryWithBaseEntry = (
           const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
           const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
           if (typeof doesExistInCreateUpdateEntry === 'undefined') {
-            set(populatedEntry, newPrefix, value);
+            const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
+            if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+              set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
+            } else {
+              set(populatedEntry, newPrefix, value);
+            }
           } else {
             populateEntry(
               value,

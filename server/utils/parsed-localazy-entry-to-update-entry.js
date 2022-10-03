@@ -8,6 +8,7 @@ const populateCreateUpdateEntryWithBaseEntry = require("./populate-create-update
 const parsedLocalazyEntryToUpdateEntry = (
   allModels,
   localazyEntry,
+  fullyPopulatedLocalizedEntry,
   currentEntry,
   baseEntry,
   uid
@@ -50,10 +51,21 @@ const parsedLocalazyEntryToUpdateEntry = (
     "updatedBy",
     "publishedAt",
   ]);
+  const filteredFullyPopulatedLocalizedEntry = omitDeep(fullyPopulatedLocalizedEntry, [
+    // "__component",
+    "locale",
+    "localizations",
+    "createdAt",
+    "createdBy",
+    "updatedAt",
+    "updatedBy",
+    "publishedAt",
+  ]);
   const populatedEntry = populateCreateUpdateEntryWithBaseEntry(
     allModels,
     updateEntry,
     filteredBaseEntry,
+    filteredFullyPopulatedLocalizedEntry,
     uid
   );
 

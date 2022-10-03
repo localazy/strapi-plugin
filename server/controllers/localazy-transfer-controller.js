@@ -434,10 +434,18 @@ module.exports = {
                     populate,
                   }
                 );
+                const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
+                  uid,
+                  localizedEntryId,
+                  {
+                    populate: "*",
+                  }
+                );
 
                 const updateEntry = parsedLocalazyEntryToUpdateEntry(
                   strapiContentTypesModels,
                   translatedModel,
+                  fullyPopulatedLocalizedEntry,
                   localizedEntry,
                   baseEntry,
                   uid
