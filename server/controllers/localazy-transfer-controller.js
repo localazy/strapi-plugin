@@ -364,14 +364,17 @@ module.exports = {
             /**
              * Get original source language entry
              */
-            const populate = await StrapiService.getPopulateObject(uid);
-            const baseEntryDeep = await strapi.entityService.findOne(uid, id, {
-              populate,
+            // const populate = await StrapiService.getPopulateObject(uid);
+            // const baseEntryDeep = await strapi.entityService.findOne(uid, id, {
+            //   populate: "deep", // TODO: determine the correct "deep" level
+            // });
+            const baseEntry = await strapi.entityService.findOne(uid, id, {
+              populate: "deep", // TODO: determine the correct "deep" level
             });
-            let baseEntry = await strapi.entityService.findOne(uid, id, {
-              populate: "*",
-            });
-            baseEntry = merge(baseEntry, baseEntryDeep);
+            // let baseEntry = await strapi.entityService.findOne(uid, id, {
+            //   populate: "*",
+            // });
+            // baseEntry = merge(baseEntry, baseEntryDeep);
 
             if (isEmpty(baseEntry)) {
               const message = `Source language entry ${uid}[${id}] does not exist anymore, skipping...`;
@@ -434,11 +437,18 @@ module.exports = {
                     populate,
                   }
                 );
+                // const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
+                //   uid,
+                //   localizedEntryId,
+                //   {
+                //     populate: "*",
+                //   }
+                // );
                 const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
                   uid,
                   localizedEntryId,
                   {
-                    populate: "*",
+                    populate: "deep", // TODO: determine the correct "deep" level
                   }
                 );
 

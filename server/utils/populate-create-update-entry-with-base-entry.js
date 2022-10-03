@@ -63,6 +63,7 @@ const populateCreateUpdateEntryWithBaseEntry = (
       if (typeof attribute !== 'undefined') {
         const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
         const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
+        // TODO: decide whether add || doesExistInCreateUpdateEntry === null to the condition
         if (typeof doesExistInCreateUpdateEntry === 'undefined') {
           const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
           if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
@@ -95,6 +96,10 @@ const populateCreateUpdateEntryWithBaseEntry = (
 
     } else if (typeof partialBaseEntry === "object") {
       // is object
+      if (partialBaseEntry === null) {
+        partialBaseEntry = {};
+      }
+
       for (const [objectKey, value] of Object.entries(partialBaseEntry)) {
         const attribute = getAttribute(model, objectKey);
         if (attribute === undefined) {
@@ -111,14 +116,18 @@ const populateCreateUpdateEntryWithBaseEntry = (
           if (isRepeatable(attribute)) {
             // TODO: how to handle repeatable components?
             console.log(`repeatable component: ${component}`);
-            doesExistInCreateUpdateEntry = !inCreateUpdateEntry.length;
+            doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length);
           } else {
             doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);
           }
 
           // TODO: double check & update the condition
           if (!!doesExistInCreateUpdateEntry) {
+            const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
             let valueToSet = value;
+            if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+              valueToSet = populatedLocalizedEntryVal;
+            }
             if (isRepeatable(attribute)) {
               valueToSet = value.map((item) => {
                 delete item.id;
@@ -131,26 +140,21 @@ const populateCreateUpdateEntryWithBaseEntry = (
               delete valueToSet.id;
               valueToSet.__component = component;
             }
-            const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
-            if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
-              set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
-            } else {
-              set(populatedEntry, newPrefix, valueToSet);
-            }
-          } else {
-            populateEntry(
-              value,
-              componentModel,
-              objectKey,
-              newPrefix,
-              component,
-              isRepeatable(attribute),
-            );
-          }
+            set(populatedEntry, newPrefix, valueToSet);
+          }// else {
+          populateEntry(
+            value,
+            componentModel,
+            objectKey,
+            newPrefix,
+            component,
+            isRepeatable(attribute),
+          );
+          //}
         } else {
           const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
           const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
-          if (typeof doesExistInCreateUpdateEntry === 'undefined') {
+          if (typeof doesExistInCreateUpdateEntry === 'undefined' || doesExistInCreateUpdateEntry === null) {
             const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
             if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
               set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
