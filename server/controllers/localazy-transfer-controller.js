@@ -15,10 +15,8 @@ const {
 } = require("../utils/iso-locales-utils");
 const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
 const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
-const populateCreateUpdateEntryWithBaseEntry = require("../utils/populate-create-update-entry-with-base-entry");
 const set = require("lodash/set");
 const isEmpty = require("lodash/isEmpty");
-const omitDeep = require("../utils/omit-deep");
 
 module.exports = {
   async upload(ctx) {
