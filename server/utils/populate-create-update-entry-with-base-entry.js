@@ -137,8 +137,10 @@ const populateCreateUpdateEntryWithBaseEntry = (
                 };
               });
             } else {
-              delete valueToSet.id;
-              valueToSet.__component = component;
+              if (!isEmpty(valueToSet)) {
+                delete valueToSet.id;
+                valueToSet.__component = component;
+              }
             }
             set(populatedEntry, newPrefix, valueToSet);
           }// else {
