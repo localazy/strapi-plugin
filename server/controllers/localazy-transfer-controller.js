@@ -15,9 +15,10 @@ const {
 } = require("../utils/iso-locales-utils");
 const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
 const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
+const populateCreateUpdateEntryWithBaseEntry = require("../utils/populate-create-update-entry-with-base-entry");
 const set = require("lodash/set");
-const merge = require("lodash/merge");
 const isEmpty = require("lodash/isEmpty");
+const omitDeep = require("../utils/omit-deep");
 
 module.exports = {
   async upload(ctx) {
@@ -414,6 +415,42 @@ module.exports = {
                     baseEntry,
                     createEntry
                   );
+
+                // * The entry will be created and then updated as the structures differ
+                // * It's one extra database call, but the amount of recursive code to maintain is worth it
+                const localizedEntryId = createdEntry.id;
+                const populate = await StrapiService.getPopulateObject(uid);
+                const localizedEntry = await strapi.entityService.findOne(
+                  uid,
+                  localizedEntryId,
+                  {
+                    populate,
+                  }
+                );
+
+                const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
+                  uid,
+                  createdEntry.id,
+                  {
+                    populate: "deep", // TODO: determine the correct "deep" level
+                  }
+                );
+
+                const updateEntry = parsedLocalazyEntryToUpdateEntry(
+                  strapiContentTypesModels,
+                  translatedModel,
+                  fullyPopulatedLocalizedEntry,
+                  localizedEntry,
+                  baseEntry,
+                  uid
+                );
+
+                await StrapiI18nService.updateLocalizationForAnExistingEntry(
+                  uid,
+                  localizedEntryId,
+                  updateEntry
+                );
+
                 messageReport.push(
                   `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`
                 );
