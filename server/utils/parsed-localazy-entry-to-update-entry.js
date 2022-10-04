@@ -40,7 +40,7 @@ const parsedLocalazyEntryToUpdateEntry = (
   * content transfer setup
   * create function where fields will be assigned based on setup
   */
-  // updateEntry.carousel = baseEntry.carousel;
+
   const filteredBaseEntry = omitDeep(baseEntry, [
     // "__component",
     "locale",
