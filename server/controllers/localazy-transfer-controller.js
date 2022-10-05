@@ -434,13 +434,14 @@ module.exports = {
                   }
                 );
 
-                const updateEntry = parsedLocalazyEntryToUpdateEntry(
+                const updateEntry = await parsedLocalazyEntryToUpdateEntry(
                   strapiContentTypesModels,
                   translatedModel,
                   fullyPopulatedLocalizedEntry,
                   localizedEntry,
                   baseEntry,
-                  uid
+                  uid,
+                  isoStrapi
                 );
 
                 await StrapiI18nService.updateLocalizationForAnExistingEntry(
@@ -487,13 +488,14 @@ module.exports = {
                   }
                 );
 
-                const updateEntry = parsedLocalazyEntryToUpdateEntry(
+                const updateEntry = await parsedLocalazyEntryToUpdateEntry(
                   strapiContentTypesModels,
                   translatedModel,
                   fullyPopulatedLocalizedEntry,
                   localizedEntry,
                   baseEntry,
-                  uid
+                  uid,
+                  isoStrapi
                 );
 
                 const updatedEntry =

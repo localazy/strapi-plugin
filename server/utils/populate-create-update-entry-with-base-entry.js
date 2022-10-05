@@ -12,6 +12,11 @@ const isComponent = (attributeObj) => {
 };
 
 // TODO: move to external function set
+const isRelation = (attributeObj) => {
+  return attributeObj.type === "relation" && attributeObj.target !== "plugin::upload.file";
+}
+
+// TODO: move to external function set
 const isRepeatable = (attributeObj) => {
   return isComponent(attributeObj) && !!attributeObj.repeatable;
 };
@@ -39,16 +44,17 @@ const doesExistInPopulatedLocalizedEntry = (val) => {
   }
 }
 
-const populateCreateUpdateEntryWithBaseEntry = (
+const populateCreateUpdateEntryWithBaseEntry = async (
   models,
   createUpdateEntry,
   baseEntry,
   populatedLocalizedEntry,
-  uid
+  uid,
+  locale
 ) => {
   const populatedEntry = cloneDeep(createUpdateEntry);
 
-  const populateEntry = (
+  const populateEntry = async (
     partialBaseEntry,
     model,
     objectKey = "",
@@ -73,7 +79,7 @@ const populateCreateUpdateEntryWithBaseEntry = (
           }
         } else {
           for (const [objectKey, value] of Object.entries(entry)) {
-            populateEntry(
+            await populateEntry(
               value,
               model,
               objectKey,
@@ -82,10 +88,10 @@ const populateCreateUpdateEntryWithBaseEntry = (
           }
         }
       } else if (isRepeatableComponent) {
-        Object.entries(partialBaseEntry).forEach(([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
+        Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
           // TODO: is this okay?
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
-          populateEntry(
+          await populateEntry(
             partialBaseEntryItem,
             model,
             partialBaseEntryItemIndex,
@@ -144,7 +150,7 @@ const populateCreateUpdateEntryWithBaseEntry = (
             }
             set(populatedEntry, newPrefix, valueToSet);
           }// else {
-          populateEntry(
+          await populateEntry(
             value,
             componentModel,
             objectKey,
@@ -153,6 +159,40 @@ const populateCreateUpdateEntryWithBaseEntry = (
             isRepeatable(attribute),
           );
           //}
+        } else if (isRelation(attribute)) {
+          // check whether is set on populatedEntry
+          const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
+          const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
+          if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+            // skip
+            continue;
+          }
+
+          const isArray = Array.isArray(value);
+          let arraiedValue = value;
+          if (!isArray) {
+            // TODO: should I make a deep copy?
+            arraiedValue = [value];
+          }
+          for (const [index, item] of Object.entries(arraiedValue)) {
+            if (!isEmpty(item)) {
+              const entityId = item.id;
+              if (!!entityId) {
+                const entryWithLocalizations = await strapi.entityService.findOne(attribute.target, entityId, {
+                  populate: ['localizations'],
+                });
+
+                const localizedEntry = entryWithLocalizations.localizations.find((item) => item.locale === locale);
+                if (!!localizedEntry && localizedEntry.id) {
+                  if (!isArray) {
+                    set(populatedEntry, newPrefix, { id: localizedEntry.id });
+                  } else {
+                    set(populatedEntry, `${newPrefix}.${index}`, { id: localizedEntry.id });
+                  }
+                }
+              }
+            }
+          }
         } else {
           const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
           const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
@@ -164,7 +204,7 @@ const populateCreateUpdateEntryWithBaseEntry = (
               set(populatedEntry, newPrefix, value);
             }
           } else {
-            populateEntry(
+            await populateEntry(
               value,
               model,
               objectKey,
@@ -189,7 +229,7 @@ const populateCreateUpdateEntryWithBaseEntry = (
   }
 
   const model = findModel(models, uid);
-  populateEntry(baseEntry, model);
+  await populateEntry(baseEntry, model);
 
   return populatedEntry;
 };

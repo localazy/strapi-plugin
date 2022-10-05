@@ -5,13 +5,14 @@ const parsedLocalazyEntryToCreateEntry = require("./parsed-localazy-entry-to-cre
 const omitDeep = require("./omit-deep");
 const populateCreateUpdateEntryWithBaseEntry = require("./populate-create-update-entry-with-base-entry");
 
-const parsedLocalazyEntryToUpdateEntry = (
+const parsedLocalazyEntryToUpdateEntry = async (
   allModels,
   localazyEntry,
   fullyPopulatedLocalizedEntry,
   currentEntry,
   baseEntry,
-  uid
+  uid,
+  locale
 ) => {
   const createEntry = parsedLocalazyEntryToCreateEntry(
     allModels,
@@ -61,12 +62,13 @@ const parsedLocalazyEntryToUpdateEntry = (
     "updatedBy",
     "publishedAt",
   ]);
-  const populatedEntry = populateCreateUpdateEntryWithBaseEntry(
+  const populatedEntry = await populateCreateUpdateEntryWithBaseEntry(
     allModels,
     updateEntry,
     filteredBaseEntry,
     filteredFullyPopulatedLocalizedEntry,
-    uid
+    uid,
+    locale
   );
 
   // return updateEntry;
