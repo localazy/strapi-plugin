@@ -1,31 +1,16 @@
 "use strict";
 
 const cloneDeep = require("lodash/cloneDeep");
-const findModel = require("./find-model");
 const set = require("lodash/set");
 const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
-
-// TODO: move to external function set
-const isComponent = (attributeObj) => {
-  return attributeObj.type === "component";
-};
-
-// TODO: move to external function set
-const isRelation = (attributeObj) => {
-  return attributeObj.type === "relation" && attributeObj.target !== "plugin::upload.file";
-}
-
-// TODO: move to external function set
-const isRepeatable = (attributeObj) => {
-  return isComponent(attributeObj) && !!attributeObj.repeatable;
-};
-
-// TODO: move to external function set
-const getAttribute = (model, attribute) => {
-  const attributeObj = model.attributes[attribute];
-  return attributeObj;
-};
+const {
+  getAttribute,
+  isComponent,
+  isRepeatable,
+  isRelation,
+  findModel
+} = require("./model-utils");
 
 const doesExistInPopulatedLocalizedEntry = (val) => {
   if (Array.isArray(val)) {
@@ -89,7 +74,6 @@ const populateCreateUpdateEntryWithBaseEntry = async (
         }
       } else if (isRepeatableComponent) {
         Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
-          // TODO: is this okay?
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
           await populateEntry(
             partialBaseEntryItem,
@@ -120,8 +104,6 @@ const populateCreateUpdateEntryWithBaseEntry = async (
           const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
           let doesExistInCreateUpdateEntry;
           if (isRepeatable(attribute)) {
-            // TODO: how to handle repeatable components?
-            console.log(`repeatable component: ${component}`);
             doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length);
           } else {
             doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);

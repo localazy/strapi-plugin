@@ -34,16 +34,8 @@ const parsedLocalazyEntryToUpdateEntry = async (
     "publishedAt",
   ]);
 
-  /* TODO:
-  * need models
-  * updateEntry
-  * baseEntry
-  * content transfer setup
-  * create function where fields will be assigned based on setup
-  */
-
   const filteredBaseEntry = omitDeep(baseEntry, [
-    // "__component",
+    // "__component", // do not omit the __component
     "locale",
     "localizations",
     "createdAt",
@@ -53,7 +45,7 @@ const parsedLocalazyEntryToUpdateEntry = async (
     "publishedAt",
   ]);
   const filteredFullyPopulatedLocalizedEntry = omitDeep(fullyPopulatedLocalizedEntry, [
-    // "__component",
+    // "__component", // do not omit the __component
     "locale",
     "localizations",
     "createdAt",
