@@ -1,6 +1,12 @@
 "use strict";
 
+const isEmpty = require("lodash/isEmpty");
+
 const getAttribute = (model, attribute) => {
+  if (isEmpty(model)) {
+    return undefined;
+  }
+
   const attributeObj = model.attributes[attribute];
   return attributeObj;
 };
