@@ -13,8 +13,6 @@ const {
   isoLocalazyToStrapi,
   isoStrapiToLocalazy,
 } = require("../utils/iso-locales-utils");
-const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
-const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
 const set = require("lodash/set");
 const isEmpty = require("lodash/isEmpty");
 
@@ -159,7 +157,9 @@ module.exports = {
     const messageReport = [];
 
     // Strapi service
-    const StrapiService = strapi.plugin("localazy").service("strapiService");
+    const StrapiService = strapi
+      .plugin("localazy")
+      .service("strapiService");
 
     // Strapi i18n Service
     const StrapiI18nService = strapi
@@ -175,7 +175,11 @@ module.exports = {
     const LocalazyDownloadService = strapi
       .plugin("localazy")
       .service("localazyDownloadService");
-    // get content transfer setup
+    const strapiLocalazyI18nService = strapi
+      .plugin("localazy")
+      .service("strapiLocalazyI18nService");
+
+    // TODO: work with the model later when UI proposal is ready
     const contentTransferSetup = await strapi
       .plugin("localazy")
       .service("pluginSettingsService")
@@ -363,17 +367,9 @@ module.exports = {
             /**
              * Get original source language entry
              */
-            // const populate = await StrapiService.getPopulateObject(uid);
-            // const baseEntryDeep = await strapi.entityService.findOne(uid, id, {
-            //   populate: "deep", // TODO: determine the correct "deep" level
-            // });
             const baseEntry = await strapi.entityService.findOne(uid, id, {
-              populate: "deep", // TODO: determine the correct "deep" level
+              populate: "deep",
             });
-            // let baseEntry = await strapi.entityService.findOne(uid, id, {
-            //   populate: "*",
-            // });
-            // baseEntry = merge(baseEntry, baseEntryDeep);
 
             if (isEmpty(baseEntry)) {
               const message = `Source language entry ${uid}[${id}] does not exist anymore, skipping...`;
@@ -399,55 +395,13 @@ module.exports = {
             if (!baseEntryCurrentLanguageLocalizationInfo) {
               // create new entry
               try {
-                const createEntry = parsedLocalazyEntryToCreateEntry(
+                const createdEntry = await strapiLocalazyI18nService.createEntry(
+                  ctx,
+                  uid,
                   strapiContentTypesModels,
                   translatedModel,
                   baseEntry,
-                  uid,
-                  isoStrapi
-                );
-                const createdEntry =
-                  await StrapiI18nService.createLocalizationForAnExistingEntry(
-                    ctx,
-                    uid,
-                    baseEntry,
-                    createEntry
-                  );
-
-                // * The entry will be created and then updated as the structures differ
-                // * It's one extra database call, but the amount of recursive code to maintain is worth it
-                const localizedEntryId = createdEntry.id;
-                const populate = await StrapiService.getPopulateObject(uid);
-                const localizedEntry = await strapi.entityService.findOne(
-                  uid,
-                  localizedEntryId,
-                  {
-                    populate,
-                  }
-                );
-
-                const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
-                  uid,
-                  createdEntry.id,
-                  {
-                    populate: "deep", // TODO: determine the correct "deep" level
-                  }
-                );
-
-                const updateEntry = await parsedLocalazyEntryToUpdateEntry(
-                  strapiContentTypesModels,
-                  translatedModel,
-                  fullyPopulatedLocalizedEntry,
-                  localizedEntry,
-                  baseEntry,
-                  uid,
-                  isoStrapi
-                );
-
-                await StrapiI18nService.updateLocalizationForAnExistingEntry(
-                  uid,
-                  localizedEntryId,
-                  updateEntry
+                  isoStrapi,
                 );
 
                 messageReport.push(
@@ -465,45 +419,16 @@ module.exports = {
               try {
                 const localizedEntryId =
                   baseEntryCurrentLanguageLocalizationInfo.id;
-                const populate = await StrapiService.getPopulateObject(uid);
-                const localizedEntry = await strapi.entityService.findOne(
-                  uid,
-                  localizedEntryId,
-                  {
-                    populate,
-                  }
-                );
-                // const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
-                //   uid,
-                //   localizedEntryId,
-                //   {
-                //     populate: "*",
-                //   }
-                // );
-                const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
-                  uid,
-                  localizedEntryId,
-                  {
-                    populate: "deep", // TODO: determine the correct "deep" level
-                  }
-                );
 
-                const updateEntry = await parsedLocalazyEntryToUpdateEntry(
+                const updatedEntry = await strapiLocalazyI18nService.updateEntry(
+                  uid,
+                  localizedEntryId,
                   strapiContentTypesModels,
                   translatedModel,
-                  fullyPopulatedLocalizedEntry,
-                  localizedEntry,
                   baseEntry,
-                  uid,
-                  isoStrapi
+                  isoStrapi,
                 );
 
-                const updatedEntry =
-                  await StrapiI18nService.updateLocalizationForAnExistingEntry(
-                    uid,
-                    localizedEntryId,
-                    updateEntry
-                  );
                 messageReport.push(
                   `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`
                 );

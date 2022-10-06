@@ -80,7 +80,7 @@ module.exports = ({ strapi }) => ({
       // this might not be localizable (then method is missing, skip)
       const contentTypeController = strapi.controller(uid);
       const newLocalizationCtx = { ...ctx };
-      newLocalizationCtx.is = () => false; // else throws an error in createLocalization
+      newLocalizationCtx.is = () => false; // ! else throws an error in createLocalization
       newLocalizationCtx.params.id = baseEntry.id;
 
       const newEntryLocale = newEntry.locale;
@@ -88,7 +88,7 @@ module.exports = ({ strapi }) => ({
         "locale",
         "id",
         "createdAt",
-        "publishedAt", // sets as draft (no timestamp)
+        "publishedAt", // * sets as draft (no timestamp)
         "updatedAt",
       ]);
       filteredNewEntry.locale = newEntryLocale;
