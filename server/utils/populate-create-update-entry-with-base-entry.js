@@ -29,6 +29,10 @@ const doesExistInPopulatedLocalizedEntry = (val) => {
   }
 }
 
+const getNewPrefix = (objectKey, prefix) => {
+  return prefix ? `${prefix}.${objectKey}` : objectKey;
+};
+
 const populateCreateUpdateEntryWithBaseEntry = async (
   models,
   createUpdateEntry,
@@ -52,10 +56,11 @@ const populateCreateUpdateEntryWithBaseEntry = async (
       const attribute = getAttribute(model, objectKey);
 
       if (typeof attribute !== 'undefined') {
-        const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
-        const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
-        // TODO: decide whether add || doesExistInCreateUpdateEntry === null to the condition
-        if (typeof doesExistInCreateUpdateEntry === 'undefined') {
+        const newPrefix = getNewPrefix(objectKey, prefix);
+        const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
+        // TODO: decide whether add || inCreateUpdateEntry === null to the condition
+        const isMissingInCreateUpdateEntry = !!(typeof inCreateUpdateEntry === 'undefined');
+        if (isMissingInCreateUpdateEntry) {
           const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
           if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
             set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
@@ -92,25 +97,24 @@ const populateCreateUpdateEntryWithBaseEntry = async (
 
       for (const [objectKey, value] of Object.entries(partialBaseEntry)) {
         const attribute = getAttribute(model, objectKey);
-        if (attribute === undefined) {
-          // logicaly don't anything, skip...
+        if (typeof attribute === 'undefined') {
+          // skip...
           continue;
         } else if (isComponent(attribute)) {
           // is component
           const component = attribute.component;
           const componentModel = findModel(models, component);
 
-          const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
+          const newPrefix = getNewPrefix(objectKey, prefix);
           const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
-          let doesExistInCreateUpdateEntry;
+          let isMissingInCreateUpdateEntry;
           if (isRepeatable(attribute)) {
-            doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length);
+            isMissingInCreateUpdateEntry = !!((typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length));
           } else {
-            doesExistInCreateUpdateEntry = (typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);
+            isMissingInCreateUpdateEntry = !!(typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);
           }
 
-          // TODO: double check & update the condition
-          if (!!doesExistInCreateUpdateEntry) {
+          if (isMissingInCreateUpdateEntry) {
             const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
             let valueToSet = value;
             if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
@@ -131,7 +135,7 @@ const populateCreateUpdateEntryWithBaseEntry = async (
               }
             }
             set(populatedEntry, newPrefix, valueToSet);
-          }// else {
+          }
           await populateEntry(
             value,
             componentModel,
@@ -140,20 +144,17 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             component,
             isRepeatable(attribute),
           );
-          //}
         } else if (isRelation(attribute)) {
-          // check whether is set on populatedEntry
-          const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
+          const newPrefix = getNewPrefix(objectKey, prefix);
           const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
           if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
-            // skip
+            // skip...
             continue;
           }
 
           const isArray = Array.isArray(value);
           let arraiedValue = value;
           if (!isArray) {
-            // TODO: should I make a deep copy?
             arraiedValue = [value];
           }
           for (const [index, item] of Object.entries(arraiedValue)) {
@@ -176,9 +177,10 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             }
           }
         } else {
-          const newPrefix = prefix ? `${prefix}.${objectKey}` : objectKey;
-          const doesExistInCreateUpdateEntry = get(createUpdateEntry, newPrefix);
-          if (typeof doesExistInCreateUpdateEntry === 'undefined' || doesExistInCreateUpdateEntry === null) {
+          const newPrefix = getNewPrefix(objectKey, prefix);
+          const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
+          const isMissingInCreateUpdateEntry = !!(typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);
+          if (isMissingInCreateUpdateEntry) {
             const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
             if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
               set(populatedEntry, newPrefix, populatedLocalizedEntryVal);
@@ -199,14 +201,15 @@ const populateCreateUpdateEntryWithBaseEntry = async (
       // is primitive/literal
       const attribute = getAttribute(model, objectKey);
       if (typeof attribute !== 'undefined') {
-        const doesExistInCreateUpdateEntry = get(createUpdateEntry, prefix);
-        // TODO: double check & update the condition
-        if (typeof doesExistInCreateUpdateEntry === 'undefined' || doesExistInCreateUpdateEntry === null) {
+        const inCreateUpdateEntry = get(createUpdateEntry, prefix);
+        const isMissingInCreateUpdateEntry = !!(typeof inCreateUpdateEntry === 'undefined' || inCreateUpdateEntry === null);
+        if (isMissingInCreateUpdateEntry) {
           set(populatedEntry, prefix, partialBaseEntry);
         }
       }
     } else {
-      // ! TODO: something unknown?
+      // ? TODO: something unknown
+      console.info(`Unknown type processed: ${partialBaseEntry}`);
     }
   }
 
