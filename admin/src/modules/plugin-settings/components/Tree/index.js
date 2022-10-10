@@ -30,6 +30,7 @@ function Tree(props) {
 
             const hasTruthyValue = Object.values(flattened).some(v => v);
             const hasFalsyValue = Object.values(flattened).some(v => !v && v !== null);
+            const hasAllNullValue = Object.values(flattened).every(v => v === null);
 
             if (key === "__model__") {
               return false;
@@ -45,6 +46,7 @@ function Tree(props) {
               >
                 {isSubbranchObject && (
                   <Checkbox
+                    disabled={hasAllNullValue}
                     checked={hasTruthyValue && !hasFalsyValue}
                     indeterminate={hasTruthyValue && hasFalsyValue}
                     onChange={() => onTreeItemClick(flattenedKeys, hasTruthyValue && !hasFalsyValue)}
