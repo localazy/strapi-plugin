@@ -1,5 +1,7 @@
 "use strict";
 
+const SUPPORTED_CONTENT_TYPE_FIELDS = require("../models/supported-content-type-fields");
+
 const getModelTree = (attributes, models) => {
   const currentModelTree = {};
   for (const attribute in attributes) {
@@ -12,7 +14,7 @@ const getModelTree = (attributes, models) => {
         ...getModelTree(nestedModel.__schema__.attributes, models),
       };
     } else if (
-      ["string", "text", "richtext"].includes(attributes[attribute].type)
+      SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
     ) {
       currentModelTree[attribute] = false;
     } else {

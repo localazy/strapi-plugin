@@ -1,3 +1,5 @@
+import SUPPORTED_CONTENT_TYPE_FIELDS from "../../@common/models/supported-content-type-fields";
+
 /**
  * Supported kinds of models are expected by the function, needs to be checked before calling the function
  */
@@ -27,7 +29,7 @@ const getModelsTree = (allModels, localizableModels = []) => {
           ),
         };
       } else if (
-        ["string", "text", "richtext"].includes(attributes[attribute].type)
+        SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
       ) {
         // field might not be localizable
         if (isComponentAttributes) {
