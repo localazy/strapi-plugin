@@ -70,7 +70,7 @@ it("should return a tree all all models", () => {
       up_users: {
         __model__: true,
         username: false,
-        email: null,
+        email: false,
         provider: false,
         password: null,
         resetPasswordToken: false,
