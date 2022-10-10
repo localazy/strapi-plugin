@@ -5,6 +5,19 @@ const findSetupModelByCollectionName = (models, collectionName) => {
   return models.find((model) => Object.keys(model)[0] === collectionName);
 };
 
+const findSetupModelByCollectionUid = (
+  contentTransferSetup,
+  strapiContentTypesModels,
+  collectionUid
+) => {
+  const currentModel = strapiContentTypesModels.find(
+    (model) => model.uid === collectionUid
+  );
+  const modelContentTransferSetup = contentTransferSetup.setup
+    .find((model) => Object.keys(model)[0] === currentModel.collectionName);
+  return modelContentTransferSetup[currentModel.collectionName];
+}
+
 const getCollectionsNames = (setup) => {
   return getMainKeysOfNestedArrayObjects(setup);
 };
@@ -33,6 +46,7 @@ const getPickPaths = (transferSetupModelProps) => {
 
 module.exports = {
   findSetupModelByCollectionName,
+  findSetupModelByCollectionUid,
   getCollectionsNames,
   isCollectionTransferEnabled,
   getPickPaths,

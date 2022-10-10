@@ -4,6 +4,7 @@ const flattenObject = require("../utils/flatten-object");
 const {
   getCollectionsNames,
   findSetupModelByCollectionName,
+  findSetupModelByCollectionUid,
   isCollectionTransferEnabled,
   getPickPaths,
 } = require("../utils/transfer-setup-utils");
@@ -13,7 +14,9 @@ const {
   isoLocalazyToStrapi,
   isoStrapiToLocalazy,
 } = require("../utils/iso-locales-utils");
+const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
+const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 
 module.exports = {
@@ -179,7 +182,6 @@ module.exports = {
       .plugin("localazy")
       .service("strapiLocalazyI18nService");
 
-    // TODO: work with the model later when UI proposal is ready
     const contentTransferSetup = await strapi
       .plugin("localazy")
       .service("pluginSettingsService")
@@ -316,6 +318,7 @@ module.exports = {
      * Parse Localazy content
      */
     const parsedLocalazyContent = {};
+    const strapiContentTypesModels = await StrapiService.getModels();
     for (const [isoLocalazy, keys] of Object.entries(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
@@ -330,21 +333,29 @@ module.exports = {
         const value = localazyEntry.value;
 
         const parsedKey = StrapiI18nService.parseLocalazyKey(key);
-        const setKey = [
-          isoStrapi,
-          parsedKey.uid,
-          parsedKey.id,
-          ...parsedKey.rest,
-        ];
 
-        set(parsedLocalazyContent, setKey, value);
+        const modelContentTransferSetup = findSetupModelByCollectionUid(
+          contentTransferSetup,
+          strapiContentTypesModels,
+          parsedKey.uid
+        );
+
+        if (shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
+          const setKey = [
+            isoStrapi,
+            parsedKey.uid,
+            parsedKey.id,
+            ...parsedKey.rest,
+          ];
+
+          set(parsedLocalazyContent, setKey, value);
+        }
       }
     }
 
     /**
      * Iterate over parsed Localazy content and insert/update content in Strapi
      */
-    const strapiContentTypesModels = await StrapiService.getModels();
     for (const [isoStrapi, contentTypes] of Object.entries(
       parsedLocalazyContent
     )) {
