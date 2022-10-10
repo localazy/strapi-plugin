@@ -16,7 +16,6 @@ const {
 } = require("../utils/iso-locales-utils");
 const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
-const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 
 module.exports = {
