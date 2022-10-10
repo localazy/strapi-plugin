@@ -12,7 +12,7 @@ const {
 } = require("../../tests/fixtures/parsed-localazy-entry-to-update-entry");
 
 describe("parsed-localazy-entry-to-update-entry.js", () => {
-  it("should return transformed book entry to strapi update entry structure", async () => {
+  it("should return transformed 'cookbook' entry to strapi update entry structure", async () => {
     // EXECUTE
     const result = await parsedLocalazyEntryToUpdateEntry(
       allModels,
