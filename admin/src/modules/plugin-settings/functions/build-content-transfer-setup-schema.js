@@ -1,6 +1,6 @@
 import set from "lodash-es/set";
 import get from "lodash-es/get";
-import deepKeys from "deep-keys";
+import deepKeys from "@david-vaclavek/deep-keys";
 import sortByModelName from "../../@common/utils/sort-by-model-name";
 import arrayOfModelsToObject from "../utils/array-of-models-to-object";
 import findModelValueByKey from "../utils/find-model-value-by-key";

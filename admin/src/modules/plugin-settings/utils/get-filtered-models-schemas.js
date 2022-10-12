@@ -1,10 +1,4 @@
-import baseSupportedContentTypeFields from "../../@common/models/supported-content-type-fields";
-
-const SUPPORTED_CONTENT_TYPE_FIELDS = [
-  ...baseSupportedContentTypeFields,
-  "component",
-  // "relation", // relation cannot be supported field type
-];
+import SUPPORTED_CONTENT_TYPE_FIELDS from "../../@common/models/supported-content-type-fields";
 
 export default (models) => {
   if (!models) {
