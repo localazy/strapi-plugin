@@ -111,6 +111,11 @@ function ContentTransferSetup() {
 
       const newState = cloneDeep(prevState);
       keys.forEach((key) => {
+        // * if there's a "__component__" in the key; skip
+        if (key.includes("__component__")) {
+          return;
+        }
+
         const isEditable = get(model, key) !== null;
 
         if (isEditable) {

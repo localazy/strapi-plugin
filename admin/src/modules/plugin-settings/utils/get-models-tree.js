@@ -41,7 +41,10 @@ const getModelsTree = (allModels, localizableModels = []) => {
               ? attributes[attribute].pluginOptions?.i18n?.localized || false
               : isComponentAttributesObjectTranslatable
           );
-          currentModelTree[attribute].push(modelTree);
+          currentModelTree[attribute].push({
+            "__component__": c,
+            ...modelTree,
+          });
         });
       } else if (SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)) {
         // field might not be localizable
