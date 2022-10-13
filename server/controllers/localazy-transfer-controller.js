@@ -17,6 +17,7 @@ const {
 const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
 const isEmpty = require("lodash/isEmpty");
+const omitDeep = require("../utils/omit-deep");
 
 module.exports = {
   async upload(ctx) {
@@ -86,7 +87,8 @@ module.exports = {
         }
 
         // get only enabled fields paths
-        const pickPaths = getPickPaths(transferSetupModel[collectionName]);
+        const currentTransferSetupModel = transferSetupModel[collectionName];
+        const pickPaths = getPickPaths(currentTransferSetupModel);
         if (!pickPaths.length) {
           const message = `No fields for collection ${collectionName} transfer are enabled.`;
           messageReport.push(message);
@@ -97,11 +99,22 @@ module.exports = {
           (pickPath) => `${modelUid}.${pickPath}`
         );
 
-        const populate = await StrapiService.getPopulateObject(modelUid);
+        // ? TODO: can populate: "deep" be used here
+        // const populate = await StrapiService.getPopulateObject(modelUid);
 
         let entries = await strapi.entityService.findMany(modelUid, {
-          populate,
+          populate: "deep",
         });
+        entries = omitDeep(entries, [
+          // "__component",
+          "locale",
+          "localizations",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "publishedAt",
+        ]);
 
         if (!entries) {
           strapi.log.info(`No entries found for model ${modelUid}`);
@@ -116,8 +129,8 @@ module.exports = {
           const flatten = flattenObject({
             [modelUid]: entry,
           });
-          // get only enabled fields
-          const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
+          // get only enabled fields; "__component" will be filtered out inside of the function
+          const pickedFlatten = pickEntries(flatten, pickPathsWithUid, currentTransferSetupModel);
 
           flattenContent = {
             ...flattenContent,

@@ -1,11 +1,77 @@
 "use strict";
 
-const pickEntries = (flatten, pickPaths) => {
+const map = require("lodash/map");
+const pickDeep = require("./pick-deep");
+const flattenObject = require("./flatten-object");
+
+const isDynamicZoneKey = (key) => {
+  const matches = key.match(/\[\d+\]+/g);
+  return matches.length === 2;
+};
+
+const getDynamicZoneEntryId = (key) => {
+  if (!isDynamicZoneKey(key)) {
+    return undefined;
+  }
+
+  const matches = key.match(/\[\d+\]+/g);
+  // remove square brackets
+  const id = matches[1].replace(/[\[\]']+/g, '');
+  return id;
+}
+
+const doesPickPathsIncludeTheComponent = (pickPaths, dzParameterKey) => {
+  return pickPaths.some((pp) => pp.includes(dzParameterKey));
+}
+
+const pickEntries = (flatten, pickPaths, transferSetupModel) => {
+  // * 1. dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
+  // * 2. everything in flattened that contains "__component" and having TWO ids in square brackets is considered a DZ
+
+  // acording to 2., do the map of (flatten) dynamic entry id -> DZ component
+  const dzEntryIdComponentMap = {};
+  const flattenComponentProps = Object.fromEntries(Object.entries(flatten).filter(([key]) => key.includes('__component')));
+
+  const pickedDeep = pickDeep(transferSetupModel, ["__component__"]);
+  const flattenedPickedDeep = flattenObject(pickedDeep);
+  map(flattenedPickedDeep, (v, i) => {
+    const newI = i.replace(".__component__", "");
+    flattenedPickedDeep[newI] = v;
+    delete flattenedPickedDeep[i];
+  });
+
+  Object.keys(flattenComponentProps).map((key) => {
+    if (!isDynamicZoneKey(key)) {
+      return;
+    }
+
+    const entryId = getDynamicZoneEntryId(key);
+    dzEntryIdComponentMap[entryId] = {
+      component: flattenComponentProps[key],
+      key: Object.keys(flattenedPickedDeep).find((fpdk) => flattenedPickedDeep[fpdk] === flattenComponentProps[key]),
+    };
+  });
+
   const pickedEntries = {};
-  Object.keys(flatten).forEach((key) => {
+  const mappedPickPaths = pickPaths.map((pickPath) => pickPath.replace(/\[\d+\]/g, ""));
+
+  // filter out "__component"
+  const filteredFlatten = Object.fromEntries(Object.entries(flatten).filter(([key]) => !key.includes('__component')));
+  Object.keys(filteredFlatten).forEach((key) => {
+    // decide whether it is a dynamic zone
+    // handle dynamic zones, in case of similarly-named fields across more components
+    // ? TODO: test whether it works as expected
+    if (isDynamicZoneKey(key)) {
+      const dzEntryId = getDynamicZoneEntryId(key);
+      const dzParameterKey = dzEntryIdComponentMap[dzEntryId].key;
+
+      if (!doesPickPathsIncludeTheComponent(pickPaths, dzParameterKey)) {
+        return;
+      }
+    }
+
     const filteredKey = key.replace(/\[\d+\]/g, "");
-    // const filteredKey = key.replace(/\d|[[\]]+/g, "");
-    if (pickPaths.includes(filteredKey)) {
+    if (mappedPickPaths.includes(filteredKey)) {
       pickedEntries[key] = flatten[key];
     }
   });
