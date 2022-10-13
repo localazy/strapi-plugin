@@ -1,9 +1,9 @@
+import baseSupportedContentTypeFields from "../../@common/models/supported-content-type-fields";
+
 const SUPPORTED_CONTENT_TYPE_FIELDS = [
-  "string",
-  "text",
-  "richtext",
-  // "relation", // relation cannot be supported field type
+  ...baseSupportedContentTypeFields,
   "component",
+  // "relation", // relation cannot be supported field type
 ];
 
 export default (models) => {

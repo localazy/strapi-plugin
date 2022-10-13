@@ -4,6 +4,7 @@ const flattenObject = require("../utils/flatten-object");
 const {
   getCollectionsNames,
   findSetupModelByCollectionName,
+  findSetupModelByCollectionUid,
   isCollectionTransferEnabled,
   getPickPaths,
 } = require("../utils/transfer-setup-utils");
@@ -13,10 +14,8 @@ const {
   isoLocalazyToStrapi,
   isoStrapiToLocalazy,
 } = require("../utils/iso-locales-utils");
-const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
-const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
+const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
-const merge = require("lodash/merge");
 const isEmpty = require("lodash/isEmpty");
 
 module.exports = {
@@ -160,7 +159,9 @@ module.exports = {
     const messageReport = [];
 
     // Strapi service
-    const StrapiService = strapi.plugin("localazy").service("strapiService");
+    const StrapiService = strapi
+      .plugin("localazy")
+      .service("strapiService");
 
     // Strapi i18n Service
     const StrapiI18nService = strapi
@@ -176,6 +177,14 @@ module.exports = {
     const LocalazyDownloadService = strapi
       .plugin("localazy")
       .service("localazyDownloadService");
+    const strapiLocalazyI18nService = strapi
+      .plugin("localazy")
+      .service("strapiLocalazyI18nService");
+
+    const contentTransferSetup = await strapi
+      .plugin("localazy")
+      .service("pluginSettingsService")
+      .getContentTransferSetup();
 
     const user = await LocalazyUserService.getUser();
 
@@ -308,6 +317,7 @@ module.exports = {
      * Parse Localazy content
      */
     const parsedLocalazyContent = {};
+    const strapiContentTypesModels = await StrapiService.getModels();
     for (const [isoLocalazy, keys] of Object.entries(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
@@ -322,21 +332,29 @@ module.exports = {
         const value = localazyEntry.value;
 
         const parsedKey = StrapiI18nService.parseLocalazyKey(key);
-        const setKey = [
-          isoStrapi,
-          parsedKey.uid,
-          parsedKey.id,
-          ...parsedKey.rest,
-        ];
 
-        set(parsedLocalazyContent, setKey, value);
+        const modelContentTransferSetup = findSetupModelByCollectionUid(
+          contentTransferSetup,
+          strapiContentTypesModels,
+          parsedKey.uid
+        );
+
+        if (shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
+          const setKey = [
+            isoStrapi,
+            parsedKey.uid,
+            parsedKey.id,
+            ...parsedKey.rest,
+          ];
+
+          set(parsedLocalazyContent, setKey, value);
+        }
       }
     }
 
     /**
      * Iterate over parsed Localazy content and insert/update content in Strapi
      */
-    const strapiContentTypesModels = await StrapiService.getModels();
     for (const [isoStrapi, contentTypes] of Object.entries(
       parsedLocalazyContent
     )) {
@@ -359,14 +377,9 @@ module.exports = {
             /**
              * Get original source language entry
              */
-            const populate = await StrapiService.getPopulateObject(uid);
-            const baseEntryDeep = await strapi.entityService.findOne(uid, id, {
-              populate,
+            const baseEntry = await strapi.entityService.findOne(uid, id, {
+              populate: "deep",
             });
-            let baseEntry = await strapi.entityService.findOne(uid, id, {
-              populate: "*",
-            });
-            baseEntry = merge(baseEntry, baseEntryDeep);
 
             if (isEmpty(baseEntry)) {
               const message = `Source language entry ${uid}[${id}] does not exist anymore, skipping...`;
@@ -392,20 +405,15 @@ module.exports = {
             if (!baseEntryCurrentLanguageLocalizationInfo) {
               // create new entry
               try {
-                const createEntry = parsedLocalazyEntryToCreateEntry(
+                const createdEntry = await strapiLocalazyI18nService.createEntry(
+                  ctx,
+                  uid,
                   strapiContentTypesModels,
                   translatedModel,
                   baseEntry,
-                  uid,
-                  isoStrapi
+                  isoStrapi,
                 );
-                const createdEntry =
-                  await StrapiI18nService.createLocalizationForAnExistingEntry(
-                    ctx,
-                    uid,
-                    baseEntry,
-                    createEntry
-                  );
+
                 messageReport.push(
                   `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`
                 );
@@ -421,29 +429,16 @@ module.exports = {
               try {
                 const localizedEntryId =
                   baseEntryCurrentLanguageLocalizationInfo.id;
-                const populate = await StrapiService.getPopulateObject(uid);
-                const localizedEntry = await strapi.entityService.findOne(
+
+                const updatedEntry = await strapiLocalazyI18nService.updateEntry(
                   uid,
                   localizedEntryId,
-                  {
-                    populate,
-                  }
-                );
-
-                const updateEntry = parsedLocalazyEntryToUpdateEntry(
                   strapiContentTypesModels,
                   translatedModel,
-                  localizedEntry,
                   baseEntry,
-                  uid
+                  isoStrapi,
                 );
 
-                const updatedEntry =
-                  await StrapiI18nService.updateLocalizationForAnExistingEntry(
-                    uid,
-                    localizedEntryId,
-                    updateEntry
-                  );
                 messageReport.push(
                   `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`
                 );

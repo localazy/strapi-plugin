@@ -1,3 +1,0 @@
-module.exports =
-  // eslint-disable-next-line quotes
-  '{"title":"Plná restaurace","description":"S nějakým skvělým popisem","recipes":[null,null,{"name":"Hovězí vývar","ingredients":[null,null,null,null,{"name":"Hovězí"},{"name":"Voda"}]},{"name":"Rajčatová polévka","ingredients":[null,null,{"name":"rajče"},{"name":"Polévka"}],"variants":[null,null,null,null,{"name":"Červená, žlutá, zelená"}]},{"name":"Guláš","ingredients":[null,null,null,null,null,null,{"name":"Hovězí maso"},{"name":"Pepř"},{"name":"pepř, koření"},{"name":"Voda"}]}],"descs":[null,null,null,{"rich_description":"Další restaurace desc","history":"Est. 2022, se sídlem v NY, NY","excerpt":"Est. 2022","test_variants":[null,null,null,null,null,{"name":"nic takového..."}]}]}';

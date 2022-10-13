@@ -3,6 +3,7 @@
 const { isoLocalazyToStrapi } = require("../utils/iso-locales-utils.js");
 const intlDisplayName = require("../utils/intl-display-name.js");
 const merge = require("lodash/merge");
+const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
 
 module.exports = ({ strapi }) => ({
@@ -79,7 +80,7 @@ module.exports = ({ strapi }) => ({
       // this might not be localizable (then method is missing, skip)
       const contentTypeController = strapi.controller(uid);
       const newLocalizationCtx = { ...ctx };
-      newLocalizationCtx.is = () => false; // else throws an error in createLocalization
+      newLocalizationCtx.is = () => false; // ! else throws an error in createLocalization
       newLocalizationCtx.params.id = baseEntry.id;
 
       const newEntryLocale = newEntry.locale;
@@ -87,7 +88,7 @@ module.exports = ({ strapi }) => ({
         "locale",
         "id",
         "createdAt",
-        "publishedAt", // sets as draft (no timestamp)
+        "publishedAt", // * sets as draft (no timestamp)
         "updatedAt",
       ]);
       filteredNewEntry.locale = newEntryLocale;
@@ -101,7 +102,7 @@ module.exports = ({ strapi }) => ({
         baseEntry.id,
         newEntryLocale
       );
-      const mergedEntry = merge(baseEntry, insertedEntry);
+      const mergedEntry = merge(cloneDeep(baseEntry), insertedEntry);
 
       return mergedEntry;
     } catch (e) {
