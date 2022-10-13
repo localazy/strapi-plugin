@@ -4,13 +4,22 @@ const map = require("lodash/map");
 const pickDeep = require("./pick-deep");
 const flattenObject = require("./flatten-object");
 
-const isDynamicZoneKey = (key) => {
+const isDynamicZoneKey = (key, transferSetupModel) => {
   const matches = key.match(/\[\d+\]+/g);
-  return matches.length === 2;
+
+  if (matches.length !== 2) {
+    return false;
+  }
+
+  const dynamicPropertyEntryIdWithSquareBrackets = matches[1];
+  const dynamicPropertyNamePart = key.split(".").find((s) => s.includes(dynamicPropertyEntryIdWithSquareBrackets));
+  const dynamicPropertyName = dynamicPropertyNamePart.replace(dynamicPropertyEntryIdWithSquareBrackets, "");
+
+  return Array.isArray(transferSetupModel[dynamicPropertyName]);
 };
 
-const getDynamicZoneEntryId = (key) => {
-  if (!isDynamicZoneKey(key)) {
+const getDynamicZoneEntryId = (key, transferSetupModel) => {
+  if (!isDynamicZoneKey(key, transferSetupModel)) {
     return undefined;
   }
 
@@ -28,7 +37,7 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
   // * 1. dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
   // * 2. everything in flattened that contains "__component" and having TWO ids in square brackets is considered a DZ
 
-  // acording to 2., do the map of (flatten) dynamic entry id -> DZ component
+  // according to 2., do the map of (flatten) dynamic entry id -> DZ component
   const dzEntryIdComponentMap = {};
   const flattenComponentProps = Object.fromEntries(Object.entries(flatten).filter(([key]) => key.includes('__component')));
 
@@ -41,11 +50,11 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
   });
 
   Object.keys(flattenComponentProps).map((key) => {
-    if (!isDynamicZoneKey(key)) {
+    if (!isDynamicZoneKey(key, transferSetupModel)) {
       return;
     }
 
-    const entryId = getDynamicZoneEntryId(key);
+    const entryId = getDynamicZoneEntryId(key, transferSetupModel);
     dzEntryIdComponentMap[entryId] = {
       component: flattenComponentProps[key],
       key: Object.keys(flattenedPickedDeep).find((fpdk) => flattenedPickedDeep[fpdk] === flattenComponentProps[key]),
@@ -61,8 +70,8 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
     // decide whether it is a dynamic zone
     // handle dynamic zones, in case of similarly-named fields across more components
     // ? TODO: test whether it works as expected
-    if (isDynamicZoneKey(key)) {
-      const dzEntryId = getDynamicZoneEntryId(key);
+    if (isDynamicZoneKey(key, transferSetupModel)) {
+      const dzEntryId = getDynamicZoneEntryId(key, transferSetupModel);
       const dzParameterKey = dzEntryIdComponentMap[dzEntryId].key;
 
       if (!doesPickPathsIncludeTheComponent(pickPaths, dzParameterKey)) {
