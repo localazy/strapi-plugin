@@ -7,7 +7,7 @@ const flattenObject = require("./flatten-object");
 const isDynamicZoneKey = (key, transferSetupModel) => {
   const matches = key.match(/\[\d+\]+/g);
 
-  if (matches.length !== 2) {
+  if (matches.length < 2) {
     return false;
   }
 
@@ -70,7 +70,8 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
     // decide whether it is a dynamic zone
     // handle dynamic zones, in case of similarly-named fields across more components
     // ? TODO: test whether it works as expected
-    if (isDynamicZoneKey(key, transferSetupModel)) {
+    const isDynamicZone = isDynamicZoneKey(key, transferSetupModel);
+    if (isDynamicZone) {
       const dzEntryId = getDynamicZoneEntryId(key, transferSetupModel);
       const dzParameterKey = dzEntryIdComponentMap[dzEntryId].key;
 
@@ -81,7 +82,19 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
 
     const filteredKey = key.replace(/\[\d+\]/g, "");
     if (mappedPickPaths.includes(filteredKey)) {
-      pickedEntries[key] = flatten[key];
+      if (isDynamicZone) {
+        const dzEntryId = getDynamicZoneEntryId(key, transferSetupModel);
+        const dzParameterKey = dzEntryIdComponentMap[dzEntryId].key;
+
+        const dzParameterName = dzParameterKey.substring(0, dzParameterKey.indexOf('['));
+        const toBeReplaced = `${dzParameterName}[${dzEntryId}]`;
+        const dzParameterComponent = dzEntryIdComponentMap[dzEntryId].component;
+        const componentAddition = `${dzParameterName}[${dzEntryId};${dzParameterComponent}]`;
+        const replacedKey = key.replace(toBeReplaced, componentAddition);
+        pickedEntries[replacedKey] = flatten[key];
+      } else {
+        pickedEntries[key] = flatten[key];
+      }
     }
   });
   return pickedEntries;
