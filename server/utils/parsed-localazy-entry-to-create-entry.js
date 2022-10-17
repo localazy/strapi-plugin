@@ -3,7 +3,7 @@
 const set = require("lodash/set");
 const get = require("lodash/get");
 const resetArrayKeysDeep = require("./reset-array-keys-deep");
-const { getAttribute, isComponent, isRepeatable, findModel } = require("./model-utils");
+const { getAttribute, isComponent, isDynamicZone, isRepeatable, findModel } = require("./model-utils");
 
 const parsedLocalazyEntryToCreateEntry = (
   models,
@@ -14,6 +14,7 @@ const parsedLocalazyEntryToCreateEntry = (
 ) => {
   const createEntry = {};
   const repeatableComponentsKeystoFilter = [];
+  const dynamicZoneComponentKeys = [];
 
   const toCreateEntry = (
     entry,
@@ -23,7 +24,8 @@ const parsedLocalazyEntryToCreateEntry = (
     key = "",
     prefix = "",
     component = "",
-    isRepeatableComponent = false
+    isRepeatableComponent = false,
+    isDZ = false,
   ) => {
     if (Array.isArray(entry)) {
       // is array
@@ -46,6 +48,34 @@ const parsedLocalazyEntryToCreateEntry = (
 
           if (component && !isRepeatableComponent) {
             toCreateEntry(value, model, baseEntry, `${prefix}`, `${prefix}`);
+          }
+
+          if (!component && isRepeatableComponent) {
+            // TODO: this is a DZ; implement
+            // used for indices filtering in dynamic zones
+            if (!repeatableComponentsKeystoFilter.includes(prefix)) {
+              repeatableComponentsKeystoFilter.push(prefix);
+            }
+            const baseEntryRepeatableItemId = parseInt(baseEntryItemId);
+            const baseEntryRepeateableGroup = get(baseEntry, prefix);
+            if (baseEntryRepeateableGroup !== undefined) {
+              const localizedEntryRepeatableItemPosition = baseEntryRepeateableGroup.findIndex((repeatableItem) => !!repeatableItem && repeatableItem.id === baseEntryRepeatableItemId);
+              if (localizedEntryRepeatableItemPosition > -1) {
+                const dzEntry = get(baseEntry, prefix).find((v) => v.id === baseEntryRepeatableItemId);
+                const dzEntryComponent = dzEntry.__component;
+                const dzEntryComponentModel = findModel(models, dzEntryComponent);
+                toCreateEntry(
+                  value,
+                  dzEntryComponentModel,
+                  baseEntry,
+                  localizedEntryRepeatableItemPosition,
+                  `${prefix}.${localizedEntryRepeatableItemPosition}`,
+                  dzEntryComponent,
+                  true,
+                  true,
+                );
+              }
+            }
           }
         }
       });
@@ -89,12 +119,38 @@ const parsedLocalazyEntryToCreateEntry = (
               false
             );
           }
+        } else if (isDynamicZone(attribute)) {
+          // TODO: implement logic
+          // behaves sort of like repeatable component
+          const newPrefix = prefix
+            ? `${prefix}.${objectKey}`
+            : `${objectKey}`;
+          toCreateEntry(
+            value,
+            null, // model is evaluated later as it's dynamic (DZ)
+            baseEntry,
+            objectKey,
+            newPrefix,
+            "", // component is computed later as it's dynamic (DZ)
+            true,
+            true,
+          );
         } else {
           const newPrefix = prefix ? `${prefix}.${objectKey}` : `${objectKey}`;
           set(createEntry, newPrefix, value);
 
           if (component) {
-            set(createEntry, `${prefix}.__component`, component);
+            const componentKeyToSet = `${prefix}.__component`;
+            set(createEntry, componentKeyToSet, component);
+
+            if (isDZ) {
+              const isKeyAdded = (typeof dynamicZoneComponentKeys.find((v) => v.key === componentKeyToSet) !== "undefined");
+              if (!isKeyAdded)
+                dynamicZoneComponentKeys.push({
+                  key: componentKeyToSet,
+                  component,
+                });
+            }
           }
           // is not component
         }
@@ -109,7 +165,7 @@ const parsedLocalazyEntryToCreateEntry = (
   }
 
   resetArrayKeysDeep(createEntry, repeatableComponentsKeystoFilter);
-  return createEntry;
+  return { createEntry, dynamicZoneComponentKeys };
 };
 
 module.exports = parsedLocalazyEntryToCreateEntry;

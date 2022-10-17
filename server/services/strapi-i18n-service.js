@@ -39,7 +39,7 @@ module.exports = ({ strapi }) => ({
     }
   },
   parseLocalazyKey(key) {
-    const split = key.split(/\.|\[|\]/);
+    const split = key.split(/\.(?![^[]*])|\[|\]/);
     const filteredSplit = split.filter((item) => item !== "");
 
     return {

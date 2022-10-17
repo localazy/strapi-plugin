@@ -353,11 +353,21 @@ module.exports = {
         );
 
         if (shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
+          const parsedKeyRestWithoutComponents = parsedKey.rest.map((segment) => {
+            const semicolonIndex = segment.indexOf(";");
+
+            if (semicolonIndex === -1) {
+              return segment;
+            }
+
+            return segment.substring(0, semicolonIndex);
+          });
+
           const setKey = [
             isoStrapi,
             parsedKey.uid,
             parsedKey.id,
-            ...parsedKey.rest,
+            ...parsedKeyRestWithoutComponents,
           ];
 
           set(parsedLocalazyContent, setKey, value);

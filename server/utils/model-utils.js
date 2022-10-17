@@ -15,6 +15,10 @@ const isComponent = (attributeObj) => {
   return attributeObj.type === "component";
 };
 
+const isDynamicZone = (attributeObj) => {
+  return attributeObj.type === "dynamiczone";
+}
+
 const isRepeatable = (attributeObj) => {
   return isComponent(attributeObj) && !!attributeObj.repeatable;
 };
@@ -32,6 +36,7 @@ const findModel = (models, uid) => {
 module.exports = {
   getAttribute,
   isComponent,
+  isDynamicZone,
   isRepeatable,
   isRelation,
   findModel,

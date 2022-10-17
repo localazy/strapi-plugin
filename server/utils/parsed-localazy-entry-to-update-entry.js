@@ -4,6 +4,7 @@ const merge = require("lodash/merge");
 const parsedLocalazyEntryToCreateEntry = require("./parsed-localazy-entry-to-create-entry");
 const omitDeep = require("./omit-deep");
 const populateCreateUpdateEntryWithBaseEntry = require("./populate-create-update-entry-with-base-entry");
+const { set } = require("lodash");
 
 const parsedLocalazyEntryToUpdateEntry = async (
   allModels,
@@ -14,7 +15,7 @@ const parsedLocalazyEntryToUpdateEntry = async (
   uid,
   locale
 ) => {
-  const createEntry = parsedLocalazyEntryToCreateEntry(
+  const { createEntry, dynamicZoneComponentKeys } = parsedLocalazyEntryToCreateEntry(
     allModels,
     localazyEntry,
     baseEntry,
@@ -33,6 +34,10 @@ const parsedLocalazyEntryToUpdateEntry = async (
     "updatedBy",
     "publishedAt",
   ]);
+  // set dynamic zone compoonent keys again
+  dynamicZoneComponentKeys.forEach((v) => {
+    set(updateEntry, v.key, v.component);
+  });
 
   const filteredBaseEntry = omitDeep(baseEntry, [
     // "__component", // do not omit the __component
