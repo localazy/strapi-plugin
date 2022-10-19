@@ -113,7 +113,10 @@ const populateCreateUpdateEntryWithBaseEntry = async (
 
       for (const [objectKey, value] of Object.entries(partialBaseEntry)) {
         const attribute = getAttribute(model, objectKey);
-        if (typeof attribute === 'undefined') {
+        if (typeof attribute === 'undefined' && objectKey === '__component') {
+          const newPrefix = getNewPrefix(objectKey, prefix);
+          set(populatedEntry, newPrefix, value);
+        } else if (typeof attribute === 'undefined') {
           // skip...
           continue;
         } else if (isComponent(attribute)) {
