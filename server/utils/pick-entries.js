@@ -12,7 +12,7 @@ const isDynamicZoneKey = (key, transferSetupModel) => {
   }
 
   const dynamicPropertyEntryIdWithSquareBrackets = matches[1];
-  const dynamicPropertyNamePart = key.split(".").find((s) => s.includes(dynamicPropertyEntryIdWithSquareBrackets));
+  const dynamicPropertyNamePart = key.split(".").find((s, index) => index > 1 && s.includes(dynamicPropertyEntryIdWithSquareBrackets));
   const dynamicPropertyName = dynamicPropertyNamePart.replace(dynamicPropertyEntryIdWithSquareBrackets, "");
 
   return Array.isArray(transferSetupModel[dynamicPropertyName]);
