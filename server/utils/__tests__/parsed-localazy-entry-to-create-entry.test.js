@@ -18,17 +18,17 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
 
     // VERIFY
     const expected = {
-      name: "hlad, okno",
-      description: "Orientální pouliční jídlo v ústech rychlé a snadné!",
-      locale: "cs",
+      createEntry: {
+        name: "hlad, okno",
+        description: "Orientální pouliční jídlo v ústech rychlé a snadné!",
+        locale: "cs",
+      },
+      dynamicZoneComponentKeys: []
     };
 
     expect(result).toEqual(expected);
   });
   it("should return transformed 'cookbook' entry to strapi create entry structure", () => {
-    // SETUP
-
-
     // EXECUTE
     const result = parsedLocalazyEntryToCreateEntry(
       allModels,
@@ -40,79 +40,82 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
 
     // VERIFY
     const expected = {
-      title: "Pro každý den v roce",
-      recipes: [
-        {
-          name: "Bramborový salát",
-          __component: "food.cookbook-item",
-          recipe: "Oloupejte brambory, smíchejte je se všemi ingrediencemi a máte hotovo. Bon apetit!",
-          author_name: "Mr. Bramborová hlava",
-          gallery: [
-            {
-              image_title: "Syrové brambory",
-              __component: "food.gallery-item",
-              image_description: "Čerstvý!",
-            },
-            {
-              image_title: "Salát",
-              __component: "food.gallery-item",
-              image_description: "Mňam!",
-            },
-          ],
-          ingredients: [
-            {
-              name: "Brambory",
-              __component: "food.recipe-ingredient",
-              unit: "kg",
-            },
-            {
-              name: "Hrášek",
-              __component: "food.recipe-ingredient",
-              unit: "plechovka",
-            },
-            {
-              name: "Kukuřice",
-              __component: "food.recipe-ingredient",
-              unit: "plechovka",
-            },
-            {
-              name: "Mayo",
-              __component: "food.recipe-ingredient",
-              unit: "lžíce",
-            },
-            {
-              name: "Sýr",
-              __component: "food.recipe-ingredient",
-              unit: "blok",
-            },
-            {
-              name: "Apple",
-              __component: "food.recipe-ingredient",
-              unit: "ks",
-            },
-          ],
-        },
-      ],
-      gallery: {
-        __component: "food.gallery",
-        annotation: "Podívejte se na naše chutné jídlo, pak čtěte dál a ponořte se do kulinářského nebe!",
-        main_image: {
-          __component: "food.gallery-item",
-          image_title: "Kuchařka",
-          image_description: "Brožura II",
-        },
-        gallery: [
+      createEntry: {
+        title: "Pro každý den v roce",
+        recipes: [
           {
-            image_description: "Brožura a listy a vidlice.",
-            __component: "food.gallery-item",
-          },
-          {
-            image_title: "Koření",
-            __component: "food.gallery-item",
+            name: "Bramborový salát",
+            __component: "food.cookbook-item",
+            recipe: "Oloupejte brambory, smíchejte je se všemi ingrediencemi a máte hotovo. Bon apetit!",
+            author_name: "Mr. Bramborová hlava",
+            gallery: [
+              {
+                image_title: "Syrové brambory",
+                __component: "food.gallery-item",
+                image_description: "Čerstvý!",
+              },
+              {
+                image_title: "Salát",
+                __component: "food.gallery-item",
+                image_description: "Mňam!",
+              },
+            ],
+            ingredients: [
+              {
+                name: "Brambory",
+                __component: "food.recipe-ingredient",
+                unit: "kg",
+              },
+              {
+                name: "Hrášek",
+                __component: "food.recipe-ingredient",
+                unit: "plechovka",
+              },
+              {
+                name: "Kukuřice",
+                __component: "food.recipe-ingredient",
+                unit: "plechovka",
+              },
+              {
+                name: "Mayo",
+                __component: "food.recipe-ingredient",
+                unit: "lžíce",
+              },
+              {
+                name: "Sýr",
+                __component: "food.recipe-ingredient",
+                unit: "blok",
+              },
+              {
+                name: "Apple",
+                __component: "food.recipe-ingredient",
+                unit: "ks",
+              },
+            ],
           },
         ],
+        gallery: {
+          __component: "food.gallery",
+          annotation: "Podívejte se na naše chutné jídlo, pak čtěte dál a ponořte se do kulinářského nebe!",
+          main_image: {
+            __component: "food.gallery-item",
+            image_title: "Kuchařka",
+            image_description: "Brožura II",
+          },
+          gallery: [
+            {
+              image_description: "Brožura a listy a vidlice.",
+              __component: "food.gallery-item",
+            },
+            {
+              image_title: "Koření",
+              __component: "food.gallery-item",
+            },
+          ],
+        },
+        locale: "cs",
       },
-      locale: "cs",
+      dynamicZoneComponentKeys: [],
     };
 
     expect(result).toEqual(expected);
