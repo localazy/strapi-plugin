@@ -34,10 +34,8 @@ const doesPickPathsIncludeTheComponent = (pickPaths, dzParameterKey) => {
 }
 
 const pickEntries = (flatten, pickPaths, transferSetupModel) => {
-  // * 1. dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
-  // * 2. everything in flattened that contains "__component" and having TWO ids in square brackets is considered a DZ
+  // * dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
 
-  // according to 2., do the map of (flatten) dynamic entry id -> DZ component
   const dzEntryIdComponentMap = {};
   const flattenComponentProps = Object.fromEntries(Object.entries(flatten).filter(([key]) => key.includes('__component')));
 
@@ -69,7 +67,6 @@ const pickEntries = (flatten, pickPaths, transferSetupModel) => {
   Object.keys(filteredFlatten).forEach((key) => {
     // decide whether it is a dynamic zone
     // handle dynamic zones, in case of similarly-named fields across more components
-    // ? TODO: test whether it works as expected
     const isDynamicZone = isDynamicZoneKey(key, transferSetupModel);
     if (isDynamicZone) {
       const dzEntryId = getDynamicZoneEntryId(key, transferSetupModel);

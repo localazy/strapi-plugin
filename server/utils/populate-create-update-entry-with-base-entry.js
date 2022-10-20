@@ -79,10 +79,8 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             );
           }
         }
-      } else if (!component && isRepeatableComponent && isDZ) { // TODO: do I need `isDZ` here?
-        // TODO: this is a DZ; implement
+      } else if (!component && isRepeatableComponent && isDZ) {
         Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
-          // TODO: determine `model` and `component`
           const component = partialBaseEntryItem.__component;
           const model = findModel(models, component);
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
@@ -165,9 +163,6 @@ const populateCreateUpdateEntryWithBaseEntry = async (
           );
         } else if (isDynamicZone(attribute)) {
           // is dynamic zone
-          // TODO: implement the functionality
-
-          // console.log(attribute);
           const newPrefix = getNewPrefix(objectKey, prefix);
           const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
           const isMissingInCreateUpdateEntry = !!((typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length));
@@ -181,7 +176,7 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             valueToSet = value.map((item) => {
               delete item.id;
               return {
-                __component: component, // TODO: determine 'component' from baseEntry
+                __component: component,
                 ...item,
               };
             });
@@ -193,7 +188,7 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             objectKey,
             newPrefix,
             "", // component is computed later as it's dynamic (DZ)
-            true, // ? TODO: should be equal to true?
+            true,
             true,
           );
           // }

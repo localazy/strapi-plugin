@@ -31,18 +31,10 @@ const buildPopulate = (models, modelUid) => {
         const innerModelUid = attribute.component;
         buildPopulateStep(models, innerModelUid, newPrefix);
       } else if (attribute.type === "dynamiczone") {
-        // TODO: implement
         const key = prefix
           ? `${prefix}.${attributeName}.populate`
           : `${attributeName}.populate`;
         keys.push(key);
-        // const newPrefix = prefix
-        //   ? `${prefix}.${attributeName}`
-        //   : `${attributeName}`;
-        // attribute.components.forEach((dzComponent, index) => {
-        //   const innerModelUid = dzComponent;
-        //   buildPopulateStep(models, innerModelUid, newPrefix);
-        // });
       }
     }
 

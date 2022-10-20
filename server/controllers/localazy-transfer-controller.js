@@ -99,9 +99,6 @@ module.exports = {
           (pickPath) => `${modelUid}.${pickPath}`
         );
 
-        // ? TODO: can populate: "deep" be used here
-        // const populate = await StrapiService.getPopulateObject(modelUid);
-
         let entries = await strapi.entityService.findMany(modelUid, {
           populate: "deep",
         });

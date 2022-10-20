@@ -20,7 +20,6 @@ module.exports = ({ strapi }) => ({
       .plugin("localazy")
       .service("strapiI18nService");
 
-    // TODO: Is processing of 'parsedLocalazyEntryToCreateEntry' needed?
     const { createEntry } = parsedLocalazyEntryToCreateEntry(
       strapiContentTypesModels,
       translatedModel,

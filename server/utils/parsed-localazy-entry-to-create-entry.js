@@ -51,7 +51,6 @@ const parsedLocalazyEntryToCreateEntry = (
           }
 
           if (!component && isRepeatableComponent) {
-            // TODO: this is a DZ; implement
             // used for indices filtering in dynamic zones
             if (!repeatableComponentsKeystoFilter.includes(prefix)) {
               repeatableComponentsKeystoFilter.push(prefix);
@@ -120,7 +119,6 @@ const parsedLocalazyEntryToCreateEntry = (
             );
           }
         } else if (isDynamicZone(attribute)) {
-          // TODO: implement logic
           // behaves sort of like repeatable component
           const newPrefix = prefix
             ? `${prefix}.${objectKey}`
