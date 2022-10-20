@@ -8,6 +8,8 @@ const simpleMenuEmptyModel = require("../../tests/fixtures/populate-create-updat
 const sampleJSONModel = require("../../tests/fixtures/populate-create-update-entry-with-base-entry-sample-json");
 const cookbookModel = require("../../tests/fixtures/populate-create-update-entry-with-base-entry-cookbook");
 const cookbookEmptyRecipesModel = require("../../tests/fixtures/populate-create-update-entry-with-base-entry-cookbook-empty-recipes");
+const sampleJSONWithDZsModel = require("../../tests/fixtures/populate-create-update-entry-with-base-entry-sample-json-dz");
+const lessonWithDZsModel = require("../../tests/fixtures/populate-create-update-entry-with-base-entry-lesson-dz");
 
 const populateCreateUpdateEntryWithBaseEntry = require("../populate-create-update-entry-with-base-entry");
 
@@ -845,6 +847,291 @@ describe("populate-create-update-entry-with-base-entry.js", () => {
         gallery: [
         ],
       },
+    };
+
+    expect(populatedEntry).toEqual(expected);
+  });
+
+  it("should populate a 'sample-json' including DZs correctly", async () => {
+    const populatedEntry = await populateCreateUpdateEntryWithBaseEntry(
+      allModels,
+      sampleJSONWithDZsModel.updateEntry,
+      sampleJSONWithDZsModel.baseEntry,
+      sampleJSONWithDZsModel.fullyPopulatedLocalizedEntry,
+      sampleJSONWithDZsModel.uid,
+      sampleJSONWithDZsModel.locale,
+    );
+
+    const expected = {
+      id: 24,
+      purpose: "Bar",
+      data: {
+        bar: "baz",
+      },
+      dynamic_property: [
+        {
+          id: 170,
+          image_title: "Nějaký název obrázku",
+          image_description: "Nějaký popis obrázku",
+          image: {
+            id: 11,
+            name: "heather-ford-G4LFhuLXhLE-unsplash.jpg",
+            alternativeText: "heather-ford-G4LFhuLXhLE-unsplash.jpg",
+            caption: "heather-ford-G4LFhuLXhLE-unsplash.jpg",
+            width: 6127,
+            height: 3844,
+            formats: {
+              thumbnail: {
+                name: "thumbnail_heather-ford-G4LFhuLXhLE-unsplash.jpg",
+                hash: "thumbnail_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f",
+                ext: ".jpg",
+                mime: "image/jpeg",
+                path: null,
+                width: 245,
+                height: 154,
+                size: 9.54,
+                url: "/uploads/thumbnail_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f.jpg",
+              },
+              large: {
+                name: "large_heather-ford-G4LFhuLXhLE-unsplash.jpg",
+                hash: "large_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f",
+                ext: ".jpg",
+                mime: "image/jpeg",
+                path: null,
+                width: 1000,
+                height: 628,
+                size: 117.56,
+                url: "/uploads/large_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f.jpg",
+              },
+              medium: {
+                name: "medium_heather-ford-G4LFhuLXhLE-unsplash.jpg",
+                hash: "medium_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f",
+                ext: ".jpg",
+                mime: "image/jpeg",
+                path: null,
+                width: 750,
+                height: 471,
+                size: 66.32,
+                url: "/uploads/medium_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f.jpg",
+              },
+              small: {
+                name: "small_heather-ford-G4LFhuLXhLE-unsplash.jpg",
+                hash: "small_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f",
+                ext: ".jpg",
+                mime: "image/jpeg",
+                path: null,
+                width: 500,
+                height: 314,
+                size: 31.42,
+                url: "/uploads/small_heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f.jpg",
+              },
+            },
+            hash: "heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f",
+            ext: ".jpg",
+            mime: "image/jpeg",
+            size: 6971.47,
+            url: "/uploads/heather_ford_G4_L_Fhu_L_Xh_LE_unsplash_7a2c2cac8f.jpg",
+            previewUrl: null,
+            provider: "local",
+            provider_metadata: null,
+          },
+          __component: "food.gallery-item",
+        },
+        {
+          id: 191,
+          name: "Přísada I",
+          amount: null,
+          unit: null,
+          is_required: true,
+          __component: "food.recipe-ingredient",
+        },
+        {
+          id: 36,
+          name: "První položka CB",
+          recipe: null,
+          estimated_cook_time: "00:03:00.000",
+          difficulty: "beginner",
+          author_name: "Já",
+          gallery: [
+            {
+              id: 171,
+              image_title: "Obrázek G Jedna",
+              image_description: "Obrázek G Popis Jedna",
+            },
+            {
+              id: 172,
+              image_title: "Img G Two",
+              image_description: "Img G Desc Two",
+            },
+          ],
+          ingredients: [
+            {
+              id: 193,
+              name: "První Ingr DZ",
+              amount: null,
+              unit: null,
+              is_required: true,
+            },
+          ],
+          __component: "food.cookbook-item",
+        },
+        {
+          id: 192,
+          name: "Druhá přísada",
+          amount: null,
+          unit: null,
+          is_required: true,
+          __component: "food.recipe-ingredient",
+        },
+      ],
+      repeatable_component_property: [
+        {
+          id: 61,
+          name: "Položka 1",
+          price: 1,
+          currency: "CZK",
+          description: "Nějaký popis",
+          is_available: null,
+          food_gallery: null,
+        },
+        {
+          id: 62,
+          name: "Položka 2",
+          price: 2,
+          currency: "CZK",
+          description: "Nějaký další popis",
+          is_available: null,
+          food_gallery: [
+            {
+              id: 6,
+              name: "rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+              alternativeText: "rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+              caption: "rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+              width: 2268,
+              height: 4032,
+              formats: {
+                thumbnail: {
+                  name: "thumbnail_rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+                  hash: "thumbnail_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea",
+                  ext: ".jpg",
+                  mime: "image/jpeg",
+                  path: null,
+                  width: 88,
+                  height: 156,
+                  size: 5.35,
+                  url: "/uploads/thumbnail_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea.jpg",
+                },
+                large: {
+                  name: "large_rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+                  hash: "large_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea",
+                  ext: ".jpg",
+                  mime: "image/jpeg",
+                  path: null,
+                  width: 563,
+                  height: 1000,
+                  size: 108.15,
+                  url: "/uploads/large_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea.jpg",
+                },
+                medium: {
+                  name: "medium_rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+                  hash: "medium_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea",
+                  ext: ".jpg",
+                  mime: "image/jpeg",
+                  path: null,
+                  width: 422,
+                  height: 750,
+                  size: 65.52,
+                  url: "/uploads/medium_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea.jpg",
+                },
+                small: {
+                  name: "small_rodrigo-dos-reis-h3AkzboxK4Q-unsplash.jpg",
+                  hash: "small_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea",
+                  ext: ".jpg",
+                  mime: "image/jpeg",
+                  path: null,
+                  width: 281,
+                  height: 500,
+                  size: 34.23,
+                  url: "/uploads/small_rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea.jpg",
+                },
+              },
+              hash: "rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea",
+              ext: ".jpg",
+              mime: "image/jpeg",
+              size: 1081.59,
+              url: "/uploads/rodrigo_dos_reis_h3_Akzbox_K4_Q_unsplash_d17e795cea.jpg",
+              previewUrl: null,
+              provider: "local",
+              provider_metadata: null,
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(populatedEntry).toEqual(expected);
+  });
+
+  it("should populate a 'lesson' including DZs correctly", async () => {
+    const populatedEntry = await populateCreateUpdateEntryWithBaseEntry(
+      allModels,
+      lessonWithDZsModel.updateEntry,
+      lessonWithDZsModel.baseEntry,
+      lessonWithDZsModel.fullyPopulatedLocalizedEntry,
+      lessonWithDZsModel.uid,
+      lessonWithDZsModel.locale,
+    );
+
+    const expected = {
+      id: 4,
+      title: "Test: Sčítání",
+      start_time: "2022-10-01T13:00:00.000Z",
+      duration: "02:00:00.000",
+      description: "Otestujte si své dovednosti, které jsme se naučili v předchozí lekci.",
+      lesson_type: [
+        {
+          id: 2,
+          title: "Vyberte správnou odpověď",
+          questions: [
+            {
+              id: 4,
+              question: "1 + 1 = ",
+              is_active: true,
+              question_number: 1,
+            },
+            {
+              id: 5,
+              question: "5 + 15 = ",
+              is_active: false,
+              question_number: 2,
+            },
+            {
+              id: 6,
+              question: "Kolik pohárů je na fotce?",
+              is_active: false,
+              question_number: 3,
+            },
+          ],
+          answers: [
+            {
+              id: 4,
+              question_number: 1,
+              correct_answer: "2",
+            },
+            {
+              id: 5,
+              question_number: 2,
+              correct_answer: "20",
+            },
+            {
+              id: 6,
+              question_number: 3,
+              correct_answer: "15",
+            },
+          ],
+          __component: "lesson.quiz",
+        },
+      ],
     };
 
     expect(populatedEntry).toEqual(expected);

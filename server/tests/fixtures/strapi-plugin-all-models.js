@@ -1,6 +1,132 @@
 module.exports = [
   {
     kind: "collectionType",
+    collectionName: "chapters",
+    info: {
+      singularName: "chapter",
+      pluralName: "chapters",
+      displayName: "chapter",
+      description: "",
+    },
+    options: {
+      draftAndPublish: true,
+    },
+    pluginOptions: {
+      i18n: {
+        localized: true,
+      },
+    },
+    attributes: {
+      title: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "string",
+      },
+      lessons: {
+        type: "relation",
+        relation: "oneToMany",
+        target: "api::lesson.lesson",
+      },
+      createdAt: {
+        type: "datetime",
+      },
+      updatedAt: {
+        type: "datetime",
+      },
+      publishedAt: {
+        type: "datetime",
+        configurable: false,
+        writable: true,
+        visible: false,
+      },
+      createdBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      updatedBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      localizations: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "relation",
+        relation: "oneToMany",
+        target: "api::chapter.chapter",
+      },
+      locale: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "string",
+      },
+    },
+    __schema__: {
+      collectionName: "chapters",
+      info: {
+        singularName: "chapter",
+        pluralName: "chapters",
+        displayName: "chapter",
+        description: "",
+      },
+      options: {
+        draftAndPublish: true,
+      },
+      pluginOptions: {
+        i18n: {
+          localized: true,
+        },
+      },
+      attributes: {
+        title: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "string",
+        },
+        lessons: {
+          type: "relation",
+          relation: "oneToMany",
+          target: "api::lesson.lesson",
+        },
+      },
+      kind: "collectionType",
+    },
+    modelType: "contentType",
+    modelName: "chapter",
+    connection: "default",
+    uid: "api::chapter.chapter",
+    apiName: "chapter",
+    globalId: "Chapter",
+    actions: {
+    },
+    lifecycles: {
+    },
+    singularName: "chapter",
+    tableName: "chapters",
+  },
+  {
+    kind: "collectionType",
     collectionName: "cookbooks",
     info: {
       singularName: "cookbook",
@@ -198,6 +324,358 @@ module.exports = [
     },
     singularName: "cookbook",
     tableName: "cookbooks",
+  },
+  {
+    kind: "collectionType",
+    collectionName: "courses",
+    info: {
+      singularName: "course",
+      pluralName: "courses",
+      displayName: "course",
+      description: "",
+    },
+    options: {
+      draftAndPublish: true,
+    },
+    pluginOptions: {
+      i18n: {
+        localized: true,
+      },
+    },
+    attributes: {
+      title: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "string",
+      },
+      description: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "richtext",
+      },
+      chapters: {
+        type: "relation",
+        relation: "oneToMany",
+        target: "api::chapter.chapter",
+      },
+      gallery: {
+        type: "component",
+        repeatable: false,
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        component: "food.gallery",
+      },
+      createdAt: {
+        type: "datetime",
+      },
+      updatedAt: {
+        type: "datetime",
+      },
+      publishedAt: {
+        type: "datetime",
+        configurable: false,
+        writable: true,
+        visible: false,
+      },
+      createdBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      updatedBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      localizations: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "relation",
+        relation: "oneToMany",
+        target: "api::course.course",
+      },
+      locale: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "string",
+      },
+    },
+    __schema__: {
+      collectionName: "courses",
+      info: {
+        singularName: "course",
+        pluralName: "courses",
+        displayName: "course",
+        description: "",
+      },
+      options: {
+        draftAndPublish: true,
+      },
+      pluginOptions: {
+        i18n: {
+          localized: true,
+        },
+      },
+      attributes: {
+        title: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "string",
+        },
+        description: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "richtext",
+        },
+        chapters: {
+          type: "relation",
+          relation: "oneToMany",
+          target: "api::chapter.chapter",
+        },
+        gallery: {
+          type: "component",
+          repeatable: false,
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          component: "food.gallery",
+        },
+      },
+      kind: "collectionType",
+    },
+    modelType: "contentType",
+    modelName: "course",
+    connection: "default",
+    uid: "api::course.course",
+    apiName: "course",
+    globalId: "Course",
+    actions: {
+    },
+    lifecycles: {
+    },
+    singularName: "course",
+    tableName: "courses",
+  },
+  {
+    kind: "collectionType",
+    collectionName: "lessons",
+    info: {
+      singularName: "lesson",
+      pluralName: "lessons",
+      displayName: "lesson",
+      description: "",
+    },
+    options: {
+      draftAndPublish: true,
+    },
+    pluginOptions: {
+      i18n: {
+        localized: true,
+      },
+    },
+    attributes: {
+      title: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "string",
+      },
+      start_time: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "datetime",
+      },
+      duration: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "time",
+      },
+      description: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "richtext",
+      },
+      lesson_type: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "dynamiczone",
+        components: [
+          "lesson.lecture",
+          "lesson.survey",
+          "lesson.quiz",
+        ],
+      },
+      createdAt: {
+        type: "datetime",
+      },
+      updatedAt: {
+        type: "datetime",
+      },
+      publishedAt: {
+        type: "datetime",
+        configurable: false,
+        writable: true,
+        visible: false,
+      },
+      createdBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      updatedBy: {
+        type: "relation",
+        relation: "oneToOne",
+        target: "admin::user",
+        configurable: false,
+        writable: false,
+        visible: false,
+        useJoinTable: false,
+        private: true,
+      },
+      localizations: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "relation",
+        relation: "oneToMany",
+        target: "api::lesson.lesson",
+      },
+      locale: {
+        writable: true,
+        private: false,
+        configurable: false,
+        visible: false,
+        type: "string",
+      },
+    },
+    __schema__: {
+      collectionName: "lessons",
+      info: {
+        singularName: "lesson",
+        pluralName: "lessons",
+        displayName: "lesson",
+        description: "",
+      },
+      options: {
+        draftAndPublish: true,
+      },
+      pluginOptions: {
+        i18n: {
+          localized: true,
+        },
+      },
+      attributes: {
+        title: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "string",
+        },
+        start_time: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "datetime",
+        },
+        duration: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "time",
+        },
+        description: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "richtext",
+        },
+        lesson_type: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "dynamiczone",
+          components: [
+            "lesson.lecture",
+            "lesson.survey",
+            "lesson.quiz",
+          ],
+        },
+      },
+      kind: "collectionType",
+    },
+    modelType: "contentType",
+    modelName: "lesson",
+    connection: "default",
+    uid: "api::lesson.lesson",
+    apiName: "lesson",
+    globalId: "Lesson",
+    actions: {
+    },
+    lifecycles: {
+    },
+    singularName: "lesson",
+    tableName: "lessons",
   },
   {
     kind: "collectionType",
@@ -755,6 +1233,7 @@ module.exports = [
       singularName: "sample-json",
       pluralName: "sample-jsons",
       displayName: "sample-json",
+      description: "",
     },
     options: {
       draftAndPublish: true,
@@ -780,6 +1259,31 @@ module.exports = [
           },
         },
         type: "json",
+      },
+      dynamic_property: {
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        type: "dynamiczone",
+        components: [
+          "food.gallery",
+          "food.recipe-ingredient",
+          "food.cookbook-item",
+          "restaurant.menu-item",
+          "food.gallery-item",
+        ],
+      },
+      repeatable_component_property: {
+        type: "component",
+        repeatable: true,
+        pluginOptions: {
+          i18n: {
+            localized: true,
+          },
+        },
+        component: "restaurant.menu-item",
       },
       createdAt: {
         type: "datetime",
@@ -836,6 +1340,7 @@ module.exports = [
         singularName: "sample-json",
         pluralName: "sample-jsons",
         displayName: "sample-json",
+        description: "",
       },
       options: {
         draftAndPublish: true,
@@ -861,6 +1366,31 @@ module.exports = [
             },
           },
           type: "json",
+        },
+        dynamic_property: {
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          type: "dynamiczone",
+          components: [
+            "food.gallery",
+            "food.recipe-ingredient",
+            "food.cookbook-item",
+            "restaurant.menu-item",
+            "food.gallery-item",
+          ],
+        },
+        repeatable_component_property: {
+          type: "component",
+          repeatable: true,
+          pluginOptions: {
+            i18n: {
+              localized: true,
+            },
+          },
+          component: "restaurant.menu-item",
         },
       },
       kind: "collectionType",
@@ -1161,6 +1691,283 @@ module.exports = [
     globalId: "ComponentFoodRecipeIngredient",
     singularName: "recipe-ingredient",
     tableName: "components_food_recipe_ingredients",
+  },
+  {
+    collectionName: "components_lesson_answers",
+    info: {
+      displayName: "Answer",
+      icon: "info",
+      description: "",
+    },
+    options: {
+    },
+    attributes: {
+      question_number: {
+        type: "integer",
+      },
+      correct_answer: {
+        type: "text",
+      },
+      answer_asset: {
+        type: "relation",
+        relation: "morphOne",
+        target: "plugin::upload.file",
+        morphBy: "related",
+      },
+    },
+    __filename__: "answers.json",
+    __schema__: {
+      collectionName: "components_lesson_answers",
+      info: {
+        displayName: "Answer",
+        icon: "info",
+        description: "",
+      },
+      options: {
+      },
+      attributes: {
+        question_number: {
+          type: "integer",
+        },
+        correct_answer: {
+          type: "text",
+        },
+        answer_asset: {
+          type: "media",
+          multiple: false,
+          required: false,
+          allowedTypes: [
+            "images",
+            "files",
+            "videos",
+            "audios",
+          ],
+        },
+      },
+      __filename__: "answers.json",
+    },
+    uid: "lesson.answers",
+    category: "lesson",
+    modelType: "component",
+    modelName: "answers",
+    globalId: "ComponentLessonAnswers",
+    singularName: "answers",
+    tableName: "components_lesson_answers",
+  },
+  {
+    collectionName: "components_lesson_lectures",
+    info: {
+      displayName: "Lecture",
+      icon: "align-left",
+    },
+    options: {
+    },
+    attributes: {
+      content: {
+        type: "richtext",
+      },
+    },
+    __filename__: "lecture.json",
+    __schema__: {
+      collectionName: "components_lesson_lectures",
+      info: {
+        displayName: "Lecture",
+        icon: "align-left",
+      },
+      options: {
+      },
+      attributes: {
+        content: {
+          type: "richtext",
+        },
+      },
+      __filename__: "lecture.json",
+    },
+    uid: "lesson.lecture",
+    category: "lesson",
+    modelType: "component",
+    modelName: "lecture",
+    globalId: "ComponentLessonLecture",
+    singularName: "lecture",
+    tableName: "components_lesson_lectures",
+  },
+  {
+    collectionName: "components_lesson_quizzes",
+    info: {
+      displayName: "Quiz",
+      icon: "question-circle",
+      description: "",
+    },
+    options: {
+    },
+    attributes: {
+      title: {
+        type: "string",
+      },
+      questions: {
+        type: "component",
+        repeatable: true,
+        component: "lesson.survey-question",
+      },
+      answers: {
+        displayName: "answers",
+        type: "component",
+        repeatable: true,
+        component: "lesson.answers",
+      },
+    },
+    __filename__: "quiz.json",
+    __schema__: {
+      collectionName: "components_lesson_quizzes",
+      info: {
+        displayName: "Quiz",
+        icon: "question-circle",
+        description: "",
+      },
+      options: {
+      },
+      attributes: {
+        title: {
+          type: "string",
+        },
+        questions: {
+          type: "component",
+          repeatable: true,
+          component: "lesson.survey-question",
+        },
+        answers: {
+          displayName: "answers",
+          type: "component",
+          repeatable: true,
+          component: "lesson.answers",
+        },
+      },
+      __filename__: "quiz.json",
+    },
+    uid: "lesson.quiz",
+    category: "lesson",
+    modelType: "component",
+    modelName: "quiz",
+    globalId: "ComponentLessonQuiz",
+    singularName: "quiz",
+    tableName: "components_lesson_quizzes",
+  },
+  {
+    collectionName: "components_lesson_survey_questions",
+    info: {
+      displayName: "Question",
+      icon: "question",
+      description: "",
+    },
+    options: {
+    },
+    attributes: {
+      question: {
+        type: "richtext",
+      },
+      is_active: {
+        type: "boolean",
+      },
+      assets: {
+        type: "relation",
+        relation: "morphMany",
+        target: "plugin::upload.file",
+        morphBy: "related",
+      },
+      question_number: {
+        type: "integer",
+      },
+    },
+    __filename__: "survey-question.json",
+    __schema__: {
+      collectionName: "components_lesson_survey_questions",
+      info: {
+        displayName: "Question",
+        icon: "question",
+        description: "",
+      },
+      options: {
+      },
+      attributes: {
+        question: {
+          type: "richtext",
+        },
+        is_active: {
+          type: "boolean",
+        },
+        assets: {
+          type: "media",
+          multiple: true,
+          required: false,
+          allowedTypes: [
+            "images",
+            "files",
+            "videos",
+            "audios",
+          ],
+        },
+        question_number: {
+          type: "integer",
+        },
+      },
+      __filename__: "survey-question.json",
+    },
+    uid: "lesson.survey-question",
+    category: "lesson",
+    modelType: "component",
+    modelName: "survey-question",
+    globalId: "ComponentLessonSurveyQuestion",
+    singularName: "survey-question",
+    tableName: "components_lesson_survey_questions",
+  },
+  {
+    collectionName: "components_lesson_surveys",
+    info: {
+      displayName: "Survey",
+      icon: "sort-numeric-down",
+      description: "",
+    },
+    options: {
+    },
+    attributes: {
+      description: {
+        type: "richtext",
+      },
+      questions: {
+        type: "component",
+        repeatable: true,
+        component: "lesson.survey-question",
+      },
+    },
+    __filename__: "survey.json",
+    __schema__: {
+      collectionName: "components_lesson_surveys",
+      info: {
+        displayName: "Survey",
+        icon: "sort-numeric-down",
+        description: "",
+      },
+      options: {
+      },
+      attributes: {
+        description: {
+          type: "richtext",
+        },
+        questions: {
+          type: "component",
+          repeatable: true,
+          component: "lesson.survey-question",
+        },
+      },
+      __filename__: "survey.json",
+    },
+    uid: "lesson.survey",
+    category: "lesson",
+    modelType: "component",
+    modelName: "survey",
+    globalId: "ComponentLessonSurvey",
+    singularName: "survey",
+    tableName: "components_lesson_surveys",
   },
   {
     collectionName: "components_restaurant_menu_items",
