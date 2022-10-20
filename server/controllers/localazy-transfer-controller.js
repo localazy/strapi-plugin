@@ -375,7 +375,6 @@ module.exports = {
     /**
      * Iterate over parsed Localazy content and insert/update content in Strapi
      */
-    const strapiContentTypesModels = await StrapiService.getModels();
     for (const [isoStrapi, contentTypes] of Object.entries(
       parsedLocalazyContent
     )) {
