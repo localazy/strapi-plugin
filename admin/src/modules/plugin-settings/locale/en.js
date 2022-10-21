@@ -1,7 +1,7 @@
 export default {
   content_transfer_setup: "Content Transfer Setup",
   content_transfer_setup_description:
-    "Setup what content type fields will be uploaded to Localazy",
+    "Select which content type fields will be uploaded to Localazy",
   save: "Save",
   cancel: "Cancel",
   close: "Close",
