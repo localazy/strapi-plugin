@@ -1,4 +1,4 @@
-import deepKeys from "deep-keys";
+import deepKeys from "@david-vaclavek/deep-keys";
 import get from "lodash-es/get";
 import PluginSettingsService from "../services/plugin-settings-service";
 import StrapiModelService from "../services/strapi-model-service";

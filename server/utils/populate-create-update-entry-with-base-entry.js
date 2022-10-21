@@ -8,6 +8,7 @@ const {
   getAttribute,
   isComponent,
   isRepeatable,
+  isDynamicZone,
   isRelation,
   findModel
 } = require("./model-utils");
@@ -49,7 +50,8 @@ const populateCreateUpdateEntryWithBaseEntry = async (
     objectKey = "",
     prefix = "",
     component = "",
-    isRepeatableComponent = false
+    isRepeatableComponent = false,
+    isDZ = false,
   ) => {
     if (Array.isArray(partialBaseEntry)) {
       // is array
@@ -77,7 +79,19 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             );
           }
         }
-      } else if (isRepeatableComponent) {
+      } else if (!component && isRepeatableComponent && isDZ) {
+        Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
+          const component = partialBaseEntryItem.__component;
+          const model = findModel(models, component);
+          const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
+          await populateEntry(
+            partialBaseEntryItem,
+            model,
+            partialBaseEntryItemIndex,
+            newPrefix,
+          );
+        });
+      } else if (component && isRepeatableComponent) {
         Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
           await populateEntry(
@@ -97,7 +111,10 @@ const populateCreateUpdateEntryWithBaseEntry = async (
 
       for (const [objectKey, value] of Object.entries(partialBaseEntry)) {
         const attribute = getAttribute(model, objectKey);
-        if (typeof attribute === 'undefined') {
+        if (typeof attribute === 'undefined' && objectKey === '__component') {
+          const newPrefix = getNewPrefix(objectKey, prefix);
+          set(populatedEntry, newPrefix, value);
+        } else if (typeof attribute === 'undefined') {
           // skip...
           continue;
         } else if (isComponent(attribute)) {
@@ -144,6 +161,37 @@ const populateCreateUpdateEntryWithBaseEntry = async (
             component,
             isRepeatable(attribute),
           );
+        } else if (isDynamicZone(attribute)) {
+          // is dynamic zone
+          const newPrefix = getNewPrefix(objectKey, prefix);
+          const inCreateUpdateEntry = get(createUpdateEntry, newPrefix);
+          const isMissingInCreateUpdateEntry = !!((typeof inCreateUpdateEntry === 'undefined') || (inCreateUpdateEntry && !inCreateUpdateEntry.length));
+
+          if (isMissingInCreateUpdateEntry) {
+            const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
+            let valueToSet = value;
+            if (doesExistInPopulatedLocalizedEntry(populatedLocalizedEntryVal)) {
+              valueToSet = populatedLocalizedEntryVal;
+            }
+            valueToSet = value.map((item) => {
+              delete item.id;
+              return {
+                __component: component,
+                ...item,
+              };
+            });
+            set(populatedEntry, newPrefix, valueToSet);
+          }
+          await populateEntry(
+            value,
+            "", // model is evaluated later as it's dynamic (DZ)
+            objectKey,
+            newPrefix,
+            "", // component is computed later as it's dynamic (DZ)
+            true,
+            true,
+          );
+          // }
         } else if (isRelation(attribute)) {
           const newPrefix = getNewPrefix(objectKey, prefix);
           const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);

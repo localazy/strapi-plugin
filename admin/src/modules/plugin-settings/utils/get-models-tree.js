@@ -28,9 +28,25 @@ const getModelsTree = (allModels, localizableModels = []) => {
               : isComponentAttributesObjectTranslatable
           ),
         };
-      } else if (
-        SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
-      ) {
+      } else if (attributes[attribute].type === "dynamiczone") {
+        const components = attributes[attribute].components;
+        currentModelTree[attribute] = [];
+        components.forEach((c) => {
+          const nestedModel = allModels.find((model) => model.uid === c);
+
+          const modelTree = getModelTree(
+            nestedModel.__schema__.attributes,
+            true,
+            isComponentAttributesObjectTranslatable === null
+              ? attributes[attribute].pluginOptions?.i18n?.localized || false
+              : isComponentAttributesObjectTranslatable
+          );
+          currentModelTree[attribute].push({
+            "__component__": c,
+            ...modelTree,
+          });
+        });
+      } else if (SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)) {
         // field might not be localizable
         if (isComponentAttributes) {
           if (isComponentAttributesObjectTranslatable) {
