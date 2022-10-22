@@ -311,10 +311,11 @@ module.exports = {
     );
     const localazyContent = {};
     for (const isoLocalazy of supportedLanguages) {
+      const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       const result = await LocalazyDownloadService.download({
         projectId: user.project.id,
         fileId: strapiFile.id,
-        lang: isoLocalazy,
+        lang: isoStrapi,
       });
       if (!result.success) {
         messageReport.push(result.message);
