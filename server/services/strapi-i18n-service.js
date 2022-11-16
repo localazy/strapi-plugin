@@ -88,10 +88,13 @@ module.exports = ({ strapi }) => ({
         "locale",
         "id",
         "createdAt",
-        "publishedAt", // * sets as draft (no timestamp)
+        // "publishedAt",
         "updatedAt",
       ]);
       filteredNewEntry.locale = newEntryLocale;
+      // * sets as draft (no timestamp)
+      // ! do not completely omit as it won't process the required fields
+      filteredNewEntry.publishedAt = null;
 
       newLocalizationCtx.request.body = filteredNewEntry;
 
