@@ -13,6 +13,11 @@ const findSetupModelByCollectionUid = (
   const currentModel = strapiContentTypesModels.find(
     (model) => model.uid === collectionUid
   );
+
+  if (!currentModel) {
+    return undefined;
+  }
+
   const modelContentTransferSetup = contentTransferSetup.setup
     .find((model) => Object.keys(model)[0] === currentModel.collectionName);
   return modelContentTransferSetup[currentModel.collectionName];
