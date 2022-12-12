@@ -350,7 +350,7 @@ module.exports = {
           parsedKey.uid
         );
 
-        if (shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
+        if (typeof modelContentTransferSetup !== "undefined" && shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
           const parsedKeyRestWithoutComponents = parsedKey.rest.map((segment) => {
             const semicolonIndex = segment.indexOf(";");
 
@@ -438,6 +438,7 @@ module.exports = {
                 messageReport.push(
                   `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`
                 );
+                strapi.log.info(`Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`);
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
@@ -463,6 +464,7 @@ module.exports = {
                 messageReport.push(
                   `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`
                 );
+                strapi.log.info(`Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`);
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
