@@ -23,4 +23,6 @@ export default {
   step_3: "Check <1>Enable localization for this Content-Type</1>",
   step_4: "Repeat for all Content-Types you want to translate",
   step_5: "Return to this screen and finish the transfer setup",
+
+  general: "General",
 };

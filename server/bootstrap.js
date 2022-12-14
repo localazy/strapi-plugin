@@ -1,18 +1,23 @@
 "use strict";
 
-const getFullPopulateObject = require('./utils/get-full-populate-object')
+const beforeFindHooks = require('./lifecycles/before-find-hooks');
+const afterCreateUpdateDelete = require('./lifecycles/after-create-hooks');
 
 module.exports = ({ strapi }) => {
   // bootstrap phase
   // Subscribe to the lifecycles that we are intrested in.
-  strapi.db.lifecycles.subscribe((event) => {
-    if (event.action === 'beforeFindMany' || event.action === 'beforeFindOne') {
-      const populate = event.params?.populate;
-
-      if (populate && populate[0] === 'deep') {
-        const depth = populate[1] ?? 5
-        const modelObject = getFullPopulateObject(event.model.uid, depth);
-        event.params.populate = modelObject.populate
+  strapi.db.lifecycles.subscribe(async (event) => {
+    switch (event.action) {
+      case 'beforeFindMany':
+      case 'beforeFindOne': {
+        beforeFindHooks(event);
+        break;
+      }
+      case 'afterCreate':
+      case 'afterUpdate':
+      case 'afterDelete': {
+        await afterCreateUpdateDelete(event);
+        break;
       }
     }
   });
