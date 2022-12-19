@@ -7,7 +7,7 @@ import { auth } from "@strapi/helper-plugin";
 import pluginId from "../pluginId";
 
 console.log('process.env', process.env);
-const BASE_PLUGIN_PATH = `${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}/${pluginId}`;
+const BASE_PLUGIN_PATH = `/${pluginId}`;
 
 const createAxiosInstance = (baseUrl = null) => {
   if (baseUrl === null) {
@@ -15,7 +15,7 @@ const createAxiosInstance = (baseUrl = null) => {
   }
 
   const instance = axios.create({
-    baseURL: baseUrl,
+    baseURL: `${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}${baseUrl}`,
   });
 
   instance.interceptors.request.use(
