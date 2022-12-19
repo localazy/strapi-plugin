@@ -48,12 +48,6 @@ module.exports = {
 
 To run tests, run the `npm run test` command. To watch tests, run the `npm run test:watch` command.
 
-### API Endpoints Prefix
-If your Strapi Instance is running in a subfolder (see the `url` parameter in [Strapi documentation](https://docs.strapi.io/developer-docs/latest/setup-deployment-guides/configurations/required/server.html#available-options)), the Localazy Plugin needs to be additionally configured to respect this.
-
-You can use the `.env ` variable `STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX`. A value assigned to this variable will be used as the prefix.
-
-
 ## Additional Resources
 - Localazy Docs: [Introduction to Strapi](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation)
 - Localazy Blog: [Articles about the Strapi plugin](https://localazy.com/tags/strapi)
