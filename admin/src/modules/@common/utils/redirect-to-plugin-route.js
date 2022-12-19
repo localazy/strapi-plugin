@@ -13,10 +13,10 @@ export const PLUGIN_ROUTES = {
 
 export default (route) => {
   if (route === PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP) {
-    history.push(`${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}${process.env.ADMIN_PATH}settings/${pluginId}/${route}`);
+    history.push(`${process.env.ADMIN_PATH}settings/${pluginId}/${route}`);
 
     return;
   }
 
-  history.push(`${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}${process.env.ADMIN_PATH}plugins/${pluginId}/${route}`);
+  history.push(`${process.env.ADMIN_PATH}plugins/${pluginId}/${route}`);
 };

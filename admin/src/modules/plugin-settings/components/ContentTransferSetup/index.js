@@ -198,7 +198,7 @@ function ContentTransferSetup() {
 
   return (
     <>
-      {!isLoading && !isLoggedIn && <Redirect to={`${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}${process.env.ADMIN_PATH}plugins/${pluginId}/login`} />}
+      {!isLoading && !isLoggedIn && <Redirect to={`${process.env.ADMIN_PATH}plugins/${pluginId}/login`} />}
 
       <HeaderLayout
         title={t("plugin_settings.content_transfer_setup")}
