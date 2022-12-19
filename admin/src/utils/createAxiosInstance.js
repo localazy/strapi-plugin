@@ -11,11 +11,11 @@ const BASE_PLUGIN_PATH = `/${pluginId}`;
 
 const createAxiosInstance = (baseUrl = null) => {
   if (baseUrl === null) {
-    baseUrl = `${process.env.STRAPI_ADMIN_BACKEND_URL}${BASE_PLUGIN_PATH}`;
+    baseUrl = `${BASE_PLUGIN_PATH}`;
   }
 
   const instance = axios.create({
-    baseURL: baseUrl,
+    baseURL: `${process.env.STRAPI_ADMIN_BACKEND_URL}${baseUrl}`,
   });
 
   instance.interceptors.request.use(
