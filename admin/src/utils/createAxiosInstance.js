@@ -6,6 +6,7 @@ import axios from "axios";
 import { auth } from "@strapi/helper-plugin";
 import pluginId from "../pluginId";
 
+console.log('process.env', process.env);
 const BASE_PLUGIN_PATH = `${process.env.STRAPI_ADMIN_LOCALAZY_PLUGIN_BACKEND_PREFIX}/${pluginId}`;
 
 const createAxiosInstance = (baseUrl = null) => {
