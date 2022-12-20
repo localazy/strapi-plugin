@@ -1,7 +1,7 @@
 "use strict";
 
 const deepPopulateHook = require('./lifecycles/deep-populate-hook');
-const afterCreateUpdateDelete = require('./lifecycles/after-create-hooks');
+const uploadEventEntryToLocalazyHook = require('./lifecycles/upload-event-entry-to-localazy-hook');
 
 module.exports = ({ strapi }) => {
   // bootstrap phase
@@ -15,7 +15,7 @@ module.exports = ({ strapi }) => {
       }
       case 'afterCreate':
       case 'afterUpdate': {
-        await afterCreateUpdateDelete(event);
+        await uploadEventEntryToLocalazyHook(event);
         break;
       }
       case 'beforeDelete': {
