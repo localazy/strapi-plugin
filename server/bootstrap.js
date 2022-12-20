@@ -1,6 +1,6 @@
 "use strict";
 
-const beforeFindHooks = require('./lifecycles/before-find-hooks');
+const deepPopulateHook = require('./lifecycles/deep-populate-hook');
 const afterCreateUpdateDelete = require('./lifecycles/after-create-hooks');
 
 module.exports = ({ strapi }) => {
@@ -10,15 +10,20 @@ module.exports = ({ strapi }) => {
     switch (event.action) {
       case 'beforeFindMany':
       case 'beforeFindOne': {
-        beforeFindHooks(event);
+        deepPopulateHook(event);
         break;
       }
       case 'afterCreate':
-      case 'afterUpdate':
-      case 'afterDelete': {
+      case 'afterUpdate': {
         await afterCreateUpdateDelete(event);
         break;
       }
+      case 'beforeDelete': {
+        // TODO: set keys as deprecated
+        break;
+      }
+      default:
+        break;
     }
   });
 };

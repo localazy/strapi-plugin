@@ -1,4 +1,4 @@
-const getFullPopulateObject = require('./../utils/get-full-populate-object')
+const getFullPopulateObject = require('../utils/get-full-populate-object');
 
 module.exports = (event) => {
   const populate = event.params?.populate;
