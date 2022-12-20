@@ -14,7 +14,7 @@ const createAxiosInstance = (baseUrl = null) => {
   }
 
   const instance = axios.create({
-    baseURL: baseUrl,
+    baseURL: `${process.env.STRAPI_ADMIN_BACKEND_URL}${baseUrl}`,
   });
 
   instance.interceptors.request.use(
