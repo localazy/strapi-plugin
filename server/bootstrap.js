@@ -28,6 +28,7 @@ module.exports = ({ strapi }) => {
           break;
         }
       }
+      case 'beforeDeleteMany':
       case 'beforeDelete': {
         try {
           // have to await here

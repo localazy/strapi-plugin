@@ -31,7 +31,7 @@ const shouldProcessEntry = (contentTransferSetup, eventModel) => {
   return !!modelContentTransferSetup[key].__model__;
 }
 
-const getEventEntry = async (event) => {
+const getEventEntries = async (event) => {
   switch (event.action) {
     case 'afterCreate':
     case 'afterUpdate': {
@@ -51,6 +51,15 @@ const getEventEntry = async (event) => {
           populate: "deep",
         })];
       return entry;
+    }
+    case "beforeDeleteMany": {
+      const entries = await strapi.entityService.findMany(
+        event.model.uid,
+        {
+          ...event.params,
+          populate: "deep",
+        });
+      return entries;
     }
     default: {
       throw new Error("Unhandled event action");
@@ -139,8 +148,9 @@ module.exports = async (event) => {
      * Prepare the data structure and upload it to Localazy
      */
   const modelUid = event.model.uid;
-  const entry = await getEventEntry(event);
-  const eventEntryLocale = entry[0].locale;
+  const entries = await getEventEntries(event);
+  // ? TODO: will always be valid?
+  const eventEntryLocale = entries[0].locale;
 
   // event entry not in source language; break execution
   if (isoStrapiToLocalazy(eventEntryLocale) !== projectSourceLanguageCode) {
@@ -148,7 +158,7 @@ module.exports = async (event) => {
     return;
   }
 
-  const reducedEntryArray = omitDeep(entry, [
+  const reducedEntries = omitDeep(entries, [
     // "__component",
     "locale",
     "localizations",
@@ -174,9 +184,15 @@ module.exports = async (event) => {
   );
 
   // flatten Strapi content
-  const flatten = flattenObject({
-    [modelUid]: reducedEntryArray[0],
-  });
+  let flatten = {};
+  for (const reducedEntry of reducedEntries) {
+    flatten = {
+      ...flatten,
+      ...flattenObject({
+        [modelUid]: reducedEntry,
+      }),
+    };
+  }
   // get only enabled fields; "__component" will be filtered out inside of the function
   const pickedFlatten = pickEntries(flatten, pickPathsWithUid, currentTransferSetupModel);
 
