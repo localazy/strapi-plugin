@@ -54,7 +54,7 @@ module.exports = async (event) => {
   const user = await LocalazyUserService.getUser();
   const { accessToken } = user;
   if (!accessToken) {
-    strapi.log.error("Localazy Plugin: Localazy user is not logged in.");
+    strapi.log.error("Localazy Plugin: Localazy user is not logged in; the operation won't proceed");
     return;
   }
 
@@ -78,7 +78,7 @@ module.exports = async (event) => {
     return;
   }
   if (!shouldProcess) {
-    strapi.log.info("Localazy Plugin: The entry is not set to be transfered");
+    strapi.log.info("Localazy Plugin: The entry collection transfer is disabled");
     return;
   }
 
@@ -114,7 +114,9 @@ module.exports = async (event) => {
     return;
   }
 
-  // call
+  /**
+   * Prepare the data structure and upload it to Localazy
+   */
   const modelUid = event.model.uid;
   const entry = [await strapi.entityService.findOne(modelUid, eventEntry.id, {
     populate: "deep",
