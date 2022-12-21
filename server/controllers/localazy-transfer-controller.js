@@ -152,7 +152,11 @@ module.exports = {
         locale,
         chunks
       );
-      await LocalazyUploadService.upload(importFile);
+      await LocalazyUploadService.upload(
+        importFile,
+        {
+          deprecate: "file"
+        });
 
       ctx.body = {
         success,
