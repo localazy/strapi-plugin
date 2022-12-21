@@ -2,6 +2,7 @@
 
 const deepPopulateHook = require('./lifecycles/deep-populate-hook');
 const uploadEventEntryToLocalazyHook = require('./lifecycles/upload-event-entry-to-localazy-hook');
+const deprecateEventEntryInLocalazyHook = require('./lifecycles/deprecate-event-entry-in-localazy-hook');
 
 module.exports = ({ strapi }) => {
   // bootstrap phase
@@ -21,7 +22,6 @@ module.exports = ({ strapi }) => {
               strapi.log.info(`${event.action} hook result: ${JSON.stringify(result)}`);
             }
           });
-
         } catch (e) {
           strapi.log.error(e);
         } finally {
@@ -29,8 +29,17 @@ module.exports = ({ strapi }) => {
         }
       }
       case 'beforeDelete': {
-        // TODO: set keys as deprecated
-        break;
+        try {
+          // have to await here
+          const result = await deprecateEventEntryInLocalazyHook(event);
+          if (typeof result !== 'undefined') {
+            strapi.log.info(`${event.action} hook result: ${JSON.stringify(result)}`);
+          }
+        } catch (e) {
+          strapi.log.error(e);
+        } finally {
+          break;
+        }
       }
       default:
         break;
