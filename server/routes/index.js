@@ -6,6 +6,7 @@ const pluginSettingsRoutes = require("./plugin-settings");
 const strapiRoutes = require("./strapi");
 const localazyTransferRoutes = require("./localazy-transfer");
 const localazyProjectRoutes = require("./localazy-project");
+const localazyPublicTransferRoutes = require("./localazy-public-transfer");
 
 module.exports = {
   "content-api": {
@@ -23,4 +24,5 @@ module.exports = {
       ...localazyProjectRoutes,
     ],
   },
+  localazyPublicTransferRoutes,
 };

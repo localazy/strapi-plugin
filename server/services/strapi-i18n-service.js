@@ -22,6 +22,10 @@ module.exports = ({ strapi }) => ({
       localeName = `${localeName} (${isoStrapi})`;
 
       const newLocaleCtx = { ...ctx };
+      // ! TODO: [FIXME] make selectable in admin
+      newLocaleCtx.state.user = {
+        id: 1,
+      };
       newLocaleCtx.request.body = {
         isDefault: false,
         code: isoStrapi,

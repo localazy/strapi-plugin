@@ -209,8 +209,15 @@ module.exports = {
       user.project.id
     );
     if (!strapiFile) {
-      strapi.log.error(`File ${config.LOCALAZY_DEFAULT_FILE_NAME} not found`);
-      ctx.throw(400, `File ${config.LOCALAZY_DEFAULT_FILE_NAME} not found`);
+      success = false;
+      const message = `File ${config.LOCALAZY_DEFAULT_FILE_NAME} not found`;
+      strapi.log.error(message);
+      messageReport.push(message);
+      ctx.body = {
+        success,
+        report: messageReport,
+      };
+      return;
     }
 
     /**

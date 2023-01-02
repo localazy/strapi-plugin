@@ -44,4 +44,10 @@ module.exports = ({ strapi }) => ({
 
     return projects.find((project) => project.id === projectId);
   },
+  async getWebhooksSecret(projectId) {
+    const LocalazyApi = await getLocalazyApi();
+    const result = await LocalazyApi.getWebhooksSecret({ projectId });
+
+    return result;
+  }
 });
