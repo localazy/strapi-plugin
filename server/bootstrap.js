@@ -19,11 +19,13 @@ module.exports = ({ strapi }) => {
         try {
           // if called by Localazy webhook; skip
           const ctx = strapi.requestContext.get();
-          const ctxHeaders = ctx.headers;
-          const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
-          const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
-          if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
-            return;
+          if (typeof ctx !== 'undefined') {
+            const ctxHeaders = ctx.headers;
+            const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
+            const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
+            if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
+              return;
+            }
           }
 
 
