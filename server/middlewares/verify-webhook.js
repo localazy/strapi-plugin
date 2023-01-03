@@ -5,6 +5,9 @@ const crypto = require("crypto");
 module.exports = (config, { strapi }) => {
   return async (ctx, next) => {
     try {
+      const requestBody = ctx.request.body;
+      strapi.log.info(`Localazy Plugin: Webhook of type '${requestBody.type}' procedure started`);
+
       const LocalazyPubApiService = strapi
         .plugin("localazy")
         .service("localazyPubApiService");
@@ -31,16 +34,18 @@ module.exports = (config, { strapi }) => {
         throw new Error("Localazy Plugin: Webhook request is older than threshold; terminating execution");
       }
 
-      const body = ctx.request.body;
+
 
       const strapiHmac = crypto.createHmac("sha256", secret);
-      const signedMessage = strapiHmac.update(`${xLocalazyTimestamp}-${JSON.stringify(body)}`).digest("hex");
+      const signedMessage = strapiHmac.update(`${xLocalazyTimestamp}-${JSON.stringify(requestBody)}`).digest("hex");
 
       if (xLocalazyHmac !== signedMessage) {
         throw new Error("Localazy Plugin: Webhook verification did not pass; terminating execution");
       }
 
-      next();
+      await next();
+
+      strapi.log.info(`Localazy Plugin: Webhook of type '${requestBody.type}' procedure finished`);
     } catch (e) {
       strapi.log.warn(e.message);
       ctx.body = {
