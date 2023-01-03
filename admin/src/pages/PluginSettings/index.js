@@ -5,6 +5,7 @@ import { ThemeProvider } from "@strapi/design-system/ThemeProvider";
 import { lightTheme } from "@strapi/design-system/themes";
 import pluginId from "../../pluginId";
 import ContentTransferSetup from "../../modules/plugin-settings/components/ContentTransferSetup";
+import GlobalSettings from "../../modules/plugin-settings/components/GlobalSettings";
 import LocalazyUserService from "../../modules/user/services/localazy-user-service";
 import { setLocalazyIdentity } from "../../state/localazy-identity";
 
@@ -31,6 +32,9 @@ function PluginSettings() {
           <Switch>
             <Route path={`/settings/${pluginId}/content-transfer-setup`} exact>
               <ContentTransferSetup />
+            </Route>
+            <Route path={`/settings/${pluginId}/global-settings`} exact>
+              <GlobalSettings />
             </Route>
           </Switch>
         </Box>

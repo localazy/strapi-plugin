@@ -13,10 +13,10 @@ const SETTINGS_SETUP = [
     sectionDefaultLabel: "Localazy Settings",
     links: [
       {
-        linkId: `${pluginId}-settings-general`,
+        linkId: `${pluginId}-settings-global`,
         intlId: `general`,
-        defaultLabel: "General",
-        to: `/settings/${pluginId}/general`,
+        defaultLabel: "Global Settings",
+        to: `/settings/${pluginId}/global-settings`,
         Component: async () => {
           const component = await import("./pages/PluginSettings");
 
