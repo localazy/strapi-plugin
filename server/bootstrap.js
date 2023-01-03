@@ -17,6 +17,16 @@ module.exports = ({ strapi }) => {
       case 'afterCreate':
       case 'afterUpdate': {
         try {
+          // if called by Localazy webhook; skip
+          const ctx = strapi.requestContext.get();
+          const ctxHeaders = ctx.headers;
+          const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
+          const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
+          if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
+            return;
+          }
+
+
           uploadEventEntryToLocalazyHook(event).then((result) => {
             if (typeof result !== 'undefined') {
               strapi.log.info(`${event.action} hook result: ${JSON.stringify(result)}`);
