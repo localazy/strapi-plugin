@@ -29,7 +29,7 @@ export default {
   webhook_author_info: "Select the author signed under the webhook actions (required by Strapi for certain actions, e.g. creating a locale).",
   webhook_author_placeholder: "Select webhook actions author",
   webhook_languages: "Allowed webhook languages",
-  webhook_languages_info: "Select the languages from Localazy. Translations of selected languages would be downloaded.",
+  webhook_languages_info: "Select the languages from Localazy. Translations of selected languages would be downloaded. If no language is selected, all translations will be downloaded.",
   webhook_languages_placeholder: "Select allowed webhook languages",
 
   global_settings_saved_successfully: "Global Settings were saved",
