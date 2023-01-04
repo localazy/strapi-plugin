@@ -14,9 +14,11 @@ import { Divider } from "@strapi/design-system/Divider";
 import { Typography } from "@strapi/design-system/Typography";
 import isEqual from "lodash-es/isEqual";
 import set from "lodash-es/set";
+import LanguagesSelector from "../../../@common/components/LanguagesSelector";
 import PluginSettingsService from "../../services/plugin-settings-service";
 import StrapiUsersService from "../../services/strapi-users-service";
 import { getLocalazyIdentity } from "../../../../state/localazy-identity";
+import ProjectService from "../../../@common/services/project-service";
 import pluginId from "../../../../pluginId";
 
 import "../../../../i18n";
@@ -33,6 +35,16 @@ function GlobalSettings() {
   const [localazyIdentity] = getLocalazyIdentity();
   const hasLocalazyIdentity = () => !!localazyIdentity.accessToken;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  /**
+   * Connected project
+   */
+  const [, setConnectedProject] = useState({});
+
+  /**
+   * Project Languages without default language
+   */
+  const [projectLanguages, setProjectLanguages] = useState([]);
 
   /**
    * Component state
@@ -91,6 +103,12 @@ function GlobalSettings() {
 
         return;
       }
+
+      const project = await ProjectService.getConnectedProject();
+      setConnectedProject(project);
+      const projectLanguagesWithoutDefaultLanguage =
+        project?.languages?.filter(language => language.id !== project.sourceLanguage) || [];
+      setProjectLanguages(projectLanguagesWithoutDefaultLanguage);
 
       const globalSettings = await PluginSettingsService.getPluginSettings();
 
@@ -236,6 +254,12 @@ function GlobalSettings() {
                 </Option>
               ))}
             </Select>
+            {/* Webhook languages selector */}
+            <LanguagesSelector
+              preselectedLanguages={formModel?.download?.webhookLanguages || []}
+              projectLanguages={projectLanguages}
+              onChange={(languages) => patchFormModel("download.webhookLanguages", languages)}
+            />
 
           </Box>
         )}
