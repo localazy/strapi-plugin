@@ -54,12 +54,42 @@ const getEventEntries = async (event) => {
       return entry;
     }
     case "beforeDeleteMany": {
+      /**
+       * Strapi sets the locale to the default one, so passing the ids won't help (won't fetch the entries in the correct locale)
+       * And therefore because of Strapi being Strapi, we need to get one id from the filter and fetch it's language
+       * And then pass the locale parameter to the findMany method
+       */
+      // const entry = await strapi.entityService.findOne(
+      //   event.model.uid,
+      //   event.params.where.$and[0].id.$in[0],
+      //   {
+      //     populate: "deep",
+      //   });
+      // const locale = entry.locale;
+      // const entries = await strapi.entityService.findMany(
+      //   event.model.uid,
+      //   {
+      //     filters: {
+      //       id: event.params.where.$and[0].id.$in,
+      //     },
+      //     locale,
+      //     populate: "deep",
+      //   });
+
+      /**
+       * If deletion of other than default locale is requested, `entries` will be an empty array
+       * If deletion of default locale is requested, `entries` will contain requested entries, and we can proceed with the deprecation process
+       */
       const entries = await strapi.entityService.findMany(
         event.model.uid,
         {
-          ...event.params,
+          filters: event.params.where,
           populate: "deep",
         });
+
+      if (entries.length === 0) {
+        strapi.log.info(`Localazy Plugin: No entries in source language for ${event.action} found; the operation won't proceed`);
+      }
       return entries;
     }
     default: {
@@ -181,6 +211,11 @@ module.exports = async (event) => {
      */
   const modelUid = event.model.uid;
   const entries = await getEventEntries(event);
+
+  if (entries.length === 0) {
+    return;
+  }
+
   // ? TODO: will always be valid?
   const eventEntryLocale = entries[0].locale;
 
