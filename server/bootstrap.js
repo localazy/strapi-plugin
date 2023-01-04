@@ -4,11 +4,25 @@ const deepPopulateHook = require('./lifecycles/deep-populate-hook');
 const uploadEventEntryToLocalazyHook = require('./lifecycles/upload-event-entry-to-localazy-hook');
 const deprecateEventEntryInLocalazyHook = require('./lifecycles/deprecate-event-entry-in-localazy-hook');
 
+const isTriggeredByLocalazyWebhook = () => {
+  const ctx = strapi.requestContext.get();
+  if (typeof ctx !== 'undefined') {
+    const ctxHeaders = ctx.headers;
+    const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
+    const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
+    if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
+      return true;
+    }
+  }
+  return false;
+}
+
 module.exports = ({ strapi }) => {
   // bootstrap phase
   // Subscribe to the lifecycles that we are interested in.
   strapi.db.lifecycles.subscribe(async (event) => {
-    switch (event.action) {
+    const action = event.action;
+    switch (action) {
       case 'beforeFindMany':
       case 'beforeFindOne': {
         deepPopulateHook(event);
@@ -17,21 +31,13 @@ module.exports = ({ strapi }) => {
       case 'afterCreate':
       case 'afterUpdate': {
         try {
-          // if called by Localazy webhook; skip
-          const ctx = strapi.requestContext.get();
-          if (typeof ctx !== 'undefined') {
-            const ctxHeaders = ctx.headers;
-            const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
-            const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
-            if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
-              return;
-            }
+          if (isTriggeredByLocalazyWebhook()) {
+            break;
           }
-
 
           uploadEventEntryToLocalazyHook(event).then((result) => {
             if (typeof result !== 'undefined') {
-              strapi.log.info(`${event.action} hook result: ${JSON.stringify(result)}`);
+              strapi.log.info(`${action} hook result: ${JSON.stringify(result)}`);
             }
           });
         } catch (e) {
@@ -46,7 +52,7 @@ module.exports = ({ strapi }) => {
           // have to await here
           const result = await deprecateEventEntryInLocalazyHook(event);
           if (typeof result !== 'undefined') {
-            strapi.log.info(`${event.action} hook result: ${JSON.stringify(result)}`);
+            strapi.log.info(`${action} hook result: ${JSON.stringify(result)}`);
           }
         } catch (e) {
           strapi.log.error(e);

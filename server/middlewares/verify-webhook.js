@@ -1,10 +1,18 @@
 "use strict";
 
 const crypto = require("crypto");
+const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
 
 module.exports = (config, { strapi }) => {
   return async (ctx, next) => {
     try {
+      const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
+      await pluginSettingsServiceHelper.setup();
+
+      if (!pluginSettingsServiceHelper.shouldAllowWebhookDownloadProcess()) {
+        throw new Error("Localazy Plugin: Webhook download process is disabled; terminating execution");
+      }
+
       const requestBody = ctx.request.body;
       strapi.log.info(`Localazy Plugin: Webhook of type '${requestBody.type}' procedure started`);
 
@@ -34,8 +42,6 @@ module.exports = (config, { strapi }) => {
         throw new Error("Localazy Plugin: Webhook request is older than threshold; terminating execution");
       }
 
-
-
       const strapiHmac = crypto.createHmac("sha256", secret);
       const signedMessage = strapiHmac.update(`${xLocalazyTimestamp}-${JSON.stringify(requestBody)}`).digest("hex");
 
@@ -43,7 +49,7 @@ module.exports = (config, { strapi }) => {
         throw new Error("Localazy Plugin: Webhook verification did not pass; terminating execution");
       }
 
-      await next();
+      await next(); // proceed with the request; await for the response
 
       strapi.log.info(`Localazy Plugin: Webhook of type '${requestBody.type}' procedure finished`);
     } catch (e) {

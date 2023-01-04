@@ -169,10 +169,10 @@ function GlobalSettings() {
               hint={t("plugin_settings.automated_upload_triggers_info")}
               clearLabel={t("plugin_settings.clear")}
               placeholder="Select triggers"
-              onClear={() => patchFormModel("upload.automated_triggers", [])}
+              onClear={() => patchFormModel("upload.automatedTriggers", [])}
               // error={error}
-              value={formModel?.upload?.automated_triggers || []}
-              onChange={(values) => patchFormModel("upload.automated_triggers", values)}
+              value={formModel?.upload?.automatedTriggers || []}
+              onChange={(values) => patchFormModel("upload.automatedTriggers", values)}
               disabled={typeof formModel?.upload?.allowAutomated === "boolean" ? !formModel.upload.allowAutomated : true}
               multi
               withTags

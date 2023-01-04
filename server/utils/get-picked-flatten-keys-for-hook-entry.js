@@ -9,6 +9,7 @@ const {
   findSetupModelByCollectionName,
   getPickPaths
 } = require("./transfer-setup-utils");
+const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
 
 /**
  *
@@ -67,6 +68,39 @@ const getEventEntries = async (event) => {
   }
 }
 
+const shouldSkipAction = async (event) => {
+  const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
+  await pluginSettingsServiceHelper.setup();
+
+  switch (event.action) {
+    case 'afterCreate': {
+      if (!pluginSettingsServiceHelper.shouldAllowAutomatedCreatedTrigger()) {
+        strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because automated created trigger is disabled.`)
+        return true;
+      }
+      return false;
+    }
+    case 'afterUpdate': {
+      if (!pluginSettingsServiceHelper.shouldAllowAutomatedUpdatedTrigger()) {
+        strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because automated update trigger is disabled.`)
+        return true;
+      }
+      return false;
+    }
+    case "beforeDelete":
+    case "beforeDeleteMany": {
+      if (!pluginSettingsServiceHelper.shouldAllowDeprecateOnDeletion()) {
+        strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because deprecate on deletion is disabled.`)
+        return true;
+      }
+      return false;
+    }
+    default: {
+      throw new Error("Unhandled event action");
+    }
+  }
+}
+
 module.exports = async (event) => {
   // Docs: https://docs.strapi.io/developer-docs/latest/development/backend-customization/models.html#hook-event-object
   // this should respect the content transfer setup
@@ -80,28 +114,13 @@ module.exports = async (event) => {
   const StrapiI18nService = strapi
     .plugin("localazy")
     .service("strapiI18nService");
-  // Localazy Upload Service
-  const LocalazyUploadService = strapi
-    .plugin("localazy")
-    .service("localazyUploadService");
-
-  const eventAction = event.action;
-  strapi.log.info(`${eventAction} triggered`);
-
-  // if project not connected; break execution
-  const user = await LocalazyUserService.getUser();
-  const { accessToken } = user;
-  if (!accessToken) {
-    strapi.log.error("Localazy Plugin: Localazy user is not logged in; the operation won't proceed");
-    return;
-  }
-
-  // TODO: if the operation not allowed in plugin's global settings; break execution
-
   const contentTransferSetup = await strapi
     .plugin("localazy")
     .service("pluginSettingsService")
     .getContentTransferSetup();
+
+  const eventAction = event.action;
+  strapi.log.info(`${eventAction} triggered`);
 
   // Content Transfer Setup not available yet; break execution
   if (!contentTransferSetup.has_setup) {
@@ -117,6 +136,19 @@ module.exports = async (event) => {
   }
   if (!shouldProcess) {
     strapi.log.info("Localazy Plugin: The entry collection transfer is disabled");
+    return;
+  }
+
+  // if project not connected; break execution
+  const user = await LocalazyUserService.getUser();
+  const { accessToken } = user;
+  if (!accessToken) {
+    strapi.log.error("Localazy Plugin: Localazy user is not logged in; the operation won't proceed");
+    return;
+  }
+
+  if (await shouldSkipAction(event)) {
+    strapi.log.info("Localazy Plugin: Automated action skipped");
     return;
   }
 
