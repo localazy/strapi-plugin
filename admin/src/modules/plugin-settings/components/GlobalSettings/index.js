@@ -255,6 +255,7 @@ function GlobalSettings() {
               ))}
             </Select>
             {/* Webhook languages selector */}
+            <br /><br />
             <LanguagesSelector
               preselectedLanguages={formModel?.download?.webhookLanguages || []}
               projectLanguages={projectLanguages}
