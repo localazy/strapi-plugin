@@ -14,8 +14,8 @@ import { Divider } from "@strapi/design-system/Divider";
 import { Typography } from "@strapi/design-system/Typography";
 import isEqual from "lodash-es/isEqual";
 import set from "lodash-es/set";
-// import get from "lodash-es/get";
 import PluginSettingsService from "../../services/plugin-settings-service";
+import StrapiUsersService from "../../services/strapi-users-service";
 import { getLocalazyIdentity } from "../../../../state/localazy-identity";
 import pluginId from "../../../../pluginId";
 
@@ -39,6 +39,11 @@ function GlobalSettings() {
    */
   const [isLoading, setIsLoading] = useState(true);
   const [showSavedAlert, setShowSavedAlert] = useState(false);
+
+  /**
+   * Admin Panel Users
+   */
+  const [users, setUsers] = useState([]);
 
   /**
    * Global Settings form model
@@ -91,6 +96,9 @@ function GlobalSettings() {
 
       setFormModel(globalSettings);
       setOriginalFormModel(cloneDeep(globalSettings));
+
+      const users = await StrapiUsersService.getAdminPanelUsers();
+      setUsers(users);
 
       setIsLoading(false);
     }
@@ -168,9 +176,8 @@ function GlobalSettings() {
               label={t("plugin_settings.automated_upload_triggers")}
               hint={t("plugin_settings.automated_upload_triggers_info")}
               clearLabel={t("plugin_settings.clear")}
-              placeholder="Select triggers"
+              placeholder={t("plugin_settings.automated_upload_triggers_placeholder")}
               onClear={() => patchFormModel("upload.automatedTriggers", [])}
-              // error={error}
               value={formModel?.upload?.automatedTriggers || []}
               onChange={(values) => patchFormModel("upload.automatedTriggers", values)}
               disabled={typeof formModel?.upload?.allowAutomated === "boolean" ? !formModel.upload.allowAutomated : true}
@@ -209,6 +216,27 @@ function GlobalSettings() {
               // eslint-disable-next-line max-len
               checked={typeof formModel?.download?.processDownloadWebhook === "boolean" ? formModel.download.processDownloadWebhook : true}
               onChange={e => patchFormModel("download.processDownloadWebhook", e.target.checked)} />
+            {/* Webhook actions author */}
+            <br /><br />
+            <Select
+              label={t("plugin_settings.webhook_author")}
+              hint={t("plugin_settings.webhook_author_info")}
+              clearLabel={t("plugin_settings.clear")}
+              placeholder={t("plugin_settings.webhook_author_placeholder")}
+              onClear={() => patchFormModel("download.webhookAuthorId", null)}
+              value={formModel?.download?.webhookAuthorId || null}
+              onChange={(value) => patchFormModel("download.webhookAuthorId", value)}
+            >
+              {users.map(user => (
+                <Option
+                  key={user.id}
+                  value={user.id}
+                >
+                  {`${user.firstname} ${user.lastname} (${user.email})`}
+                </Option>
+              ))}
+            </Select>
+
           </Box>
         )}
       </Box>

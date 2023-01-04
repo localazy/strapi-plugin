@@ -24,6 +24,10 @@ class PluginSettingsServiceHelper {
     return this.shouldAllowAutomatedUpload() && automatedTriggers.includes("updated");
   }
 
+  getAutomatedUploadTriggers() {
+    return this.pluginSettings?.upload?.automatedTriggers || [];
+  }
+
   shouldAllowDeprecateOnDeletion() {
     return typeof this.pluginSettings?.upload?.allowDeprecate === "boolean" ? this.pluginSettings.upload.allowDeprecate : false;
   }
@@ -32,8 +36,8 @@ class PluginSettingsServiceHelper {
     return typeof this.pluginSettings?.download?.processDownloadWebhook === "boolean" ? this.pluginSettings.download.processDownloadWebhook : true;
   }
 
-  getAutomatedUploadTriggers() {
-    return this.pluginSettings?.upload?.automatedTriggers || [];
+  getWebhookAuthorId() {
+    return this.pluginSettings?.download?.webhookAuthorId || null;
   }
 }
 

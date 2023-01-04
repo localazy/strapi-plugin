@@ -49,6 +49,20 @@ module.exports = (config, { strapi }) => {
         throw new Error("Localazy Plugin: Webhook verification did not pass; terminating execution");
       }
 
+      /**
+       * When further actions are called by a webhook, then there's no user assigned to the operation
+       * It's needed to assign the user ID to the operation (requested e.g. for adding a new locale)
+       */
+      if (!ctx.state.user) {
+        const webhookAuthorId = pluginSettingsServiceHelper.getWebhookAuthorId();
+        if (Number.isNaN(webhookAuthorId)) {
+          throw new Error("Localazy Plugin: Webhook author is not set; terminating execution");
+        }
+        ctx.state.user = {
+          id: webhookAuthorId,
+        };
+      }
+
       await next(); // proceed with the request; await for the response
 
       strapi.log.info(`Localazy Plugin: Webhook of type '${requestBody.type}' procedure finished`);

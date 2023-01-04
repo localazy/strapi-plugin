@@ -14,6 +14,7 @@ export default {
   allow_automated_upload_to_localazy: "Allow automated upload to Localazy",
   allow_automated_upload_to_localazy_info: "Content will be automatically uploaded to Localazy after its creation or update.",
   automated_upload_triggers: "Automated upload triggers",
+  automated_upload_triggers_placeholder: "Select triggers",
   creating_new_data_entry: "Creating new data entry",
   editing_data_entry: "Editing data entry",
   automated_upload_triggers_info: "Select actions that will trigger an upload of Strapi data to Localazy.",
@@ -24,6 +25,9 @@ export default {
   download_settings: "Download settings",
   processing_of_download_webhook: "Processing of download webhook",
   processing_of_download_webhook_info: "You can temporarily disable the webhook processing and the information will be scrapped.",
+  webhook_author: "Webhook actions author",
+  webhook_author_info: "Select the author signed under the webhook actions (required by Strapi for certain actions, e.g. creating a locale).",
+  webhook_author_placeholder: "Select webhook actions author",
 
   global_settings_saved_successfully: "Global Settings were saved",
 
