@@ -1,3 +1,4 @@
+/* eslint-disable react/require-default-props */
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
@@ -33,10 +34,10 @@ function LanguagesSelector(props) {
 
   return (
     <Select
-      label={props.label}
-      hint={props.hint}
+      label={props.label || t("common.select_languages")}
+      hint={props.hint || t("common.select_languages")}
       clearLabel={t("plugin_settings.clear")}
-      placeholder={props.placeholder}
+      placeholder={props.placeholder || t("common.select_languages")}
       onClear={() => setSelectedLanguages([])}
       value={selectedLanguages || []}
       onChange={(values) => onChange(values)}
@@ -64,10 +65,5 @@ LanguagesSelector.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-LanguagesSelector.getDefaultProps = () => ({
-  label: "",
-  hint: "",
-  placeholder: "",
-});
 
 export default LanguagesSelector;
