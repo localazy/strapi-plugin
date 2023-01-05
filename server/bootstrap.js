@@ -3,24 +3,13 @@
 const deepPopulateHook = require('./lifecycles/deep-populate-hook');
 const uploadEventEntryToLocalazyHook = require('./lifecycles/upload-event-entry-to-localazy-hook');
 const deprecateEventEntryInLocalazyHook = require('./lifecycles/deprecate-event-entry-in-localazy-hook');
-
-const isTriggeredByLocalazyWebhook = () => {
-  const ctx = strapi.requestContext.get();
-  if (typeof ctx !== 'undefined') {
-    const ctxHeaders = ctx.headers;
-    const xLocalazyHmac = ctxHeaders["x-localazy-hmac"];
-    const xLocalazyTimestamp = ctxHeaders["x-localazy-timestamp"];
-    if (!!xLocalazyHmac && !!xLocalazyTimestamp) {
-      return true;
-    }
-  }
-  return false;
-}
+const RequestInitiatorHelper = require('./utils/request-initiator-helper');
 
 module.exports = ({ strapi }) => {
   // bootstrap phase
   // Subscribe to the lifecycles that we are interested in.
   strapi.db.lifecycles.subscribe(async (event) => {
+    const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
     const action = event.action;
     switch (action) {
       case 'beforeFindMany':
@@ -31,7 +20,7 @@ module.exports = ({ strapi }) => {
       case 'afterCreate':
       case 'afterUpdate': {
         try {
-          if (isTriggeredByLocalazyWebhook()) {
+          if (requestInitiatorHelper.isInitiatedByLocalazyWebhook() || requestInitiatorHelper.isInitiatedByLocalazyPluginUI()) {
             break;
           }
 
@@ -49,6 +38,10 @@ module.exports = ({ strapi }) => {
       case 'beforeDeleteMany':
       case 'beforeDelete': {
         try {
+          if (requestInitiatorHelper.isInitiatedByLocalazyWebhook() || requestInitiatorHelper.isInitiatedByLocalazyPluginUI()) {
+            break;
+          }
+
           // have to await here
           const result = await deprecateEventEntryInLocalazyHook(event);
           if (typeof result !== 'undefined') {
