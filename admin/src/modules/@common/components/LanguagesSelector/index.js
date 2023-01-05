@@ -33,10 +33,10 @@ function LanguagesSelector(props) {
 
   return (
     <Select
-      label={t("plugin_settings.webhook_languages")}
-      hint={t("plugin_settings.webhook_languages_info")}
+      label={props.label}
+      hint={props.hint}
       clearLabel={t("plugin_settings.clear")}
-      placeholder={t("plugin_settings.webhook_languages_placeholder")}
+      placeholder={props.placeholder}
       onClear={() => setSelectedLanguages([])}
       value={selectedLanguages || []}
       onChange={(values) => onChange(values)}
@@ -56,9 +56,18 @@ function LanguagesSelector(props) {
 }
 
 LanguagesSelector.propTypes = {
+  label: PropTypes.string,
+  hint: PropTypes.string,
+  placeholder: PropTypes.string,
   projectLanguages: PropTypes.array.isRequired,
   preselectedLanguages: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
 };
+
+LanguagesSelector.getDefaultProps = () => ({
+  label: "",
+  hint: "",
+  placeholder: "",
+});
 
 export default LanguagesSelector;

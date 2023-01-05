@@ -37,11 +37,6 @@ function GlobalSettings() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   /**
-   * Connected project
-   */
-  const [, setConnectedProject] = useState({});
-
-  /**
    * Project Languages without default language
    */
   const [projectLanguages, setProjectLanguages] = useState([]);
@@ -105,7 +100,6 @@ function GlobalSettings() {
       }
 
       const project = await ProjectService.getConnectedProject();
-      setConnectedProject(project);
       const projectLanguagesWithoutDefaultLanguage =
         project?.languages?.filter(language => language.id !== project.sourceLanguage) || [];
       setProjectLanguages(projectLanguagesWithoutDefaultLanguage);
@@ -260,6 +254,9 @@ function GlobalSettings() {
               preselectedLanguages={formModel?.download?.webhookLanguages || []}
               projectLanguages={projectLanguages}
               onChange={(languages) => patchFormModel("download.webhookLanguages", languages)}
+              label={t("plugin_settings.webhook_languages")}
+              hint={t("plugin_settings.webhook_languages_info")}
+              placeholder={t("plugin_settings.webhook_languages_placeholder")}
             />
 
           </Box>

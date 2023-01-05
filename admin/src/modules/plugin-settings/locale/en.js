@@ -30,7 +30,7 @@ export default {
   webhook_author_placeholder: "Select webhook actions author",
   webhook_languages: "Allowed webhook languages",
   webhook_languages_info: "Select the languages from Localazy. Translations of selected languages would be downloaded. If no language is selected, all translations will be downloaded.",
-  webhook_languages_placeholder: "Select allowed webhook languages",
+  webhook_languages_placeholder: "Download all languages",
 
   global_settings_saved_successfully: "Global Settings were saved",
 

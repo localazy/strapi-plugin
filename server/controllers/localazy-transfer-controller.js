@@ -284,6 +284,10 @@ module.exports = {
       (language) => language.code
     );
 
+    // TODO: add filter for languages if called by a webhook
+    // TODO: add filter for languages if called by a user
+    // TODO: process filtered languages only!
+
     /**
      * Iterate over languages and create the ones that are not present in Strapi
      */
