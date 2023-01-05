@@ -39,6 +39,14 @@ class PluginSettingsServiceHelper {
   getWebhookAuthorId() {
     return this.pluginSettings?.download?.webhookAuthorId || null;
   }
+
+  getWebhookLanguagesCodes() {
+    return this.pluginSettings?.download?.webhookLanguages || [];
+  }
+
+  getUiLanguagesCodes() {
+    return this.pluginSettings?.download?.uiLanguages || [];
+  }
 }
 
 module.exports = PluginSettingsServiceHelper;

@@ -18,6 +18,31 @@ const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-
 const set = require("lodash/set");
 const isEmpty = require("lodash/isEmpty");
 const omitDeep = require("../utils/omit-deep");
+const RequestInitiatorHelper = require('../utils/request-initiator-helper');
+const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
+
+const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
+  const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
+  const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
+  await pluginSettingsServiceHelper.setup();
+  let localLanguagesCodes;
+  if (requestInitiatorHelper.isInitiatedByLocalazyWebhook()) {
+    // called by a webhook
+    localLanguagesCodes = pluginSettingsServiceHelper.getWebhookLanguagesCodes();
+  } else if (requestInitiatorHelper.isInitiatedByLocalazyPluginUI()) {
+    // called by a user from the UI
+    localLanguagesCodes = pluginSettingsServiceHelper.getUiLanguagesCodes();
+  } else {
+    strapi.log.warn("Called by an unknown initiator.");
+    return languagesCodes;
+  }
+
+  if (isEmpty(localLanguagesCodes)) {
+    return languagesCodes;
+  }
+
+  return languagesCodes.filter((code) => localLanguagesCodes.includes(code));
+};
 
 module.exports = {
   async upload(ctx) {
@@ -280,13 +305,11 @@ module.exports = {
     /**
      * Get project languages codes
      */
-    const languagesCodes = projectLanguagesWithoutSourceLanguage.map(
+    let languagesCodes = projectLanguagesWithoutSourceLanguage.map(
       (language) => language.code
     );
-
-    // TODO: add filter for languages if called by a webhook
-    // TODO: add filter for languages if called by a user
-    // TODO: process filtered languages only!
+    // process filtered languages only / keep all of empty!
+    languagesCodes = await getFilteredLanguagesCodesForDownload(languagesCodes);
 
     /**
      * Iterate over languages and create the ones that are not present in Strapi
