@@ -28,15 +28,15 @@
   },
   "dependencies": {
     "@david-vaclavek/deep-keys": "^0.5.0",
-    "@localazy/ts-api": "^1.0.6",
-    "i18next": "^21.6.13",
+    "@localazy/ts-api": "^1.0.12",
+    "i18next": "^22.4.9",
     "isomorphic-fetch": "^3.0.0",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
-    "react-hooks-global-state": "^1.0.2",
-    "react-i18next": "^11.15.5",
-    "styled-components": "^5.3.3"
+    "react-hooks-global-state": "^2.1.0",
+    "react-i18next": "^12.1.4",
+    "styled-components": "^5.3.6"
   },
   "peerDependencies": {
     "@strapi/design-system": "^1.0.0",
@@ -44,12 +44,11 @@
     "@strapi/strapi": "^4.0.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.17.7",
-    "@strapi-community/eslint-config": "^0.2.0",
-    "@strapi-community/eslint-config-admin": "^0.2.0",
-    "eslint": "^8.11.0",
-    "eslint-plugin-jest": "^26.1.3",
-    "jest": "^27.5.1"
+    "@babel/plugin-transform-modules-commonjs": "^7.20.11",
+    "@strapi-community/eslint-config": "^0.4.3",
+    "eslint": "^8.32.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "jest": "^29.3.1"
   },
   "author": {
     "name": "Localazy",
@@ -64,7 +63,7 @@
     }
   ],
   "engines": {
-    "node": ">=12.x.x <=16.x.x",
+    "node": ">=14.19.1 <=18.x.x",
     "npm": ">=6.0.0"
   },
   "license": "MIT"
