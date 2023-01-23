@@ -39,7 +39,13 @@ module.exports = ({ strapi }) => ({
   },
 
   async updatePluginSettings(settings) {
-    const newSettings = settings;
+    const currentSettings = await this.getPluginSettings();
+
+    // keep the current settings if the new settings are not provided
+    const newSettings = {
+      ...currentSettings,
+      ...settings,
+    };
     const pluginStore = getStrapiStore(strapi);
     await pluginStore.set({
       key: pluginSettingsModel.KEY,

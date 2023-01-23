@@ -1,3 +1,7 @@
 "use strict";
 
-module.exports = {};
+const verifyWebhook = require("./verify-webhook");
+
+module.exports = {
+  verifyWebhook
+};

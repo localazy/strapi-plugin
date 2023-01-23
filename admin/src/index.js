@@ -13,6 +13,20 @@ const SETTINGS_SETUP = [
     sectionDefaultLabel: "Localazy Settings",
     links: [
       {
+        linkId: `${pluginId}-settings-global`,
+        intlId: `general`,
+        defaultLabel: "Global Settings",
+        to: `/settings/${pluginId}/global-settings`,
+        Component: async () => {
+          const component = await import("./pages/PluginSettings");
+
+          return component;
+        },
+        permissions: [
+          // TODO: only allow access to this page if the user has the right permissions
+        ],
+      },
+      {
         linkId: `${pluginId}-settings-content-transfer-setup`,
         intlId: `content_transfer_setup`,
         defaultLabel: "Content Transfer Setup",
@@ -61,7 +75,7 @@ export default {
         },
       },
       [
-        // links
+        // General
         {
           id: SETTINGS_SETUP[0].links[0].linkId,
           intlLabel: {
@@ -71,6 +85,17 @@ export default {
           to: SETTINGS_SETUP[0].links[0].to,
           Component: SETTINGS_SETUP[0].links[0].Component,
           permissions: SETTINGS_SETUP[0].links[0].permissions,
+        },
+        // Content Transfer Setup
+        {
+          id: SETTINGS_SETUP[0].links[1].linkId,
+          intlLabel: {
+            id: SETTINGS_SETUP[0].links[1].intlId,
+            defaultMessage: SETTINGS_SETUP[0].links[1].defaultLabel,
+          },
+          to: SETTINGS_SETUP[0].links[1].to,
+          Component: SETTINGS_SETUP[0].links[1].Component,
+          permissions: SETTINGS_SETUP[0].links[1].permissions,
         },
       ]
     );

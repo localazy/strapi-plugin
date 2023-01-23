@@ -19,4 +19,12 @@ module.exports = [
       policies: [],
     },
   },
+  {
+    method: "POST",
+    path: `${ROUTE_PREFIX}/lifecycle/localazy-webhooks`,
+    handler: "strapiController.postLifecycleLocalazyWebhooks",
+    config: {
+      policies: [],
+    },
+  },
 ];

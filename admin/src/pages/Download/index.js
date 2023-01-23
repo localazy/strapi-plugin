@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import cloneDeep from "lodash-es/cloneDeep";
+import set from "lodash-es/set";
 import { HeaderLayout } from "@strapi/design-system/Layout";
 import { Button } from "@strapi/design-system/Button";
 import DownloadIcon from "@strapi/icons/Download";
@@ -20,6 +22,8 @@ import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 import { PLUGIN_ROUTES } from "../../modules/@common/utils/redirect-to-plugin-route";
+import LanguagesSelector from "../../modules/@common/components/LanguagesSelector";
+import ProjectService from "../../modules/@common/services/project-service";
 
 function Download(props) {
   const { t } = useTranslation();
@@ -36,12 +40,35 @@ function Download(props) {
   const [isDownloading, setIsDownloading] = useState(false);
 
   /**
-     * localazy identity / access token
-     */
+   * Localazy identity / access token
+   */
   const [localazyIdentity] = getLocalazyIdentity();
   const onTranslateInLocalazyClick = () => {
     window.open(localazyIdentity.project.url, "_blank");
   }
+
+  /**
+   * Project Languages without default language
+   */
+  const [projectLanguages, setProjectLanguages] = useState([]);
+
+  /**
+   * Global Settings form model
+   */
+  const [formModel, setFormModel] = useState([]);
+
+  const onDownloadLanguagesChange = (languages) => {
+    const newFormModel = cloneDeep(formModel);
+    set(newFormModel, 'download.uiLanguages', languages);
+    setFormModel(newFormModel);
+
+    try {
+      PluginSettingsService.updatePluginSettings(newFormModel);
+    } catch (e) {
+      console.error(e.message);
+    }
+  };
+
 
   const onDownloadClick = async () => {
     setIsDownloading(true);
@@ -70,6 +97,14 @@ function Download(props) {
        */
       setModelChanged(await hasModelChanged());
       setLocalesIncompatible(!(await areLocalesCompatible()));
+
+      const project = await ProjectService.getConnectedProject();
+      const projectLanguagesWithoutDefaultLanguage =
+        project?.languages?.filter(language => language.id !== project.sourceLanguage) || [];
+      setProjectLanguages(projectLanguagesWithoutDefaultLanguage);
+
+      const globalSettings = await PluginSettingsService.getPluginSettings();
+      setFormModel(globalSettings);
 
       PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
 
@@ -124,6 +159,18 @@ function Download(props) {
             <Typography variant="omega">
               {t("download.make_sure_note_c")}
             </Typography>
+            <Box
+              paddingTop={6}
+            >
+              <LanguagesSelector
+                preselectedLanguages={formModel?.download?.uiLanguages || []}
+                projectLanguages={projectLanguages}
+                onChange={(languages) => onDownloadLanguagesChange(languages)}
+                label={t("download.ui_languages")}
+                hint={t("download.ui_languages_info")}
+                placeholder={t("download.ui_languages_placeholder")}
+              />
+            </Box>
             <Box
               paddingTop={4}
               paddingBottom={4}

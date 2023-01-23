@@ -7,7 +7,7 @@ const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
 
 module.exports = ({ strapi }) => ({
-  async getLocales(ctx) {
+  async getLocales(ctx = {}) {
     await strapi.controller("plugin::i18n.locales").listLocales(ctx);
     return ctx.body;
   },
