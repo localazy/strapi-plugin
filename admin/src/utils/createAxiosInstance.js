@@ -23,6 +23,8 @@ const createAxiosInstance = (baseUrl = null) => {
         Authorization: `Bearer ${auth.getToken()}`,
         Accept: "application/json",
         "Content-Type": "application/json",
+        // Add this header to identify the request as initiated by the plugin
+        "X-Localazy-Initiated-By": "strapi-plugin-localazy",
       };
 
       return config;

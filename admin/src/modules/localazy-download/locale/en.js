@@ -17,4 +17,7 @@ export default {
   make_sure_note_a: "Make sure the translations are approved in Localazy, otherwise they ",
   make_sure_note_b: "will not ",
   make_sure_note_c: "be downloaded to Strapi.",
+  ui_languages: "Select languages to download",
+  ui_languages_info: "Select translations of which languages wil be downloaded from Localazy",
+  ui_languages_placeholder: "Download all languages",
 };

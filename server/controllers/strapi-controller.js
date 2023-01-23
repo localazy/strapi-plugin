@@ -13,4 +13,7 @@ module.exports = {
       .service("strapiService")
       .getLocalizableModels();
   },
+  async postLifecycleLocalazyWebhooks(ctx) {
+    strapi.log("done");
+  },
 };

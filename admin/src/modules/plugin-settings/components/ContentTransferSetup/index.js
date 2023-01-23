@@ -299,8 +299,7 @@ function ContentTransferSetup() {
               </Box>
             )}
           </Box>
-        )
-        }
+        )}
       </Box>
     </>
   );
