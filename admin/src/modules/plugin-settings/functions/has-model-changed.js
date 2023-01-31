@@ -43,8 +43,25 @@ export default async (
     storedSetupSchema.sort(sortByModelName)
   );
 
+  const currentModelsSchemaKeys = deepKeys(localizableTree);
+  const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
+
+  // components order may have changed; this would prevent properties from mixing up
+  const regex = /\.\d+\.__component__/;
+  const currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  const storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+
+  currentModelsSchemaComponentKeys.forEach((key) => {
+    get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
+  });
+
+  storedSetupSchemaComponentKeys.forEach((key) => {
+    get(storedSetupSchema, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
+  });
+
   const modelsTreeKeys = deepKeys(localizableTree);
   const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
+
 
   const removedKeys = storedSetupSchemaKeys.filter(
     (x) => !modelsTreeKeys.includes(x)
