@@ -3,10 +3,6 @@
 const contentTransferSetupModel = require("../db/model/content-transfer-setup");
 
 const pluginSettingsModel = require("../db/model/plugin-settings");
-// {
-//   KEY,
-//   emptyPluginSettings,
-// } = require("../db/model/plugin-settings");
 const getStrapiStore = require("../db/model/utils/get-strapi-store");
 
 module.exports = ({ strapi }) => ({
