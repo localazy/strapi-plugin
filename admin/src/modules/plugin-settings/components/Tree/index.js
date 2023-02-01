@@ -31,7 +31,6 @@ function Tree(props) {
             flattened = Object.fromEntries(Object.entries(flattened).filter(([key]) => !key.includes("__component__")));
             const flattenedKeys = Object.keys(flattened).map((k) => `${path}.${key}.${k}`);
 
-            // debugger;
             const hasTruthyValue = Object
               .values(flattened)
               .some(v => v);
