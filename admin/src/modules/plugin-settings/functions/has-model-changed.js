@@ -1,5 +1,6 @@
 import deepKeys from "@david-vaclavek/deep-keys";
 import get from "lodash-es/get";
+import uniq from "lodash-es/uniq";
 import PluginSettingsService from "../services/plugin-settings-service";
 import StrapiModelService from "../services/strapi-model-service";
 import getModelsTree from "../utils/get-models-tree";
@@ -48,8 +49,10 @@ export default async (
 
   // components order may have changed; this would prevent properties from mixing up
   const regex = /\.\d+\.__component__/;
-  const currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  const storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
+  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
 
   currentModelsSchemaComponentKeys.forEach((key) => {
     get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);

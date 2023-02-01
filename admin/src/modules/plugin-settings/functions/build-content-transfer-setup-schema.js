@@ -1,5 +1,6 @@
 import set from "lodash-es/set";
 import get from "lodash-es/get";
+import uniq from "lodash-es/uniq";
 import deepKeys from "@david-vaclavek/deep-keys";
 import sortByModelName from "../../@common/utils/sort-by-model-name";
 import arrayOfModelsToObject from "../utils/array-of-models-to-object";
@@ -19,11 +20,16 @@ export default (
 
   const unsortedCurrentModelsSchemaKeys = deepKeys(localizableTree);
   const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
+  const unsortedAllModelsSchemaKeys = deepKeys(allModelsTree);
 
   // components order may have changed; this would prevent properties from mixing up
   const regex = /\.\d+\.__component__/;
-  const currentModelsSchemaComponentKeys = unsortedCurrentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  const storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let currentModelsSchemaComponentKeys = unsortedCurrentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let allModelsSchemaComponentKeys = unsortedAllModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
+  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
+  allModelsSchemaComponentKeys = uniq(allModelsSchemaComponentKeys);
 
   currentModelsSchemaComponentKeys.forEach((key) => {
     get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
@@ -31,6 +37,10 @@ export default (
 
   storedSetupSchemaComponentKeys.forEach((key) => {
     get(storedSetupSchema, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
+  });
+
+  allModelsSchemaComponentKeys.forEach((key) => {
+    get(allModelsTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
   });
 
   const currentModelsSchemaKeys = deepKeys(localizableTree);
