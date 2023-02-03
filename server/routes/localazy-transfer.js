@@ -19,4 +19,12 @@ module.exports = [
       policies: [],
     },
   },
+  {
+    method: "POST",
+    path: `${ROUTE_PREFIX}/upload/v2`,
+    handler: "localazyTransferControllerV2.upload",
+    config: {
+      policies: [],
+    },
+  },
 ];
