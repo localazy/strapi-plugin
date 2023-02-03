@@ -47,7 +47,8 @@
     "module-alias": "^2.2.2",
     "react-hooks-global-state": "^2.1.0",
     "react-i18next": "^12.1.4",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "tar-stream": "^3.0.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.20.11",
@@ -66,5 +67,9 @@
   "engines": {
     "node": ">=14.19.1 <=18.x.x",
     "npm": ">=6.0.0"
+  },
+  "browser": {
+    "child_process": false,
+    "fs": false
   }
 }
