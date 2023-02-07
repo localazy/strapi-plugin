@@ -16,9 +16,6 @@ const EXPORT_FILE_NAME = 'localazy_export_upload';
 
 const getComponentType = (allModels, key, currentModel) => {
   let componentType = 'none';
-  let isComponent = false;
-  let isRepeatable = false;
-  let isDynamicZone = false;
   const keyArray = [key];
 
   const iteration = (keyArray, currentModel, index = 0) => {
@@ -29,7 +26,13 @@ const getComponentType = (allModels, key, currentModel) => {
       // cut the last part of the key and try again
       const split = keyArray[index].split('.');
       keyArray[index] = split[0];
-      keyArray.push(split.slice(1, split.length).join('.'));
+      const keyToPush = split.slice(1, split.length).join('.');
+
+      if (!keyToPush) {
+        return componentType;
+      }
+
+      keyArray.push(keyToPush);
 
       return iteration(keyArray, currentModel, index);
     } else if (modelValue.type === 'component') {
@@ -43,6 +46,14 @@ const getComponentType = (allModels, key, currentModel) => {
       return iteration(keyArray, newCurrentModel, index);
     } else if (modelValue.type === 'dynamiczone') {
       componentType = 'dynamiczone';
+
+      const components = modelValue.components;
+      components.forEach((componentUid) => {
+        const newCurrentModel = allModels.find((model) => model.uid === componentUid);
+        index += 1;
+
+        return iteration(keyArray, newCurrentModel, index);
+      });
     } else {
       // is a primitive type; the end of the recursion
       return componentType;
