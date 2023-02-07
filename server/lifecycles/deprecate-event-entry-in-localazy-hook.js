@@ -55,7 +55,7 @@ module.exports = async (event) => {
       await LocalazyApi.updateKey({
         projectId: user.project.id,
         keyId: filteredProjectKeysId,
-        deprecated: 0,
+        // deprecated: 0,
       });
       await delay();
     } catch (e) {
