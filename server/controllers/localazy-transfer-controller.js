@@ -179,9 +179,10 @@ module.exports = {
       );
       await LocalazyUploadService.upload(
         importFile,
-        {
-          deprecate: "file"
-        });
+        // {
+        //   deprecate: "file"
+        // }
+      );
 
       ctx.body = {
         success,

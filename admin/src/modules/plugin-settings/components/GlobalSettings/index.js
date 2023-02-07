@@ -200,14 +200,16 @@ function GlobalSettings() {
               <Option value="updated">{t("plugin_settings.editing_data_entry")}</Option>
             </Select>
             {/* Deprecate source keys on deletion */}
-            <br /><br />
-            <ToggleInput
-              label={t("plugin_settings.deprecate_source_keys_on_delete")}
-              hint={t("plugin_settings.deprecate_source_keys_on_delete_info")}
-              offLabel={t("plugin_settings.off")}
-              onLabel={t("plugin_settings.on")}
-              checked={typeof formModel?.upload?.allowDeprecate === "boolean" ? formModel.upload.allowDeprecate : false}
-              onChange={e => patchFormModel("upload.allowDeprecate", e.target.checked)} />
+            <div style={{ display: "none" }}>
+              <br /><br />
+              <ToggleInput
+                label={t("plugin_settings.deprecate_source_keys_on_delete")}
+                hint={t("plugin_settings.deprecate_source_keys_on_delete_info")}
+                offLabel={t("plugin_settings.off")}
+                onLabel={t("plugin_settings.on")}
+                checked={typeof formModel?.upload?.allowDeprecate === "boolean" ? formModel.upload.allowDeprecate : false}
+                onChange={e => patchFormModel("upload.allowDeprecate", e.target.checked)} />
+            </div>
             <br /><br />
             <Divider />
             {/* Download Settings */}
