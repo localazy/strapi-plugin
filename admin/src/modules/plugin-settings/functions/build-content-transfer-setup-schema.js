@@ -20,79 +20,20 @@ export default (
 
   const unsortedCurrentModelsSchemaKeys = deepKeys(localizableTree);
   const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
-  // const unsortedAllModelsSchemaKeys = deepKeys(allModelsTree);
 
   // components order may have changed; this would prevent properties from mixing up
   const regex = /\.\d+\.__component__/;
   let currentModelsSchemaComponentKeys = unsortedCurrentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
   let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  // let allModelsSchemaComponentKeys = unsortedAllModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
   currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
   storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
-  // allModelsSchemaComponentKeys = uniq(allModelsSchemaComponentKeys);
 
   const currentModelsSchemaKeys = deepKeys(localizableTree);
   const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
-  // const allModelsSchemaKeys = deepKeys(allModelsTree);
 
   // create a components indices map
   const currentModelsSchemaComponentKeysComponentProp = currentModelsSchemaKeys.filter((key) => key.includes('__component__') && currentModelsSchemaComponentKeys.some((k) => key.includes(k)));
   const storedSetupSchemaComponentKeysComponentProp = storedSetupSchemaKeys.filter((key) => key.includes('__component__') && storedSetupSchemaComponentKeys.some((k) => key.includes(k)));
-  // const allModelsSchemaComponentKeysComponentProp = allModelsSchemaKeys.filter((key) => key.includes('__component__') && allModelsSchemaComponentKeys.some((k) => key.includes(k)));
-
-  // const analyzedComponentNames = [];
-  // const componentsIndicesMap = new Map();
-  // currentModelsSchemaComponentKeysComponentProp.forEach((key) => {
-  //   const split = key.split('.');
-  //   const index = split[split.length - 2];
-  //   const componentName = get(localizableTree, key);
-  //   const componentProp = `${split.slice(0, split.length - 2).join('.')}.${componentName}`;
-
-  //   if (!analyzedComponentNames.includes(componentProp)) {
-  //     analyzedComponentNames.push(componentProp);
-  //   }
-
-  //   componentsIndicesMap.set(componentProp, [index, null, null]);
-  // });
-
-  // storedSetupSchemaComponentKeysComponentProp.forEach((key) => {
-  //   const split = key.split('.');
-  //   const index = split[split.length - 2];
-  //   const componentName = get(storedSetupSchema, key);
-  //   const componentProp = `${split.slice(0, split.length - 2).join('.')}.${componentName}`;
-
-  //   if (!analyzedComponentNames.includes(componentProp)) {
-  //     analyzedComponentNames.push(componentProp);
-  //   }
-
-  //   if (componentsIndicesMap.has(componentProp)) {
-  //     const [currentModelsSchemaIndex, , allModelsSchemaIndex] = componentsIndicesMap.get(componentProp);
-  //     componentsIndicesMap.set(componentProp, [currentModelsSchemaIndex, index, allModelsSchemaIndex]);
-  //   } else {
-  //     componentsIndicesMap.set(componentProp, [null, index, null]);
-  //   }
-  // });
-
-  // allModelsSchemaComponentKeysComponentProp.forEach((key) => {
-  //   const split = key.split('.');
-  //   const index = split[split.length - 2];
-  //   const componentName = get(allModelsTree, key);
-  //   // cut the index
-  //   const componentProp = `${split[1]}.${split.slice(1, split.length - 2).join('.')}.${componentName}`;
-
-  //   if (!analyzedComponentNames.includes(componentProp)) {
-  //     analyzedComponentNames.push(componentProp);
-  //   }
-
-  //   if (componentsIndicesMap.has(componentProp)) {
-  //     const [currentModelsSchemaIndex, storedSetupSchemaIndex,] = componentsIndicesMap.get(componentProp);
-  //     componentsIndicesMap.set(componentProp, [currentModelsSchemaIndex, storedSetupSchemaIndex, index]);
-  //   } else {
-  //     componentsIndicesMap.set(componentProp, [null, null, index]);
-  //   }
-  // });
-
-  // debugger;
 
   /**
    * Is in the "stored setup schema" but not in the "current model"
@@ -114,8 +55,6 @@ export default (
   removedKeys.push(...storedSetupSchemaKeys.filter((key) => !currentModelsSchemaKeys.includes(key)));
   removedKeys = uniq(removedKeys);
 
-  // debugger;
-
   /**
    * Is in the "current model" but not in the "stored setup schema"
    */
@@ -135,8 +74,6 @@ export default (
   }).reduce((acc, val) => acc.concat(val), []));
   newKeys.push(...currentModelsSchemaKeys.filter((key) => !storedSetupSchemaKeys.includes(key)));
   newKeys = uniq(newKeys);
-
-  // debugger;
 
   /**
    * Filter out the removed keys
