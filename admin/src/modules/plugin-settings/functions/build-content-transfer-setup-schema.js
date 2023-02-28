@@ -18,20 +18,16 @@ export default (
     storedSetupSchema.sort(sortByModelName)
   );
 
-  const unsortedCurrentModelsSchemaKeys = deepKeys(localizableTree);
-  const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
-
-  // components order may have changed; this would prevent properties from mixing up
-  const regex = /\.\d+\.__component__/;
-  let currentModelsSchemaComponentKeys = unsortedCurrentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
-  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
-
   const currentModelsSchemaKeys = deepKeys(localizableTree);
   const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
 
-  // create a components indices map
+  // components order may have changed; this would prevent properties from mixing up
+  const regex = /\.\d+\.__component__/;
+  let currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let storedSetupSchemaComponentKeys = storedSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
+  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
+
   const currentModelsSchemaComponentKeysComponentProp = currentModelsSchemaKeys.filter((key) => key.includes('__component__') && currentModelsSchemaComponentKeys.some((k) => key.includes(k)));
   const storedSetupSchemaComponentKeysComponentProp = storedSetupSchemaKeys.filter((key) => key.includes('__component__') && storedSetupSchemaComponentKeys.some((k) => key.includes(k)));
 
