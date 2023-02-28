@@ -1,66 +1,26 @@
 import set from "lodash-es/set";
 import get from "lodash-es/get";
-import uniq from "lodash-es/uniq";
-import deepKeys from "@david-vaclavek/deep-keys";
-import sortByModelName from "../../@common/utils/sort-by-model-name";
-import arrayOfModelsToObject from "../utils/array-of-models-to-object";
 import findModelValueByKey from "../utils/find-model-value-by-key";
+import getContentTransferSetupKeysSets from "./get-content-transfer-setup-keys-sets";
 
 export default (
   localizableTree = [],
   storedSetupSchema = [],
   allModelsTree = []
 ) => {
-  localizableTree = arrayOfModelsToObject(
-    localizableTree.sort(sortByModelName)
-  );
-  storedSetupSchema = arrayOfModelsToObject(
-    storedSetupSchema.sort(sortByModelName)
-  );
-
-  const unsortedCurrentModelsSchemaKeys = deepKeys(localizableTree);
-  const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
-  const unsortedAllModelsSchemaKeys = deepKeys(allModelsTree);
-
-  // components order may have changed; this would prevent properties from mixing up
-  const regex = /\.\d+\.__component__/;
-  let currentModelsSchemaComponentKeys = unsortedCurrentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  let allModelsSchemaComponentKeys = unsortedAllModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
-  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
-  allModelsSchemaComponentKeys = uniq(allModelsSchemaComponentKeys);
-
-  currentModelsSchemaComponentKeys.forEach((key) => {
-    get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
-
-  storedSetupSchemaComponentKeys.forEach((key) => {
-    get(storedSetupSchema, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
-
-  allModelsSchemaComponentKeys.forEach((key) => {
-    get(allModelsTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
-
-  const currentModelsSchemaKeys = deepKeys(localizableTree);
-  const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
-
-  const removedKeys = storedSetupSchemaKeys.filter(
-    (x) => !currentModelsSchemaKeys.includes(x)
-  );
-
-  const newKeys = currentModelsSchemaKeys.filter(
-    (key) => !storedSetupSchemaKeys.includes(key)
-  );
-
-  const filteredStoredSetupSchemaKeys = storedSetupSchemaKeys.filter(
-    (key) => !removedKeys.includes(key)
+  const {
+    oLocalizableTree,
+    oStoredSetupSchema,
+    newKeys,
+    filteredStoredSetupSchemaKeys
+  } = getContentTransferSetupKeysSets(
+    localizableTree,
+    storedSetupSchema,
   );
 
   const destinationObject = {};
   filteredStoredSetupSchemaKeys.forEach((key) => {
-    const localizableTreeValueToSet = get(storedSetupSchema, key);
+    const localizableTreeValueToSet = get(oStoredSetupSchema, key);
     const allModelsTreeValueToSet = findModelValueByKey(allModelsTree, key);
 
     if (allModelsTreeValueToSet === null) {
@@ -74,7 +34,7 @@ export default (
     }
   });
   newKeys.forEach((key) => {
-    set(destinationObject, key, get(localizableTree, key));
+    set(destinationObject, key, get(oLocalizableTree, key));
   });
 
   const destinationArray = [];

@@ -1,12 +1,9 @@
-import deepKeys from "@david-vaclavek/deep-keys";
 import get from "lodash-es/get";
-import uniq from "lodash-es/uniq";
 import PluginSettingsService from "../services/plugin-settings-service";
 import StrapiModelService from "../services/strapi-model-service";
 import getModelsTree from "../utils/get-models-tree";
-import sortByModelName from "../../@common/utils/sort-by-model-name";
-import arrayOfModelsToObject from "../utils/array-of-models-to-object";
 import findModelValueByKey from "../utils/find-model-value-by-key";
+import getContentTransferSetupKeysSets from "./get-content-transfer-setup-keys-sets";
 
 /**
  * Pass parameters optionally so we don't have to fetch them again
@@ -37,53 +34,26 @@ export default async (
     allModelsTree = getModelsTree(models, models);
   }
 
-  localizableTree = arrayOfModelsToObject(
-    localizableTree.sort(sortByModelName)
-  );
-  storedSetupSchema = arrayOfModelsToObject(
-    storedSetupSchema.sort(sortByModelName)
-  );
-
-  const currentModelsSchemaKeys = deepKeys(localizableTree);
-  const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
-
-  // components order may have changed; this would prevent properties from mixing up
-  const regex = /\.\d+\.__component__/;
-  let currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
-  storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
-
-  currentModelsSchemaComponentKeys.forEach((key) => {
-    get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
-
-  storedSetupSchemaComponentKeys.forEach((key) => {
-    get(storedSetupSchema, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
-
-  const modelsTreeKeys = deepKeys(localizableTree);
-  const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
-
-
-  const removedKeys = storedSetupSchemaKeys.filter(
-    (x) => !modelsTreeKeys.includes(x)
-  );
-  const newKeys = modelsTreeKeys.filter(
-    (key) => !storedSetupSchemaKeys.includes(key)
+  const {
+    oStoredSetupSchema,
+    removedKeys,
+    newKeys,
+    filteredStoredSetupSchemaKeys
+  } = getContentTransferSetupKeysSets(
+    localizableTree,
+    storedSetupSchema,
   );
 
   if (newKeys.length || removedKeys.length) {
     return true;
   }
 
-  const filteredStoredSetupSchemaKeys = storedSetupSchemaKeys.filter(
-    (key) => !removedKeys.includes(key)
-  );
-
+  /**
+   * Check if the values are different (type might have changed; boolean to null or vice versa)
+   */
   // eslint-disable-next-line no-restricted-syntax
   for (const key of filteredStoredSetupSchemaKeys) {
-    const localizableTreeValueToSet = get(storedSetupSchema, key);
+    const localizableTreeValueToSet = get(oStoredSetupSchema, key);
     const allModelsTreeValueToSet = findModelValueByKey(allModelsTree, key);
 
     if (
