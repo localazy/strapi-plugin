@@ -45,42 +45,72 @@ export default async (
   );
 
   const currentModelsSchemaKeys = deepKeys(localizableTree);
-  const unsortedStoredSetupSchemaKeys = deepKeys(storedSetupSchema);
+  const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
 
   // components order may have changed; this would prevent properties from mixing up
   const regex = /\.\d+\.__component__/;
   let currentModelsSchemaComponentKeys = currentModelsSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
-  let storedSetupSchemaComponentKeys = unsortedStoredSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
+  let storedSetupSchemaComponentKeys = storedSetupSchemaKeys.filter((key) => key.match(regex)).map((key) => key.replace(regex, ''));
   currentModelsSchemaComponentKeys = uniq(currentModelsSchemaComponentKeys);
   storedSetupSchemaComponentKeys = uniq(storedSetupSchemaComponentKeys);
 
-  currentModelsSchemaComponentKeys.forEach((key) => {
-    get(localizableTree, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
+  const currentModelsSchemaComponentKeysComponentProp = currentModelsSchemaKeys.filter((key) => key.includes('__component__') && currentModelsSchemaComponentKeys.some((k) => key.includes(k)));
+  const storedSetupSchemaComponentKeysComponentProp = storedSetupSchemaKeys.filter((key) => key.includes('__component__') && storedSetupSchemaComponentKeys.some((k) => key.includes(k)));
 
-  storedSetupSchemaComponentKeys.forEach((key) => {
-    get(storedSetupSchema, key).sort((a, b) => a.__component__ > b.__component__ ? 1 : -1);
-  });
+  /**
+   * Is in the "stored setup schema" but not in the "current model"
+   */
+  let removedKeys = [];
+  removedKeys.push(...storedSetupSchemaComponentKeysComponentProp.map((key) => {
+    const storedComponentName = get(storedSetupSchema, key);
+    const currentComponentName = get(localizableTree, key);
 
-  const modelsTreeKeys = deepKeys(localizableTree);
-  const storedSetupSchemaKeys = deepKeys(storedSetupSchema);
+    // this must return an array of keys
+    if (storedComponentName !== currentComponentName) {
+      const part = key.split('.').slice(0, -1).join('.');
 
+      return storedSetupSchemaKeys.filter((k) => k.includes(part));
+    }
 
-  const removedKeys = storedSetupSchemaKeys.filter(
-    (x) => !modelsTreeKeys.includes(x)
-  );
-  const newKeys = modelsTreeKeys.filter(
-    (key) => !storedSetupSchemaKeys.includes(key)
-  );
+    return [];
+  }).reduce((acc, val) => acc.concat(val), []));
+  removedKeys.push(...storedSetupSchemaKeys.filter((key) => !currentModelsSchemaKeys.includes(key)));
+  removedKeys = uniq(removedKeys);
+
+  /**
+   * Is in the "current model" but not in the "stored setup schema"
+   */
+  let newKeys = [];
+  newKeys.push(...currentModelsSchemaComponentKeysComponentProp.map((key) => {
+    const storedComponentName = get(storedSetupSchema, key);
+    const currentComponentName = get(localizableTree, key);
+
+    // this must return an array of keys
+    if (storedComponentName !== currentComponentName) {
+      const part = key.split('.').slice(0, -1).join('.');
+
+      return currentModelsSchemaKeys.filter((k) => k.includes(part));
+    }
+
+    return [];
+  }).reduce((acc, val) => acc.concat(val), []));
+  newKeys.push(...currentModelsSchemaKeys.filter((key) => !storedSetupSchemaKeys.includes(key)));
+  newKeys = uniq(newKeys);
 
   if (newKeys.length || removedKeys.length) {
     return true;
   }
 
+  /**
+   * Filter out the removed keys
+  */
   const filteredStoredSetupSchemaKeys = storedSetupSchemaKeys.filter(
     (key) => !removedKeys.includes(key)
   );
 
+  /**
+   * Check if the values are different (type might have changed; boolean to null or vice versa)
+   */
   // eslint-disable-next-line no-restricted-syntax
   for (const key of filteredStoredSetupSchemaKeys) {
     const localizableTreeValueToSet = get(storedSetupSchema, key);
