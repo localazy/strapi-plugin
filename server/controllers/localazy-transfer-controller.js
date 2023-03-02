@@ -177,11 +177,12 @@ module.exports = {
         locale,
         chunks
       );
+      // Use `deprecate: "file"` if there is one chunk of transferred data only!
+      const hasMoreTransferFilesChunks = importFile.length > 1;
+      const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
       await LocalazyUploadService.upload(
         importFile,
-        // {
-        //   deprecate: "file"
-        // }
+        uploadConfig
       );
 
       ctx.body = {

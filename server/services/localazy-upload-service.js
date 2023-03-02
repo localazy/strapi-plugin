@@ -4,6 +4,7 @@
 
 const getLocalazyApi = require("../utils/get-localazy-api");
 const delay = require("../utils/delay");
+const config = require("../config").default;
 
 module.exports = ({ strapi }) => ({
   /**
@@ -45,15 +46,21 @@ module.exports = ({ strapi }) => ({
     }
   },
 
-  splitToChunks(data, CHUNK_LIMIT = 1000) {
+  /**
+   * Check Directus for the Lifted Limits OAuth Apps IDs
+   */
+  CHUNK_LIMIT: config.LOCALAZY_PUBLIC_API_LIFTED_LIMITS ? 99900 : 9990,
+
+  splitToChunks(data, CHUNK_LIMIT = null) {
     const chunks = [];
     const keys = Object.keys(data);
     const keysCount = keys.length;
-    const chunksCount = Math.ceil(keysCount / CHUNK_LIMIT);
+    const localChunkLimit = CHUNK_LIMIT || this.CHUNK_LIMIT;
+    const chunksCount = Math.ceil(keysCount / localChunkLimit);
     for (let i = 0; i < chunksCount; i += 1) {
       const chunkStrings = {};
-      const from = CHUNK_LIMIT * i;
-      const to = CHUNK_LIMIT * (i + 1);
+      const from = localChunkLimit * i;
+      const to = localChunkLimit * (i + 1);
 
       const currentKeys = keys.slice(from, to);
       currentKeys.forEach((key) => {
