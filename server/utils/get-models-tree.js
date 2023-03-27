@@ -1,6 +1,7 @@
 "use strict";
 
 const SUPPORTED_CONTENT_TYPE_FIELDS = require("../models/supported-content-type-fields");
+const SUPPORTED_CUSTOM_FIELD_PLUGINS = require("../models/supported-custom-field-plugins");
 
 const getModelTree = (attributes, models) => {
   const currentModelTree = {};
@@ -15,6 +16,7 @@ const getModelTree = (attributes, models) => {
       };
     } else if (
       SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
+      || (attributes[attribute].type === "customField" && SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(attributes[attribute].customField))
     ) {
       currentModelTree[attribute] = false;
     } else {
