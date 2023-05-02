@@ -1,4 +1,5 @@
 import SUPPORTED_CONTENT_TYPE_FIELDS from "../../@common/models/supported-content-type-fields";
+import SUPPORTED_CUSTOM_FIELD_PLUGINS from "../../@common/models/supported-custom-field-plugins";
 
 /**
  * Supported kinds of models are expected by the function, needs to be checked before calling the function
@@ -46,7 +47,9 @@ const getModelsTree = (allModels, localizableModels = []) => {
             ...modelTree,
           });
         });
-      } else if (SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)) {
+      } else if (
+        SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
+        || (attributes[attribute].type === "customField" && SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(attributes[attribute].customField))) {
         // field might not be localizable
         if (isComponentAttributes) {
           if (isComponentAttributesObjectTranslatable) {
