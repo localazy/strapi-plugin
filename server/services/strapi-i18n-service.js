@@ -5,6 +5,7 @@ const intlDisplayName = require("../utils/intl-display-name.js");
 const merge = require("lodash/merge");
 const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
+const { forEach, map } = require("lodash")
 
 module.exports = ({ strapi }) => ({
   async getLocales(ctx = {}) {
@@ -117,6 +118,19 @@ module.exports = ({ strapi }) => ({
     try {
       const StrapiService = strapi.plugin("localazy").service("strapiService");
       const populate = await StrapiService.getPopulateObject(uid);
+
+      if(populate?.sections) {
+        populate.sections = 'deep'
+      }
+
+      if(data?.sections && Array.isArray(data.sections)) {
+        data.sections = map(data.sections, (item) => {
+          if(item.id) {
+            delete item.id
+          }
+          return item
+        })
+      }
 
       const updatedEntry = await strapi.entityService.update(
         uid,
