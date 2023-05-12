@@ -5,7 +5,7 @@ const intlDisplayName = require("../utils/intl-display-name.js");
 const merge = require("lodash/merge");
 const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
-const { forEach, map } = require("lodash")
+const { forEach, map, find } = require("lodash")
 
 module.exports = ({ strapi }) => ({
   async getLocales(ctx = {}) {
@@ -116,20 +116,26 @@ module.exports = ({ strapi }) => ({
   },
   async updateLocalizationForAnExistingEntry(uid, updateEntryId, data) {
     try {
+    
       const StrapiService = strapi.plugin("localazy").service("strapiService");
+      const strapiContentTypesModels = await StrapiService.getModels();
       const populate = await StrapiService.getPopulateObject(uid);
 
-      if(populate?.sections) {
-        populate.sections = 'deep'
-      }
-
-      if(data?.sections && Array.isArray(data.sections)) {
-        data.sections = map(data.sections, (item) => {
-          if(item.id) {
-            delete item.id
+      // Bugfix by <emanuele.c@dacoco.io>:
+      // Prevents IDs to be appended when updating a localized entry. When IDs are present
+      // Strapi attempts to update a not yet existent ID into the DB
+      if(strapiContentTypesModels) {
+        const filtered = find(strapiContentTypesModels, (model) => model.uid === uid)
+        if(filtered?.attributes) {
+          for(let attribute in filtered.attributes) {
+            if(filtered.attributes[attribute]?.type === 'dynamiczone') {
+              if(!populate[attribute] || populate[attribute] !== 'deep') {
+                populate[attribute] = 'deep'
+              }
+              forEach(data[attribute], (prop) => { if(prop?.id) delete prop.id})
+            }
           }
-          return item
-        })
+        }
       }
 
       const updatedEntry = await strapi.entityService.update(
