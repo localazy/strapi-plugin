@@ -49,10 +49,44 @@ const getPickPaths = (transferSetupModelProps) => {
   return pickPaths;
 };
 
+const getPickPathsWithComponents = (transferSetupModelProps) => {
+  const flattenedObject = flattenObject(transferSetupModelProps);
+  let pickComponents = {};
+  Object.keys(flattenedObject).forEach((key) => {
+    if (key.includes(".__component__")) {
+      const componentKey = key.split(".__component__")[0];
+      if (!pickComponents[componentKey]) {
+        const splitByDot = flattenedObject[key].split(".");
+        pickComponents[key.split(".__component__")[0]] = `${splitByDot[0]}[${splitByDot[1]}]`;
+      }
+    }
+  });
+  const pickPaths = Object.keys(flattenedObject)
+    .filter(
+      (key) => flattenedObject[key] === true && key.indexOf("__model__") === -1
+    );
+
+  // id needs to be always included
+  pickPaths.push("id");
+
+  let pickPathsWithComponents = [];
+  Object.entries(pickPaths).forEach(([, value]) => {
+    const componentKey = value.split(".")[0];
+    let pushValue = value;
+    if (pickComponents[componentKey]) {
+      pushValue = value.replace(componentKey, pickComponents[componentKey]);
+    }
+    pickPathsWithComponents.push(pushValue);
+  });
+
+  return pickPathsWithComponents;
+};
+
 module.exports = {
   findSetupModelByCollectionName,
   findSetupModelByCollectionUid,
   getCollectionsNames,
   isCollectionTransferEnabled,
   getPickPaths,
+  getPickPathsWithComponents,
 };
