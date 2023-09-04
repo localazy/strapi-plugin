@@ -22,8 +22,13 @@ const flattenObject = (object, prefix = "") => {
         const flattenedArray = object[objectKey].reduce(
           (accumulator, item, index) => {
             // No id should use the index of the array item
-            accumulator[`${objectKey}[${item.id || index}]`] =
-              flattenObject(item);
+            let key = `${objectKey}[${item.id || index}]`;
+            // is Dynamic Zone
+            if (item.id && item.__component) {
+              key = `${objectKey}[${item.id};${item.__component}]`;
+            }
+
+            accumulator[key] = flattenObject(item);
             return accumulator;
           },
           {}

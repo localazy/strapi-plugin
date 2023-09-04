@@ -6,7 +6,7 @@ const {
   findSetupModelByCollectionName,
   findSetupModelByCollectionUid,
   isCollectionTransferEnabled,
-  getPickPaths,
+  getPickPathsWithComponents,
 } = require("../utils/transfer-setup-utils");
 const pickEntries = require("../utils/pick-entries");
 const config = require("../config").default;
@@ -113,7 +113,7 @@ module.exports = {
 
         // get only enabled fields paths
         const currentTransferSetupModel = transferSetupModel[collectionName];
-        const pickPaths = getPickPaths(currentTransferSetupModel);
+        const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
         if (!pickPaths.length) {
           const message = `No fields for collection ${collectionName} transfer are enabled.`;
           messageReport.push(message);
@@ -152,7 +152,7 @@ module.exports = {
             [modelUid]: entry,
           });
           // get only enabled fields; "__component" will be filtered out inside of the function
-          const pickedFlatten = pickEntries(flatten, pickPathsWithUid, currentTransferSetupModel);
+          const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
 
           flattenContent = {
             ...flattenContent,
