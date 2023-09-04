@@ -893,19 +893,19 @@ describe("pick entries test suite", () => {
       "api::lesson.lesson[1].start_time": "2022-09-28T09:00:00.000Z",
       "api::lesson.lesson[1].duration": "03:00:00.000",
       "api::lesson.lesson[1].description": "## Description\n\nIn this lesson, we'll learn about addition and what rules to follow...",
-      "api::lesson.lesson[1].lesson_type[1].__component": "lesson.lecture",
-      "api::lesson.lesson[1].lesson_type[1].content": "You need to follow these rules:\na) add one number to the other\nb) do not subtract nor multiply\nc) ...",
+      "api::lesson.lesson[1].lesson_type[1;lesson.lecture].__component": "lesson.lecture",
+      "api::lesson.lesson[1].lesson_type[1;lesson.lecture].content": "You need to follow these rules:\na) add one number to the other\nb) do not subtract nor multiply\nc) ...",
     };
 
     const pickPaths = [
       "api::lesson.lesson.title",
       "api::lesson.lesson.description",
-      "api::lesson.lesson.lesson_type[0].content",
-      "api::lesson.lesson.lesson_type[1].description",
-      "api::lesson.lesson.lesson_type[1].questions.question",
-      "api::lesson.lesson.lesson_type[2].title",
-      "api::lesson.lesson.lesson_type[2].questions.question",
-      "api::lesson.lesson.lesson_type[2].answers.correct_answer",
+      "api::lesson.lesson.lesson_type[lecture].content",
+      "api::lesson.lesson.lesson_type[survey].description",
+      "api::lesson.lesson.lesson_type[survey].questions.question",
+      "api::lesson.lesson.lesson_type[quiz].title",
+      "api::lesson.lesson.lesson_type[quiz].questions.question",
+      "api::lesson.lesson.lesson_type[quiz].answers.correct_answer",
       "api::lesson.lesson.id",
     ];
 
