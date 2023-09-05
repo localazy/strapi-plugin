@@ -317,28 +317,32 @@ module.exports = {
      * Iterate over languages and create the ones that are not present in Strapi
      */
     const strapiUnsupportedLanguages = []; // do not iterate over these languages later
+    const strapiLocales = await StrapiI18nService.getLocales(ctx);
     for (const isoLocalazy of languagesCodes) {
       try {
+        const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
+        const strapiLocale = strapiLocales.find(
+          (locale) => locale.code === isoStrapi
+        );
+        // skip creating locale if it already exists
+        if (strapiLocale) {
+          strapi.log.info(`The Localazy locale ${isoLocalazy} already exists.`);
+          continue;
+        }
+
         const newLocaleCode = await StrapiI18nService.createStrapiLocale(
           ctx,
           isoLocalazy
         );
         messageReport.push(`Created locale ${newLocaleCode}`);
       } catch (e) {
-        if (
-          e.name === "ApplicationError" &&
-          e.message === "This locale already exists"
-        ) {
-          strapi.log.info(`The Localazy locale ${isoLocalazy} already exists.`);
-        } else {
-          strapi.log.error(e.message);
-        }
+        strapi.log.error(e.message);
         if (e.name === "ValidationError") {
           // store unsupported language code
           strapiUnsupportedLanguages.push(isoLocalazy);
-          messageReport.push(
-            `Language ${isoLocalazy} is not supported by Strapi`
-          );
+          messageReport.push(`Language ${isoLocalazy} is not supported by Strapi`);
+        } else {
+          messageReport.push(e.message);
         }
       }
     }
