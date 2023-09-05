@@ -395,15 +395,17 @@ module.exports = {
         );
 
         if (typeof modelContentTransferSetup !== "undefined" && shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
-          const parsedKeyRestWithoutComponents = parsedKey.rest.map((segment) => {
-            const semicolonIndex = segment.indexOf(";");
+          const parsedKeyRestWithoutComponents = parsedKey.rest;
+          // TODO: component needs to be included in the key for dynamic zones (otherwise we loose data - only the last item of each unique entry id is set)
+          // .map((segment) => {
+          //   const semicolonIndex = segment.indexOf(";");
 
-            if (semicolonIndex === -1) {
-              return segment;
-            }
+          //   if (semicolonIndex === -1) {
+          //     return segment;
+          //   }
 
-            return segment.substring(0, semicolonIndex);
-          });
+          //   return segment.substring(0, semicolonIndex);
+          // });
 
           const setKey = [
             isoStrapi,
@@ -412,6 +414,8 @@ module.exports = {
             ...parsedKeyRestWithoutComponents,
           ];
 
+          // ? TODO: Should be set as object instead of array?
+          // ? TODO: Should such thing be done only for dynamic zones?
           set(parsedLocalazyContent, setKey, value);
         }
       }
@@ -486,6 +490,7 @@ module.exports = {
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
+                strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 messageReport.push(
                   `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`
                 );

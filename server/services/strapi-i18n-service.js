@@ -105,9 +105,12 @@ module.exports = ({ strapi }) => ({
         baseEntry.id,
         newEntryLocale
       );
-      const mergedEntry = merge(cloneDeep(baseEntry), insertedEntry);
 
-      return mergedEntry;
+      return insertedEntry
+
+      // const mergedEntry = merge(cloneDeep(baseEntry), insertedEntry);
+
+      // return mergedEntry;
     } catch (e) {
       strapi.log.error(e);
       throw e;
