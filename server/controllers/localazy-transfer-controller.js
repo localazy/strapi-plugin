@@ -310,7 +310,7 @@ module.exports = {
     let languagesCodes = projectLanguagesWithoutSourceLanguage.map(
       (language) => language.code
     );
-    // process filtered languages only / keep all of empty!
+    // process filtered languages only / keep all if empty!
     languagesCodes = await getFilteredLanguagesCodesForDownload(languagesCodes);
 
     /**
