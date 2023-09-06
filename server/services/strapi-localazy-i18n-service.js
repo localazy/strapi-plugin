@@ -15,7 +15,7 @@ module.exports = ({ strapi }) => ({
     isoStrapi,
   ) {
     // * The entry will be created and then updated as the structures differ
-    // * It's one extra database call, but the complexity of recursive code to maintain does worth it
+    // * It's one extra database call, but the amount of recursive code's complexity is reduced
 
 
     // Strapi i18n Service
@@ -23,7 +23,7 @@ module.exports = ({ strapi }) => ({
       .plugin("localazy")
       .service("strapiI18nService");
 
-    const { createEntry, dynamicZoneComponentKeys } = parsedLocalazyEntryToCreateEntry(
+    const { createEntry } = parsedLocalazyEntryToCreateEntry(
       strapiContentTypesModels,
       translatedModel,
       baseEntry,
@@ -31,9 +31,7 @@ module.exports = ({ strapi }) => ({
       isoStrapi,
     );
 
-    // ? TODO do not omit the __component from Dynamic Zones
     const filteredBaseEntry = omitDeep(baseEntry, [
-      // "__component", // do not omit the __component
       "locale",
       "localizations",
       "createdAt",
@@ -46,7 +44,6 @@ module.exports = ({ strapi }) => ({
     let mergedCreateEntry = {};
     merge(mergedCreateEntry, filteredBaseEntry, createEntry);
     mergedCreateEntry = omitDeep(mergedCreateEntry, [
-      // "__component",
       "locale",
       "localizations",
       "createdAt",
@@ -55,10 +52,6 @@ module.exports = ({ strapi }) => ({
       "updatedBy",
       "publishedAt",
     ]);
-    // set dynamic zone compoonent keys again
-    // dynamicZoneComponentKeys.forEach((v) => {
-    //   set(mergedCreateEntry, v.key, v.component);
-    // });
 
     mergedCreateEntry.locale = isoStrapi;
     const createdEntry =
@@ -69,14 +62,14 @@ module.exports = ({ strapi }) => ({
         mergedCreateEntry,
       );
 
-    // await this.updateEntry(
-    //   uid,
-    //   createdEntry.id,
-    //   strapiContentTypesModels,
-    //   translatedModel,
-    //   baseEntry,
-    //   isoStrapi,
-    // );
+    await this.updateEntry(
+      uid,
+      createdEntry.id,
+      strapiContentTypesModels,
+      translatedModel,
+      baseEntry,
+      isoStrapi,
+    );
 
     return createdEntry;
   },

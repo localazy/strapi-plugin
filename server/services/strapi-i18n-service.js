@@ -2,8 +2,6 @@
 
 const { isoLocalazyToStrapi } = require("../utils/iso-locales-utils.js");
 const intlDisplayName = require("../utils/intl-display-name.js");
-const merge = require("lodash/merge");
-const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
 
 module.exports = ({ strapi }) => ({
@@ -86,14 +84,14 @@ module.exports = ({ strapi }) => ({
       const newEntryLocale = newEntry.locale;
       const filteredNewEntry = omitDeep(newEntry, [
         "locale",
-        "id",
+        // "id", // keep id to fill-up for the missing fields in the localized entry
         "createdAt",
         // "publishedAt",
         "updatedAt",
       ]);
       filteredNewEntry.locale = newEntryLocale;
       // * sets as draft (no timestamp)
-      // ! do not completely omit as it won't process the required fields
+      // do not completely omit as it won't process the required fields
       filteredNewEntry.publishedAt = null;
 
       newLocalizationCtx.request.body = filteredNewEntry;
@@ -107,10 +105,6 @@ module.exports = ({ strapi }) => ({
       );
 
       return insertedEntry
-
-      // const mergedEntry = merge(cloneDeep(baseEntry), insertedEntry);
-
-      // return mergedEntry;
     } catch (e) {
       strapi.log.error(e);
       throw e;
