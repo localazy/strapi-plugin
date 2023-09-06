@@ -109,8 +109,6 @@ const parsedLocalazyEntryToCreateEntry = (
           // logicaly don't anything, skip...
         } else if (isComponent(attribute)) {
           // is component
-          console.log("func key", key);
-          console.log("func comp", component);
           const innerComponent = attribute.component;
           const componentModel = findModel(models, innerComponent);
 
