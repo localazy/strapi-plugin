@@ -396,17 +396,6 @@ module.exports = {
 
         if (typeof modelContentTransferSetup !== "undefined" && shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
           const parsedKeyRestWithoutComponents = parsedKey.rest;
-          // TODO: component needs to be included in the key for dynamic zones (otherwise we loose data - only the last item of each unique entry id is set)
-          // .map((segment) => {
-          //   const semicolonIndex = segment.indexOf(";");
-
-          //   if (semicolonIndex === -1) {
-          //     return segment;
-          //   }
-
-          //   return segment.substring(0, semicolonIndex);
-          // });
-
           const setKey = [
             isoStrapi,
             parsedKey.uid,
@@ -414,8 +403,6 @@ module.exports = {
             ...parsedKeyRestWithoutComponents,
           ];
 
-          // ? TODO: Should be set as object instead of array?
-          // ? TODO: Should such thing be done only for dynamic zones?
           set(parsedLocalazyContent, setKey, value);
         }
       }

@@ -3,7 +3,7 @@
 const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
 const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
 const omitDeep = require("../utils/omit-deep");
-const { set, merge } = require("lodash");
+const { merge } = require("lodash");
 
 module.exports = ({ strapi }) => ({
   async createEntry(

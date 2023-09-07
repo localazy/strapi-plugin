@@ -19,7 +19,6 @@ const parsedLocalazyEntryToCreateEntry = (
   const toCreateEntry = (
     entry,
     model,
-    baseEntry, // this  does not need to be passed, can be referenced from the closure
     // eslint-disable-next-line no-unused-vars
     key = "",
     prefix = "",
@@ -42,13 +41,13 @@ const parsedLocalazyEntryToCreateEntry = (
             if (baseEntryRepeateableGroup !== undefined) {
               const localizedEntryRepeatableItemPosition = baseEntryRepeateableGroup.findIndex((repeatableItem) => !!repeatableItem && repeatableItem.id === baseEntryRepeatableItemId);
               if (localizedEntryRepeatableItemPosition > -1) {
-                toCreateEntry(value, model, baseEntry, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
+                toCreateEntry(value, model, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
               }
             }
           }
 
           if (component && !isRepeatableComponent) {
-            toCreateEntry(value, model, baseEntry, `${prefix}`, `${prefix}`);
+            toCreateEntry(value, model, `${prefix}`, `${prefix}`);
           }
 
           if (!component && isRepeatableComponent) {
@@ -67,7 +66,6 @@ const parsedLocalazyEntryToCreateEntry = (
                 toCreateEntry(
                   value,
                   dzEntryComponentModel,
-                  baseEntry,
                   localizedEntryRepeatableItemPosition,
                   `${prefix}.${localizedEntryRepeatableItemPosition}`,
                   dzEntryComponent,
@@ -80,7 +78,6 @@ const parsedLocalazyEntryToCreateEntry = (
         }
       });
     } else if (isDZ) {
-      // TODO: implement DZ functionality
       Object.entries(entry).forEach(([dzEntryIdWithComponent, value]) => {
         let [dzEntryId, dzEntryComponent] = dzEntryIdWithComponent.split(";");
         dzEntryId = parseInt(dzEntryId);
@@ -90,7 +87,6 @@ const parsedLocalazyEntryToCreateEntry = (
           toCreateEntry(
             value,
             dzEntryComponentModel,
-            baseEntry,
             dzEntryId,
             `${prefix}.${dzEntryId}`,
             dzEntryComponent,
@@ -119,7 +115,8 @@ const parsedLocalazyEntryToCreateEntry = (
           if (isInsideDZ) {
             let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
             dzEntryId = parseInt(dzEntryId);
-            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId)); // ? TODO: what if it's not found?
+            // ? TODO: what if it's not found?
+            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
           }
@@ -130,7 +127,6 @@ const parsedLocalazyEntryToCreateEntry = (
           toCreateEntry(
             value,
             componentModel,
-            baseEntry,
             objectKey,
             newPrefix,
             innerComponent,
@@ -138,39 +134,6 @@ const parsedLocalazyEntryToCreateEntry = (
             false,
             isInsideDZ,
           );
-          // if (isRepeatable(attribute)) {
-          //   // TODO: need to count with possible inner-DZ components
-          //   // is repeatable - array
-          //   // const newPrefix = prefix
-          //   //   ? `${prefix}.${objectKey}`
-          //   //   : `${objectKey}`;
-          //   toCreateEntry(
-          //     value,
-          //     componentModel,
-          //     baseEntry,
-          //     objectKey,
-          //     newPrefix,
-          //     innerComponent,
-          //     true,
-          //     false,
-          //     isInsideDZ,
-          //   );
-          // } else {
-          //   // TODO: need to count with possible inner-DZ components
-          //   // is no repeatable - object
-          //   set(createEntry, `${newPrefix}.__component`, innerComponent);
-          //   toCreateEntry(
-          //     value,
-          //     componentModel,
-          //     baseEntry,
-          //     objectKey,
-          //     newPrefix,
-          //     innerComponent,
-          //     false,
-          //     false,
-          //     isInsideDZ,
-          //   );
-          // }
         } else if (isDynamicZone(attribute)) {
           // behaves sort of like repeatable component
           const newPrefix = prefix
@@ -179,7 +142,6 @@ const parsedLocalazyEntryToCreateEntry = (
           toCreateEntry(
             value,
             null, // model is evaluated later as it's dynamic (DZ)
-            baseEntry,
             objectKey,
             newPrefix,
             "", // component is computed later as it's dynamic (DZ)
@@ -192,7 +154,8 @@ const parsedLocalazyEntryToCreateEntry = (
           if (isInsideDZ) {
             let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
             dzEntryId = parseInt(dzEntryId);
-            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId)); // ? TODO: what if it's not found?
+            // ? TODO: what if it's not found?
+            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
           }
@@ -218,7 +181,7 @@ const parsedLocalazyEntryToCreateEntry = (
   };
 
   const model = findModel(models, uid);
-  toCreateEntry(parsedLocalazyEntry, model, baseEntry);
+  toCreateEntry(parsedLocalazyEntry, model);
   if (locale) {
     createEntry.locale = locale;
   }
