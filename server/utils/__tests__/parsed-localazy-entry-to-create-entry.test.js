@@ -5,7 +5,7 @@ const allModels = require("../../tests/fixtures/strapi-plugin-all-models");
 const simpleMenuWithMediaModel = require("../../tests/fixtures/parsed-localazy-entry-to-create-entry-restaurant-simple-menu");
 const cookbookModel = require("../../tests/fixtures/parsed-localazy-entry-to-create-entry-cookbook");
 const lessonDZModel = require("../../tests/fixtures/parsed-localazy-entry-to-create-entry-lesson-dz");
-const sampleJSONDZModel = require("../../tests/fixtures/parsed-localazy-entry-to-create-entry-sample-json-dz");
+const pageDZModel = require("../../tests/fixtures/parsed-localazy-entry-to-create-entry-page-dz");
 
 describe("parsed-localazy-entry-to-create-entry.js", () => {
   it("should return transformed 'restaurant-simple-menu' entry to strapi create entry structure", () => {
@@ -123,24 +123,23 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
     expect(result).toEqual(expected);
   });
 
-  it("should return transformed 'lesson' entry including Dynamic Zones to strapi create entry structure", () => {
+  it("should return transformed 'lesson' entry including Dynamic Zones to strapi create entry structure (for existing entry)", () => {
     // EXECUTE
     const result = parsedLocalazyEntryToCreateEntry(
       allModels,
       lessonDZModel.parsedLocalazyEntry,
       lessonDZModel.baseEntry,
       lessonDZModel.uid,
-      lessonDZModel.locale
     );
 
     // VERIFY
     const expected = {
       createEntry: {
-        title: "Test: Sčítání",
+        title: "Test: Přidání",
         description: "Otestujte si své dovednosti, které jsme se naučili v předchozí lekci.",
         lesson_type: [
           {
-            title: "Vyberte správnou odpověď",
+            title: "Zvolte správnou odpověď",
             __component: "lesson.quiz",
             questions: [
               {
@@ -152,7 +151,7 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
                 __component: "lesson.survey-question",
               },
               {
-                question: "Kolik pohárů je na fotce?",
+                question: "Kolik šálků je na fotografii?",
                 __component: "lesson.survey-question",
               },
             ],
@@ -172,7 +171,6 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
             ],
           },
         ],
-        locale: "cs",
       },
       dynamicZoneComponentKeys: [
         {
@@ -185,85 +183,76 @@ describe("parsed-localazy-entry-to-create-entry.js", () => {
     expect(result).toEqual(expected);
   });
 
-  it("should return transformed 'sample-json' entry including Dynamic Zones to strapi create entry structure", () => {
+  it("should return transformed 'page' entry including Dynamic Zones to strapi create entry structure (for non-existing entry)", () => {
     // EXECUTE
-    const result = parsedLocalazyEntryToCreateEntry(
+    const { createEntry } = parsedLocalazyEntryToCreateEntry(
       allModels,
-      sampleJSONDZModel.parsedLocalazyEntry,
-      sampleJSONDZModel.baseEntry,
-      sampleJSONDZModel.uid,
+      pageDZModel.parsedLocalazyEntry,
+      pageDZModel.baseEntry,
+      pageDZModel.uid,
+      pageDZModel.locale,
     );
 
     // VERIFY
     const expected = {
-      createEntry: {
-        purpose: "Bar",
-        repeatable_component_property: [
-          {
-            name: "Položka 1",
-            __component: "restaurant.menu-item",
-            description: "Nějaký popis",
-          },
-          {
-            name: "Položka 2",
-            __component: "restaurant.menu-item",
-            description: "Nějaký další popis",
-          },
-        ],
-        dynamic_property: [
-          {
-            image_title: "Nějaký název obrázku",
-            __component: "food.gallery-item",
-            image_description: "Nějaký popis obrázku",
-          },
-          {
-            name: "Přísada I",
-            __component: "food.recipe-ingredient",
-          },
-          {
-            name: "První položka CB",
-            __component: "food.cookbook-item",
-            author_name: "Já",
-            ingredients: [
-              {
-                name: "První Ingr DZ",
-                __component: "food.recipe-ingredient",
-              },
-            ],
-            gallery: [
-              {
-                image_title: "Obrázek G Jedna",
-                __component: "food.gallery-item",
-                image_description: "Obrázek G Popis Jedna",
-              },
-            ],
-          },
-          {
-            name: "Druhá přísada",
-            __component: "food.recipe-ingredient",
-          },
-        ],
+      title: "Software IP Intelligence",
+      slug: "ip-intelligence-software",
+      path: "/ip-intelligence software",
+      seo: {
+        __component: "seo.seo",
+        title: "Software IP Intelligence",
+        description: "Popis stránky IP Intelligence Software.",
+        canonical: "ip-intelligence-software",
       },
-      dynamicZoneComponentKeys: [
-        {
-          key: "dynamic_property.2.__component",
-          component: "food.cookbook-item",
+      hero: {
+        __component: "global.hero",
+        preTitle: "Inteligentní software před IP",
+        title: "Inteligentní software před IP",
+        text: "Text softwaru Hero Pre-IP Intelligence",
+        animatedText: {
+          __component: "hero.animated-text",
+          items: [
+            {
+              text: "hej",
+              __component: "hero.animated-text-items",
+            },
+            {
+              text: "Člověk",
+              __component: "hero.animated-text-items",
+            },
+            {
+              text: "Úžasné",
+              __component: "hero.animated-text-items",
+            },
+            {
+              text: "Práce!",
+              __component: "hero.animated-text-items",
+            },
+          ],
         },
+      },
+      components: [
+        undefined,
         {
-          key: "dynamic_property.0.__component",
-          component: "food.gallery-item",
+          items: [
+            {
+              text: "Funkce One",
+              __component: "global.feature",
+            },
+            {
+              text: "Funkce dva",
+              __component: "global.feature",
+            },
+            {
+              text: "Funkce tři",
+              __component: "global.feature",
+            },
+          ],
         },
-        {
-          key: "dynamic_property.1.__component",
-          component: "food.recipe-ingredient",
-        },
-        {
-          key: "dynamic_property.3.__component",
-          component: "food.recipe-ingredient",
-        },
-      ]
+      ],
+      locale: "cs",
     };
 
-    expect(result).toEqual(expected);
+    expect(createEntry).toEqual(expected);
   });
 });
