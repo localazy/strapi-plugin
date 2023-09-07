@@ -95,7 +95,10 @@ const parsedLocalazyEntryToCreateEntry = (
             true,
           );
         }
-        // ? don't do anything if baseEntryDZEntry is undefined - it means that the entry was deleted
+        /**
+         * Don't do anything if `baseEntryDZEntry` is `undefined` - it means that the entry was deleted
+         * That also automatically presumes that deal with `undefined` `baseEntryDZIndex` inside the Dynamic Zone
+         */
       });
     } else {
       // is object
@@ -115,7 +118,6 @@ const parsedLocalazyEntryToCreateEntry = (
           if (isInsideDZ) {
             let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
             dzEntryId = parseInt(dzEntryId);
-            // ? TODO: what if it's not found?
             const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
@@ -154,7 +156,6 @@ const parsedLocalazyEntryToCreateEntry = (
           if (isInsideDZ) {
             let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
             dzEntryId = parseInt(dzEntryId);
-            // ? TODO: what if it's not found?
             const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
