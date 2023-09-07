@@ -310,35 +310,39 @@ module.exports = {
     let languagesCodes = projectLanguagesWithoutSourceLanguage.map(
       (language) => language.code
     );
-    // process filtered languages only / keep all of empty!
+    // process filtered languages only / keep all if empty!
     languagesCodes = await getFilteredLanguagesCodesForDownload(languagesCodes);
 
     /**
      * Iterate over languages and create the ones that are not present in Strapi
      */
     const strapiUnsupportedLanguages = []; // do not iterate over these languages later
+    const strapiLocales = await StrapiI18nService.getLocales(ctx);
     for (const isoLocalazy of languagesCodes) {
       try {
+        const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
+        const strapiLocale = strapiLocales.find(
+          (locale) => locale.code === isoStrapi
+        );
+        // skip creating locale if it already exists
+        if (strapiLocale) {
+          strapi.log.info(`The Localazy locale ${isoLocalazy} already exists.`);
+          continue;
+        }
+
         const newLocaleCode = await StrapiI18nService.createStrapiLocale(
           ctx,
           isoLocalazy
         );
         messageReport.push(`Created locale ${newLocaleCode}`);
       } catch (e) {
-        if (
-          e.name === "ApplicationError" &&
-          e.message === "This locale already exists"
-        ) {
-          strapi.log.info(`The Localazy locale ${isoLocalazy} already exists.`);
-        } else {
-          strapi.log.error(e.message);
-        }
+        strapi.log.error(e.message);
         if (e.name === "ValidationError") {
           // store unsupported language code
           strapiUnsupportedLanguages.push(isoLocalazy);
-          messageReport.push(
-            `Language ${isoLocalazy} is not supported by Strapi`
-          );
+          messageReport.push(`Language ${isoLocalazy} is not supported by Strapi`);
+        } else {
+          messageReport.push(e.message);
         }
       }
     }
@@ -391,16 +395,7 @@ module.exports = {
         );
 
         if (typeof modelContentTransferSetup !== "undefined" && shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
-          const parsedKeyRestWithoutComponents = parsedKey.rest.map((segment) => {
-            const semicolonIndex = segment.indexOf(";");
-
-            if (semicolonIndex === -1) {
-              return segment;
-            }
-
-            return segment.substring(0, semicolonIndex);
-          });
-
+          const parsedKeyRestWithoutComponents = parsedKey.rest;
           const setKey = [
             isoStrapi,
             parsedKey.uid,
@@ -482,6 +477,7 @@ module.exports = {
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
+                strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 messageReport.push(
                   `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`
                 );
@@ -508,6 +504,7 @@ module.exports = {
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
+                strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 messageReport.push(
                   `Cannot update an ${uid}[${baseEntryCurrentLanguageLocalizationInfo.id}] (${isoStrapi}): ${e.message}`
                 );

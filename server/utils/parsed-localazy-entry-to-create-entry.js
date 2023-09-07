@@ -19,13 +19,13 @@ const parsedLocalazyEntryToCreateEntry = (
   const toCreateEntry = (
     entry,
     model,
-    baseEntry,
     // eslint-disable-next-line no-unused-vars
     key = "",
     prefix = "",
     component = "",
     isRepeatableComponent = false,
     isDZ = false,
+    isInsideDZ = false,
   ) => {
     if (Array.isArray(entry)) {
       // is array
@@ -41,13 +41,13 @@ const parsedLocalazyEntryToCreateEntry = (
             if (baseEntryRepeateableGroup !== undefined) {
               const localizedEntryRepeatableItemPosition = baseEntryRepeateableGroup.findIndex((repeatableItem) => !!repeatableItem && repeatableItem.id === baseEntryRepeatableItemId);
               if (localizedEntryRepeatableItemPosition > -1) {
-                toCreateEntry(value, model, baseEntry, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
+                toCreateEntry(value, model, localizedEntryRepeatableItemPosition, `${prefix}.${localizedEntryRepeatableItemPosition}`, component);
               }
             }
           }
 
           if (component && !isRepeatableComponent) {
-            toCreateEntry(value, model, baseEntry, `${prefix}`, `${prefix}`);
+            toCreateEntry(value, model, `${prefix}`, `${prefix}`);
           }
 
           if (!component && isRepeatableComponent) {
@@ -66,7 +66,6 @@ const parsedLocalazyEntryToCreateEntry = (
                 toCreateEntry(
                   value,
                   dzEntryComponentModel,
-                  baseEntry,
                   localizedEntryRepeatableItemPosition,
                   `${prefix}.${localizedEntryRepeatableItemPosition}`,
                   dzEntryComponent,
@@ -78,6 +77,29 @@ const parsedLocalazyEntryToCreateEntry = (
           }
         }
       });
+    } else if (isDZ) {
+      Object.entries(entry).forEach(([dzEntryIdWithComponent, value]) => {
+        let [dzEntryId, dzEntryComponent] = dzEntryIdWithComponent.split(";");
+        dzEntryId = parseInt(dzEntryId);
+        const baseEntryDZEntry = get(baseEntry, prefix).find((v) => (v.id === dzEntryId) && (v.__component === dzEntryComponent));
+        if (baseEntryDZEntry !== undefined) {
+          const dzEntryComponentModel = findModel(models, dzEntryComponent);
+          toCreateEntry(
+            value,
+            dzEntryComponentModel,
+            dzEntryId,
+            `${prefix}.${dzEntryId}`,
+            dzEntryComponent,
+            true,
+            false, // we're already inside, so it's falsy
+            true,
+          );
+        }
+        /**
+         * Don't do anything if `baseEntryDZEntry` is `undefined` - it means that the entry was deleted
+         * That also automatically presumes that deal with `undefined` `baseEntryDZIndex` inside the Dynamic Zone
+         */
+      });
     } else {
       // is object
       Object.entries(entry).forEach(([objectKey, value]) => {
@@ -86,38 +108,34 @@ const parsedLocalazyEntryToCreateEntry = (
           // logicaly don't anything, skip...
         } else if (isComponent(attribute)) {
           // is component
-          const component = attribute.component;
-          const componentModel = findModel(models, component);
-          if (isRepeatable(attribute)) {
-            // is repeatable - array
-            const newPrefix = prefix
-              ? `${prefix}.${objectKey}`
-              : `${objectKey}`;
-            toCreateEntry(
-              value,
-              componentModel,
-              baseEntry,
-              objectKey,
-              newPrefix,
-              component,
-              true
-            );
-          } else {
-            // is no repeatable - object
-            const newPrefix = prefix
-              ? `${prefix}.${objectKey}`
-              : `${objectKey}`;
-            set(createEntry, `${newPrefix}.__component`, component);
-            toCreateEntry(
-              value,
-              componentModel,
-              baseEntry,
-              objectKey,
-              newPrefix,
-              component,
-              false
-            );
+          const innerComponent = attribute.component;
+          const componentModel = findModel(models, innerComponent);
+
+          let newPrefixBase = prefix;
+          let newPrefix = newPrefixBase
+            ? `${newPrefixBase}.${objectKey}`
+            : `${objectKey}`;
+          if (isInsideDZ) {
+            let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
+            dzEntryId = parseInt(dzEntryId);
+            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
+            newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
+            newPrefix = `${newPrefixBase}.${objectKey}`;
           }
+          const isRepeatableComponent = isRepeatable(attribute);
+          if (!isRepeatableComponent) {
+            set(createEntry, `${newPrefix}.__component`, innerComponent);
+          }
+          toCreateEntry(
+            value,
+            componentModel,
+            objectKey,
+            newPrefix,
+            innerComponent,
+            isRepeatableComponent,
+            false,
+            isInsideDZ,
+          );
         } else if (isDynamicZone(attribute)) {
           // behaves sort of like repeatable component
           const newPrefix = prefix
@@ -126,7 +144,6 @@ const parsedLocalazyEntryToCreateEntry = (
           toCreateEntry(
             value,
             null, // model is evaluated later as it's dynamic (DZ)
-            baseEntry,
             objectKey,
             newPrefix,
             "", // component is computed later as it's dynamic (DZ)
@@ -134,14 +151,22 @@ const parsedLocalazyEntryToCreateEntry = (
             true,
           );
         } else {
-          const newPrefix = prefix ? `${prefix}.${objectKey}` : `${objectKey}`;
+          let newPrefixBase = prefix;
+          let newPrefix = newPrefixBase ? `${newPrefixBase}.${objectKey}` : `${objectKey}`;
+          if (isInsideDZ) {
+            let [dzParamKey, dzEntryId] = newPrefixBase.split(".");
+            dzEntryId = parseInt(dzEntryId);
+            const baseEntryDZIndex = get(baseEntry, dzParamKey).findIndex((v) => (v.__component === component) && (v.id === dzEntryId));
+            newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
+            newPrefix = `${newPrefixBase}.${objectKey}`;
+          }
           set(createEntry, newPrefix, value);
 
           if (component) {
-            const componentKeyToSet = `${prefix}.__component`;
+            const componentKeyToSet = `${newPrefixBase}.__component`;
             set(createEntry, componentKeyToSet, component);
 
-            if (isDZ) {
+            if (isInsideDZ) {
               const isKeyAdded = (typeof dynamicZoneComponentKeys.find((v) => v.key === componentKeyToSet) !== "undefined");
               if (!isKeyAdded)
                 dynamicZoneComponentKeys.push({
@@ -157,7 +182,7 @@ const parsedLocalazyEntryToCreateEntry = (
   };
 
   const model = findModel(models, uid);
-  toCreateEntry(parsedLocalazyEntry, model, baseEntry);
+  toCreateEntry(parsedLocalazyEntry, model);
   if (locale) {
     createEntry.locale = locale;
   }

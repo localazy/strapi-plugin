@@ -2,10 +2,8 @@
 
 const { isoLocalazyToStrapi } = require("../utils/iso-locales-utils.js");
 const intlDisplayName = require("../utils/intl-display-name.js");
-const merge = require("lodash/merge");
-const cloneDeep = require("lodash/cloneDeep");
 const omitDeep = require("../utils/omit-deep.js");
-const { forEach, map, find } = require("lodash")
+const { forEach, find } = require("lodash")
 
 module.exports = ({ strapi }) => ({
   async getLocales(ctx = {}) {
@@ -87,14 +85,12 @@ module.exports = ({ strapi }) => ({
       const newEntryLocale = newEntry.locale;
       const filteredNewEntry = omitDeep(newEntry, [
         "locale",
-        "id",
         "createdAt",
-        // "publishedAt",
         "updatedAt",
       ]);
       filteredNewEntry.locale = newEntryLocale;
       // * sets as draft (no timestamp)
-      // ! do not completely omit as it won't process the required fields
+      // do not completely omit as it won't process the required fields
       filteredNewEntry.publishedAt = null;
 
       newLocalizationCtx.request.body = filteredNewEntry;
@@ -106,9 +102,8 @@ module.exports = ({ strapi }) => ({
         baseEntry.id,
         newEntryLocale
       );
-      const mergedEntry = merge(cloneDeep(baseEntry), insertedEntry);
 
-      return mergedEntry;
+      return insertedEntry
     } catch (e) {
       strapi.log.error(e);
       throw e;
@@ -116,7 +111,7 @@ module.exports = ({ strapi }) => ({
   },
   async updateLocalizationForAnExistingEntry(uid, updateEntryId, data) {
     try {
-    
+
       const StrapiService = strapi.plugin("localazy").service("strapiService");
       const strapiContentTypesModels = await StrapiService.getModels();
       const populate = await StrapiService.getPopulateObject(uid);
@@ -124,15 +119,15 @@ module.exports = ({ strapi }) => ({
       // Bugfix by <emanuele.c@dacoco.io>:
       // Prevents IDs to be appended when updating a localized entry. When IDs are present
       // Strapi attempts to update a not yet existent ID into the DB
-      if(strapiContentTypesModels) {
+      if (strapiContentTypesModels) {
         const filtered = find(strapiContentTypesModels, (model) => model.uid === uid)
-        if(filtered?.attributes) {
-          for(let attribute in filtered.attributes) {
-            if(filtered.attributes[attribute]?.type === 'dynamiczone') {
-              if(!populate[attribute] || populate[attribute] !== 'deep') {
+        if (filtered?.attributes) {
+          for (let attribute in filtered.attributes) {
+            if (filtered.attributes[attribute]?.type === 'dynamiczone') {
+              if (!populate[attribute] || populate[attribute] !== 'deep') {
                 populate[attribute] = 'deep'
               }
-              forEach(data[attribute], (prop) => { if(prop?.id) delete prop.id})
+              forEach(data[attribute], (prop) => { if (prop?.id) delete prop.id })
             }
           }
         }

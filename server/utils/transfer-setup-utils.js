@@ -55,9 +55,10 @@ const getPickPathsWithComponents = (transferSetupModelProps) => {
   Object.keys(flattenedObject).forEach((key) => {
     if (key.includes(".__component__")) {
       const componentKey = key.split(".__component__")[0];
+      const propertyName = componentKey.split("[")[0];
       if (!pickComponents[componentKey]) {
         const splitByDot = flattenedObject[key].split(".");
-        pickComponents[key.split(".__component__")[0]] = `${splitByDot[0]}[${splitByDot[1]}]`;
+        pickComponents[componentKey] = `${propertyName}[${splitByDot[1]}]`;
       }
     }
   });

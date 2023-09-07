@@ -1,10 +1,9 @@
 const parsedLocalazyEntry = {
-  title: "Test: Sčítání",
+  title: "Test: Přidání",
   description: "Otestujte si své dovednosti, které jsme se naučili v předchozí lekci.",
-  lesson_type: [
-    null,
-    {
-      title: "Vyberte správnou odpověď",
+  lesson_type: {
+    "1;lesson.quiz": {
+      title: "Zvolte správnou odpověď",
       questions: [
         null,
         {
@@ -14,7 +13,7 @@ const parsedLocalazyEntry = {
           question: "5 + 15 = ",
         },
         {
-          question: "Kolik pohárů je na fotce?",
+          question: "Kolik šálků je na fotografii?",
         },
       ],
       answers: [
@@ -30,7 +29,7 @@ const parsedLocalazyEntry = {
         },
       ],
     },
-  ],
+  },
 };
 
 const baseEntry = {
@@ -40,7 +39,7 @@ const baseEntry = {
   duration: "02:00:00.000",
   description: "Test your skills we've learnt in the previous lesson.",
   createdAt: "2022-10-19T09:56:10.979Z",
-  updatedAt: "2022-10-19T12:13:58.102Z",
+  updatedAt: "2023-09-07T10:33:16.442Z",
   publishedAt: null,
   locale: "en",
   lesson_type: [
@@ -52,7 +51,7 @@ const baseEntry = {
         {
           id: 1,
           question: "1 + 1 = ",
-          is_active: true,
+          is_active: null,
           question_number: 1,
           assets: null,
         },
@@ -66,7 +65,7 @@ const baseEntry = {
         {
           id: 3,
           question: "How many cups are on the photo?",
-          is_active: false,
+          is_active: true,
           question_number: 3,
           assets: [
             {
@@ -132,6 +131,7 @@ const baseEntry = {
               provider_metadata: null,
               createdAt: "2022-10-19T09:57:52.620Z",
               updatedAt: "2022-10-19T09:57:52.620Z",
+              folderPath: null,
             },
           ],
         },
@@ -141,18 +141,21 @@ const baseEntry = {
           id: 1,
           question_number: 1,
           correct_answer: "2",
+          pick_answer: "C",
           answer_asset: null,
         },
         {
           id: 2,
           question_number: 2,
           correct_answer: "20",
+          pick_answer: null,
           answer_asset: null,
         },
         {
           id: 3,
           question_number: 3,
           correct_answer: "15",
+          pick_answer: "A",
           answer_asset: null,
         },
       ],
@@ -160,39 +163,39 @@ const baseEntry = {
   ],
   localizations: [
     {
-      id: 4,
-      title: "Test: Sčítání",
+      id: 56,
+      title: "Test: Přidání",
       start_time: "2022-10-01T13:00:00.000Z",
       duration: "02:00:00.000",
       description: "Otestujte si své dovednosti, které jsme se naučili v předchozí lekci.",
-      createdAt: "2022-10-19T12:13:58.101Z",
-      updatedAt: "2022-10-20T07:58:33.627Z",
+      createdAt: "2023-09-07T10:33:16.436Z",
+      updatedAt: "2023-09-07T10:53:54.311Z",
       publishedAt: null,
       locale: "cs",
       lesson_type: [
         {
           __component: "lesson.quiz",
-          id: 2,
-          title: "Vyberte správnou odpověď",
+          id: 34,
+          title: "Zvolte správnou odpověď",
           questions: [
             {
-              id: 4,
+              id: 100,
               question: "1 + 1 = ",
-              is_active: true,
+              is_active: null,
               question_number: 1,
               assets: null,
             },
             {
-              id: 5,
+              id: 101,
               question: "5 + 15 = ",
               is_active: false,
               question_number: 2,
               assets: null,
             },
             {
-              id: 6,
-              question: "Kolik pohárů je na fotce?",
-              is_active: false,
+              id: 102,
+              question: "Kolik šálků je na fotografii?",
+              is_active: true,
               question_number: 3,
               assets: [
                 {
@@ -258,27 +261,31 @@ const baseEntry = {
                   provider_metadata: null,
                   createdAt: "2022-10-19T09:57:52.620Z",
                   updatedAt: "2022-10-19T09:57:52.620Z",
+                  folderPath: null,
                 },
               ],
             },
           ],
           answers: [
             {
-              id: 4,
+              id: 100,
               question_number: 1,
               correct_answer: "2",
+              pick_answer: "C",
               answer_asset: null,
             },
             {
-              id: 5,
+              id: 101,
               question_number: 2,
               correct_answer: "20",
+              pick_answer: null,
               answer_asset: null,
             },
             {
-              id: 6,
+              id: 102,
               question_number: 3,
               correct_answer: "15",
+              pick_answer: "A",
               answer_asset: null,
             },
           ],
@@ -292,7 +299,7 @@ const baseEntry = {
           duration: "02:00:00.000",
           description: "Test your skills we've learnt in the previous lesson.",
           createdAt: "2022-10-19T09:56:10.979Z",
-          updatedAt: "2022-10-19T12:13:58.102Z",
+          updatedAt: "2023-09-07T10:33:16.442Z",
           publishedAt: null,
           locale: "en",
           lesson_type: [
@@ -304,7 +311,7 @@ const baseEntry = {
                 {
                   id: 1,
                   question: "1 + 1 = ",
-                  is_active: true,
+                  is_active: null,
                   question_number: 1,
                 },
                 {
@@ -316,7 +323,7 @@ const baseEntry = {
                 {
                   id: 3,
                   question: "How many cups are on the photo?",
-                  is_active: false,
+                  is_active: true,
                   question_number: 3,
                 },
               ],
@@ -325,36 +332,39 @@ const baseEntry = {
                   id: 1,
                   question_number: 1,
                   correct_answer: "2",
+                  pick_answer: "C",
                 },
                 {
                   id: 2,
                   question_number: 2,
                   correct_answer: "20",
+                  pick_answer: null,
                 },
                 {
                   id: 3,
                   question_number: 3,
                   correct_answer: "15",
+                  pick_answer: "A",
                 },
               ],
             },
           ],
           localizations: [
             {
-              id: 4,
-              title: "Test: Sčítání",
+              id: 56,
+              title: "Test: Přidání",
               start_time: "2022-10-01T13:00:00.000Z",
               duration: "02:00:00.000",
               description: "Otestujte si své dovednosti, které jsme se naučili v předchozí lekci.",
-              createdAt: "2022-10-19T12:13:58.101Z",
-              updatedAt: "2022-10-20T07:58:33.627Z",
+              createdAt: "2023-09-07T10:33:16.436Z",
+              updatedAt: "2023-09-07T10:53:54.311Z",
               publishedAt: null,
               locale: "cs",
               lesson_type: [
                 {
                   __component: "lesson.quiz",
-                  id: 2,
-                  title: "Vyberte správnou odpověď",
+                  id: 34,
+                  title: "Zvolte správnou odpověď",
                 },
               ],
               createdBy: null,
@@ -367,7 +377,7 @@ const baseEntry = {
                   duration: "02:00:00.000",
                   description: "Test your skills we've learnt in the previous lesson.",
                   createdAt: "2022-10-19T09:56:10.979Z",
-                  updatedAt: "2022-10-19T12:13:58.102Z",
+                  updatedAt: "2023-09-07T10:33:16.442Z",
                   publishedAt: null,
                   locale: "en",
                 },

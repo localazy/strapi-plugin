@@ -2,6 +2,8 @@
 
 const parsedLocalazyEntryToCreateEntry = require("../utils/parsed-localazy-entry-to-create-entry");
 const parsedLocalazyEntryToUpdateEntry = require("../utils/parsed-localazy-entry-to-update-entry");
+const omitDeep = require("../utils/omit-deep");
+const { merge } = require("lodash");
 
 module.exports = ({ strapi }) => ({
   async createEntry(
@@ -13,7 +15,8 @@ module.exports = ({ strapi }) => ({
     isoStrapi,
   ) {
     // * The entry will be created and then updated as the structures differ
-    // * It's one extra database call, but the complexity of recursive code to maintain does worth it
+    // * It's one extra database call, but the amount of recursive code's complexity is reduced
+
 
     // Strapi i18n Service
     const StrapiI18nService = strapi
@@ -28,12 +31,35 @@ module.exports = ({ strapi }) => ({
       isoStrapi,
     );
 
+    const filteredBaseEntry = omitDeep(baseEntry, [
+      "locale",
+      "localizations",
+      "createdAt",
+      "createdBy",
+      "updatedAt",
+      "updatedBy",
+      "publishedAt",
+    ]);
+
+    let mergedCreateEntry = {};
+    merge(mergedCreateEntry, filteredBaseEntry, createEntry);
+    mergedCreateEntry = omitDeep(mergedCreateEntry, [
+      "locale",
+      "localizations",
+      "createdAt",
+      "createdBy",
+      "updatedAt",
+      "updatedBy",
+      "publishedAt",
+    ]);
+
+    mergedCreateEntry.locale = isoStrapi;
     const createdEntry =
       await StrapiI18nService.createLocalizationForAnExistingEntry(
         ctx,
         uid,
         baseEntry,
-        createEntry,
+        mergedCreateEntry,
       );
 
     await this.updateEntry(
