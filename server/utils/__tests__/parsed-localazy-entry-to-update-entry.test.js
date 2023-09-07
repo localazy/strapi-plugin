@@ -11,7 +11,20 @@ const {
   locale,
 } = require("../../tests/fixtures/parsed-localazy-entry-to-update-entry");
 
+const mocks = require("../../../test/helpers/mocks");
+
 describe("parsed-localazy-entry-to-update-entry.js", () => {
+  Object.defineProperty(global, "strapi", {
+    value: mocks.strapi,
+  });
+  jest.spyOn(mocks.strapi.entityService, "findOne").mockImplementation(() => {
+    return {
+      id: 24,
+      title: "Pro každý den v roce",
+      localizations: [],
+    }
+  });
+
   it("should return transformed 'cookbook' entry to strapi update entry structure", async () => {
     // EXECUTE
     const result = await parsedLocalazyEntryToUpdateEntry(

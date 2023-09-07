@@ -13,7 +13,22 @@ const lessonWithDZsModel = require("../../tests/fixtures/populate-create-update-
 
 const populateCreateUpdateEntryWithBaseEntry = require("../populate-create-update-entry-with-base-entry");
 
+
+
+const mocks = require("../../../test/helpers/mocks");
+
 describe("populate-create-update-entry-with-base-entry.js", () => {
+  Object.defineProperty(global, "strapi", {
+    value: mocks.strapi,
+  });
+  jest.spyOn(mocks.strapi.entityService, "findOne").mockImplementation(() => {
+    return {
+      id: 24,
+      title: "Pro každý den v roce",
+      localizations: [],
+    }
+  });
+
   it("should populate a 'restaurant-simple-flat' correctly", async () => {
     const populatedEntry = await populateCreateUpdateEntryWithBaseEntry(
       allModels,
