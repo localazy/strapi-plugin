@@ -504,6 +504,7 @@ module.exports = {
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
+                strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 messageReport.push(
                   `Cannot update an ${uid}[${baseEntryCurrentLanguageLocalizationInfo.id}] (${isoStrapi}): ${e.message}`
                 );

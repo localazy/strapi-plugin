@@ -22,6 +22,14 @@ const parsedLocalazyEntryToUpdateEntry = async (
     uid
   );
 
+  /**
+   * TODO: possibly improve for the following case:
+   * A `key` is deleted from the base entry, and the same `key` still exist in the localized entry.
+   * Even though the `key` is deprecated in Localazy, it concludes that the `key` is still used in the localized entry.
+   * Therefore, it leads to an error when updating the entry.
+   *
+   * The solution for now: Delete the localized entry and re-download to force the creation process.
+   */
   let updateEntry = {};
   merge(updateEntry, currentEntry, createEntry);
   updateEntry = omitDeep(updateEntry, [
