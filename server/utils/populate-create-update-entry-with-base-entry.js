@@ -194,7 +194,6 @@ const populateCreateUpdateEntryWithBaseEntry = async (
           // }
         } else if (isRelation(attribute)) {
           const newPrefix = getNewPrefix(objectKey, prefix);
-          const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
 
           const isArray = Array.isArray(value);
           let arraiedValue = value;
