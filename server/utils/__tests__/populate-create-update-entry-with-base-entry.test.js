@@ -159,6 +159,9 @@ describe("populate-create-update-entry-with-base-entry.js", () => {
       cuisine: "Thai",
       capacity: 68,
       our_story: "Za nami jest więcej**! Sprawdź naszą historię na [Localazy] (https://localazy.com).\n\n! [Logo_sq-01.png] (/uploads/Logo_sq_01_08b9bb6be1.png)",
+      used_cookbooks: {
+        id: 1,
+      },
       menu: [
         {
           id: 40,
@@ -321,6 +324,17 @@ describe("populate-create-update-entry-with-base-entry.js", () => {
       cuisine: "Italian",
       capacity: 16,
       our_story: "Długa tradycja, mądrość przekazywana z pokolenia na pokolenie... Od 1822 roku.",
+      supported_restaurants: [
+        {
+          id: 2,
+        },
+        {
+          id: 1,
+        },
+      ],
+      used_cookbooks: {
+        id: 1,
+      },
       menu: [
       ],
       featured_image: null,
@@ -366,6 +380,14 @@ describe("populate-create-update-entry-with-base-entry.js", () => {
     const expected = {
       id: 24,
       title: "Pro každý den v roce",
+      used_in_restaurants: [
+        {
+          id: 1,
+        },
+        {
+          id: 3,
+        },
+      ],
       author_name: "David V.",
       pages: 365,
       recipes: [

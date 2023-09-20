@@ -194,7 +194,6 @@ const populateCreateUpdateEntryWithBaseEntry = async (
           // }
         } else if (isRelation(attribute)) {
           const newPrefix = getNewPrefix(objectKey, prefix);
-          const populatedLocalizedEntryVal = get(populatedLocalizedEntry, newPrefix);
 
           const isArray = Array.isArray(value);
           let arraiedValue = value;
@@ -209,13 +208,12 @@ const populateCreateUpdateEntryWithBaseEntry = async (
                   populate: ['localizations'],
                 });
 
-                const localizedEntry = entryWithLocalizations.localizations.find((item) => item.locale === locale);
-                if (!!localizedEntry && localizedEntry.id) {
-                  if (!isArray) {
-                    set(populatedEntry, newPrefix, { id: localizedEntry.id });
-                  } else {
-                    set(populatedEntry, `${newPrefix}.${index}`, { id: localizedEntry.id });
-                  }
+                const localizedEntry = entryWithLocalizations.localizations?.find((item) => item.locale === locale);
+                const idToAssign = localizedEntry?.id || entityId;
+                if (!isArray) {
+                  set(populatedEntry, newPrefix, { id: idToAssign });
+                } else {
+                  set(populatedEntry, `${newPrefix}.${index}`, { id: idToAssign });
                 }
               }
             }
