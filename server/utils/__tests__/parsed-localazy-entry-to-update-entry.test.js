@@ -41,6 +41,14 @@ describe("parsed-localazy-entry-to-update-entry.js", () => {
     const expected = {
       id: 24,
       title: "Pro každý den v roce",
+      used_in_restaurants: [
+        {
+          id: 1,
+        },
+        {
+          id: 3,
+        },
+      ],
       author_name: "David V.",
       pages: 365,
       recipes: [
