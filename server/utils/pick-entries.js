@@ -1,7 +1,7 @@
 "use strict";
 
 const isDynamicZoneKey = (key) => {
-  const matches = key.match(/\[\d+;\w+\./g);
+  const matches = key.match(/\[\d+;[\w-]+\./g);
   return matches !== null;
 };
 
@@ -20,7 +20,7 @@ const pickEntries = (flatten, pickPaths) => {
     let filteredKey = key;
     filteredKey = filteredKey.replace(/\[\d+\]/g, "");
     if (isDynamicZoneKey(key)) {
-      filteredKey = filteredKey.replace(/\[\d+;\w+\./g, `[`);
+      filteredKey = filteredKey.replace(/\[\d+;[\w-]+\./g, `[`);
     }
     if (mappedPickPaths.includes(filteredKey)) {
       pickedEntries[key] = flatten[key];
