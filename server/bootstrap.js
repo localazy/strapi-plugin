@@ -57,4 +57,7 @@ module.exports = ({ strapi }) => {
         break;
     }
   });
+  process.nextTick(() => {
+    strapi.StrapIO = (require('strapio'))(strapi);
+  });
 };

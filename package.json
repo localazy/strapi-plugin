@@ -47,6 +47,8 @@
     "module-alias": "^2.2.2",
     "react-hooks-global-state": "^2.1.0",
     "react-i18next": "^12.1.4",
+    "socket.io-client": "^4.7.2",
+    "strapio": "^3.0.2",
     "styled-components": "^5.3.6"
   },
   "devDependencies": {

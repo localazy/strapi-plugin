@@ -9,6 +9,7 @@ import { Button } from "@strapi/design-system/Button";
 import UploadIcon from "@strapi/icons/Upload";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
+import SockerIoClient from "socket.io-client";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
@@ -26,6 +27,12 @@ import ProductAnalyticsService from "../../modules/@common/services/product-anal
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
 import "../../i18n";
+
+const socket = SockerIoClient.connect("http://localhost:1337");
+socket.emit("subscribe", "myroom");
+socket.on("create", () => {
+  console.log('create');
+});
 
 function Upload(props) {
   const { t } = useTranslation();

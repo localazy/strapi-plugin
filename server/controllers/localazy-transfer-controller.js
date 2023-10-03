@@ -47,6 +47,10 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
 module.exports = {
   async upload(ctx) {
     try {
+      strapi.StrapIO.emitRaw('myroom', 'create', {
+        foo: 'bar',
+      });
+
       let success = true;
       const messageReport = [];
 
