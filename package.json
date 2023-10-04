@@ -24,6 +24,7 @@
     "email": "team@localazy.com",
     "url": "https://localazy.com"
   },
+  "bin": "./install/index.mjs",
   "repository": {
     "type": "git",
     "url": "git@github.com:localazy/strapi-plugin.git"
@@ -40,13 +41,17 @@
   "dependencies": {
     "@david-vaclavek/deep-keys": "^0.5.0",
     "@localazy/ts-api": "^1.0.13",
+    "chalk": "^5.3.0",
+    "fs-extra": "^11.1.1",
     "i18next": "^22.4.9",
     "isomorphic-fetch": "^3.0.0",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
+    "ora": "^7.0.1",
     "react-hooks-global-state": "^2.1.0",
     "react-i18next": "^12.1.4",
+    "shelljs": "^0.8.5",
     "socket.io-client": "^4.7.2",
     "strapio": "^3.0.2",
     "styled-components": "^5.3.6"
