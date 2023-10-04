@@ -20,6 +20,7 @@ const isEmpty = require("lodash/isEmpty");
 const omitDeep = require("../utils/omit-deep");
 const RequestInitiatorHelper = require('../utils/request-initiator-helper');
 const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
+const generateRandomId = require('../utils/generate-random-id');
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -47,154 +48,179 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
 module.exports = {
   async upload(ctx) {
     try {
-      strapi.StrapIO.emitRaw('myroom', 'create', {
-        foo: 'bar',
-      });
+      const streamIdentifier = generateRandomId();
 
-      let success = true;
-      const messageReport = [];
-
-      // Strapi Service
-      const StrapiService = strapi
-        .plugin("localazy")
-        .service("strapiService");
-
-      // Strapi i18n Service
-      const StrapiI18nService = strapi
-        .plugin("localazy")
-        .service("strapiI18nService");
-
-      // Localazy Upload Service
-      const LocalazyUploadService = strapi
-        .plugin("localazy")
-        .service("localazyUploadService");
-
-      // get content transfer setup
-      const contentTransferSetup = await strapi
-        .plugin("localazy")
-        .service("pluginSettingsService")
-        .getContentTransferSetup();
-
-      if (!contentTransferSetup.has_setup) {
-        const message = "Content transfer setup is not set up.";
-        strapi.log.info(message);
-        messageReport.push(message);
-        success = false;
-        ctx.body = {
-          success,
-          report: messageReport,
-        };
-        return;
-      }
-
-      const { setup } = contentTransferSetup;
-      const collectionsNames = getCollectionsNames(setup);
-      const models = await StrapiService.getModels();
-      // flatten Strapi content
-      let flattenContent = {};
-
-      for (const collectionName of collectionsNames) {
-        const currentModel = models.find(
-          (model) => model.collectionName === collectionName
-        );
-        const modelUid = currentModel.uid;
-        if (!currentModel) {
-          strapi.log.warn(`Model with uid ${modelUid} is not found.`);
-          continue;
-        }
-
-        const transferSetupModel = findSetupModelByCollectionName(
-          setup,
-          collectionName
-        );
-
-        if (!isCollectionTransferEnabled(setup, collectionName)) {
-          const message = `Collection ${collectionName} transfer is disabled.`;
-          messageReport.push(message);
-          strapi.log.info(message);
-          continue;
-        }
-
-        // get only enabled fields paths
-        const currentTransferSetupModel = transferSetupModel[collectionName];
-        const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
-        if (!pickPaths.length) {
-          const message = `No fields for collection ${collectionName} transfer are enabled.`;
-          messageReport.push(message);
-          strapi.log.warn(message);
-          continue;
-        }
-        const pickPathsWithUid = pickPaths.map(
-          (pickPath) => `${modelUid}.${pickPath}`
-        );
-
-        let entries = await strapi.entityService.findMany(modelUid, {
-          populate: "deep",
+      const func = async () => {
+        strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+          message: 'Upload started',
         });
-        entries = omitDeep(entries, [
-          // "__component",
-          "locale",
-          "localizations",
-          "createdAt",
-          "createdBy",
-          "updatedAt",
-          "updatedBy",
-          "publishedAt",
-        ]);
 
-        if (!entries) {
-          strapi.log.info(`No entries found for model ${modelUid}`);
-          continue;
-        }
+        let success = true;
 
-        if (!Array.isArray(entries)) {
-          entries = [entries];
-        }
+        // Strapi Service
+        const StrapiService = strapi
+          .plugin("localazy")
+          .service("strapiService");
 
-        entries.forEach((entry) => {
-          const flatten = flattenObject({
-            [modelUid]: entry,
+        // Strapi i18n Service
+        const StrapiI18nService = strapi
+          .plugin("localazy")
+          .service("strapiI18nService");
+
+        // Localazy Upload Service
+        const LocalazyUploadService = strapi
+          .plugin("localazy")
+          .service("localazyUploadService");
+
+        // get content transfer setup
+        const contentTransferSetup = await strapi
+          .plugin("localazy")
+          .service("pluginSettingsService")
+          .getContentTransferSetup();
+
+        if (!contentTransferSetup.has_setup) {
+          const message = "Content transfer setup is not set up.";
+          success = false;
+          strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+            success,
+            message,
           });
-          // get only enabled fields; "__component" will be filtered out inside of the function
-          const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
-
-          flattenContent = {
-            ...flattenContent,
-            ...pickedFlatten,
+          strapi.log.info(message);
+          ctx.body = {
+            success,
           };
+          return;
+        }
+
+        const { setup } = contentTransferSetup;
+        const collectionsNames = getCollectionsNames(setup);
+        const models = await StrapiService.getModels();
+        // flatten Strapi content
+        let flattenContent = {};
+
+        for (const collectionName of collectionsNames) {
+          const currentModel = models.find(
+            (model) => model.collectionName === collectionName
+          );
+          const modelUid = currentModel.uid;
+          if (!currentModel) {
+            strapi.log.warn(`Model with uid ${modelUid} is not found.`);
+            continue;
+          }
+
+          const transferSetupModel = findSetupModelByCollectionName(
+            setup,
+            collectionName
+          );
+
+          if (!isCollectionTransferEnabled(setup, collectionName)) {
+            const message = `Collection ${collectionName} transfer is disabled.`;
+            strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+              message,
+            });
+            strapi.log.info(message);
+            continue;
+          }
+
+          // get only enabled fields paths
+          const currentTransferSetupModel = transferSetupModel[collectionName];
+          const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
+          if (!pickPaths.length) {
+            const message = `No fields for collection ${collectionName} transfer are enabled.`;
+            strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+              message,
+            });
+            strapi.log.warn(message);
+            continue;
+          }
+          const pickPathsWithUid = pickPaths.map(
+            (pickPath) => `${modelUid}.${pickPath}`
+          );
+
+          let entries = await strapi.entityService.findMany(modelUid, {
+            populate: "deep",
+          });
+          entries = omitDeep(entries, [
+            // "__component",
+            "locale",
+            "localizations",
+            "createdAt",
+            "createdBy",
+            "updatedAt",
+            "updatedBy",
+            "publishedAt",
+          ]);
+
+          if (!entries) {
+            strapi.log.info(`No entries found for model ${modelUid}`);
+            continue;
+          }
+
+          if (!Array.isArray(entries)) {
+            entries = [entries];
+          }
+
+          entries.forEach((entry) => {
+            const flatten = flattenObject({
+              [modelUid]: entry,
+            });
+            // get only enabled fields; "__component" will be filtered out inside of the function
+            const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
+
+            flattenContent = {
+              ...flattenContent,
+              ...pickedFlatten,
+            };
+          });
+        }
+
+        // get Strapi default language and convert it to Localazy language code
+        const strapiLocales = await StrapiI18nService.getLocales(ctx);
+        const defaultLocale = strapiLocales.find((locale) => locale.isDefault);
+
+        const locale = defaultLocale
+          ? isoStrapiToLocalazy(defaultLocale.code)
+          : config.LOCALAZY_DEFAULT_LOCALE;
+
+        const chunks = LocalazyUploadService.splitToChunks(flattenContent);
+        const importFile = LocalazyUploadService.createImportFileRepresentation(
+          config.LOCALAZY_DEFAULT_FILE_NAME,
+          config.LOCALAZY_DEFAULT_FILE_PATH,
+          config.LOCALAZY_DEFAULT_FILE_EXTENSION,
+          locale,
+          chunks
+        );
+        // Use `deprecate: "file"` if there is one chunk of transferred data only!
+        const hasMoreTransferFilesChunks = importFile.length > 1;
+        const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
+        strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+          message: "Uploading collections to Localazy...",
         });
-      }
-
-      // get Strapi default language and convert it to Localazy language code
-      const strapiLocales = await StrapiI18nService.getLocales(ctx);
-      const defaultLocale = strapiLocales.find((locale) => locale.isDefault);
-
-      const locale = defaultLocale
-        ? isoStrapiToLocalazy(defaultLocale.code)
-        : config.LOCALAZY_DEFAULT_LOCALE;
-
-      const chunks = LocalazyUploadService.splitToChunks(flattenContent);
-      const importFile = LocalazyUploadService.createImportFileRepresentation(
-        config.LOCALAZY_DEFAULT_FILE_NAME,
-        config.LOCALAZY_DEFAULT_FILE_PATH,
-        config.LOCALAZY_DEFAULT_FILE_EXTENSION,
-        locale,
-        chunks
-      );
-      // Use `deprecate: "file"` if there is one chunk of transferred data only!
-      const hasMoreTransferFilesChunks = importFile.length > 1;
-      const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
-      await LocalazyUploadService.upload(
-        importFile,
-        uploadConfig
-      );
+        await LocalazyUploadService.upload(
+          importFile,
+          uploadConfig
+        );
+        strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+          success,
+          message: "Upload finished",
+        });
+      };
+      /**
+       * start executing the function after 2 seconds
+       * (to let the client receive and subscribe to the messages stream)
+       */
+      setTimeout(func, 2000);
 
       ctx.body = {
-        success,
-        report: messageReport,
+        streamIdentifier,
       };
+
     } catch (e) {
       strapi.log.error(e.message);
+      strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+        success,
+        message: e.message,
+      });
       ctx.throw(400, e);
     }
   },

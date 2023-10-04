@@ -9,7 +9,7 @@ import { Button } from "@strapi/design-system/Button";
 import UploadIcon from "@strapi/icons/Upload";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
-import SockerIoClient from "socket.io-client";
+import SocketIoClient from "socket.io-client";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
@@ -28,11 +28,7 @@ import PluginSettingsService from "../../modules/plugin-settings/services/plugin
 
 import "../../i18n";
 
-const socket = SockerIoClient.connect("http://localhost:1337");
-socket.emit("subscribe", "myroom");
-socket.on("create", () => {
-  console.log('create');
-});
+const socket = SocketIoClient.connect(process.env.STRAPI_ADMIN_BACKEND_URL);
 
 function Upload(props) {
   const { t } = useTranslation();
@@ -44,7 +40,10 @@ function Upload(props) {
   const [modelChanged, setModelChanged] = useState(false);
   const [localesIncompatible, setLocalesIncompatible] = useState(false);
   const [showUploadFinishedModal, setShowUploadFinishedModal] = useState(false);
-  const [uploadResult, setUploadResult] = useState({});
+  const [uploadResult, setUploadResult] = useState({
+    success: false,
+    report: [],
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [strapiDefaultLocale, setStrapiDefaultLocale] = useState(null);
   const [localazySourceLanguage, setLocalazySourceLanguage] = useState(null);
@@ -58,7 +57,36 @@ function Upload(props) {
 
   const onUploadClick = async () => {
     setIsUploading(true);
+    setShowUploadFinishedModal(false);
+    setUploadResult({
+      success: false,
+      report: [],
+    });
     const result = await LocalazyUploadService.upload();
+    const { streamIdentifier } = result;
+
+    // TODO: refactor to external service
+    socket.emit("subscribe", `localazy-plugin`);
+    socket.on(`upload:${streamIdentifier}`, (data) => {
+      setUploadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+    });
+    socket.on(`upload:finish:${streamIdentifier}`, (data) => {
+      setUploadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+      setIsUploading(false);
+      setShowUploadFinishedModal(true);
+    });
     setUploadResult(result);
 
     // track upload
@@ -69,9 +97,6 @@ function Upload(props) {
         "Source Language Code": localazySourceLanguage.code,
       }
     );
-
-    setIsUploading(false);
-    setShowUploadFinishedModal(true);
   };
 
   useEffect(() => {
