@@ -86,7 +86,6 @@ function Upload(props) {
       setIsUploading(false);
       setShowUploadFinishedModal(true);
     });
-    setUploadResult(result);
 
     // track upload
     ProductAnalyticsService.trackUploadToLocalazy(
