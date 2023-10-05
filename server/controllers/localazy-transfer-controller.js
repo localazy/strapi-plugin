@@ -21,6 +21,8 @@ const omitDeep = require("../utils/omit-deep");
 const RequestInitiatorHelper = require('../utils/request-initiator-helper');
 const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
 const generateRandomId = require('../utils/generate-random-id');
+const { LOCALAZY_PLUGIN_CHANNEL } = require('../constants/channels');
+const { UPLOAD_EVENT, UPLOAD_FINISHED_EVENT } = require('../constants/events');
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -51,7 +53,7 @@ module.exports = {
       const streamIdentifier = generateRandomId();
 
       const func = async () => {
-        strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+        strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
           message: 'Upload started',
         });
 
@@ -81,7 +83,7 @@ module.exports = {
         if (!contentTransferSetup.has_setup) {
           const message = "Content transfer setup is not set up.";
           success = false;
-          strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+          strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
             success,
             message,
           });
@@ -115,7 +117,7 @@ module.exports = {
 
           if (!isCollectionTransferEnabled(setup, collectionName)) {
             const message = `Collection ${collectionName} transfer is disabled.`;
-            strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+            strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
               message,
             });
             strapi.log.info(message);
@@ -127,7 +129,7 @@ module.exports = {
           const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
           if (!pickPaths.length) {
             const message = `No fields for collection ${collectionName} transfer are enabled.`;
-            strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+            strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
               message,
             });
             strapi.log.warn(message);
@@ -193,14 +195,14 @@ module.exports = {
         // Use `deprecate: "file"` if there is one chunk of transferred data only!
         const hasMoreTransferFilesChunks = importFile.length > 1;
         const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
-        strapi.StrapIO.emitRaw('localazy-plugin', `upload:${streamIdentifier}`, {
+        strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
           message: "Uploading collections to Localazy...",
         });
         await LocalazyUploadService.upload(
           importFile,
           uploadConfig
         );
-        strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+        strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
           success,
           message: "Upload finished",
         });
@@ -217,7 +219,7 @@ module.exports = {
 
     } catch (e) {
       strapi.log.error(e.message);
-      strapi.StrapIO.emitRaw('localazy-plugin', `upload:finish:${streamIdentifier}`, {
+      strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
         success,
         message: e.message,
       });

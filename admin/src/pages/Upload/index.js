@@ -9,7 +9,6 @@ import { Button } from "@strapi/design-system/Button";
 import UploadIcon from "@strapi/icons/Upload";
 import { Box } from "@strapi/design-system/Box";
 import { Alert } from "@strapi/design-system/Alert";
-import SocketIoClient from "socket.io-client";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
@@ -25,10 +24,12 @@ import redirectToPluginRoute, {
 import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
+import UploadAlertsService from "../../modules/localazy-upload/services/upload-alerts-service";
 
 import "../../i18n";
 
-const socket = SocketIoClient.connect(process.env.STRAPI_ADMIN_BACKEND_URL);
+const uploadAlertsService = new UploadAlertsService();
+uploadAlertsService.subscribe();
 
 function Upload(props) {
   const { t } = useTranslation();
@@ -64,10 +65,8 @@ function Upload(props) {
     });
     const result = await LocalazyUploadService.upload();
     const { streamIdentifier } = result;
-
-    // TODO: refactor to external service
-    socket.emit("subscribe", `localazy-plugin`);
-    socket.on(`upload:${streamIdentifier}`, (data) => {
+    uploadAlertsService.setStreamIdentifier(streamIdentifier);
+    uploadAlertsService.onUpload((data) => {
       setUploadResult((old) => ({
         success: data.success,
         report: [
@@ -76,7 +75,7 @@ function Upload(props) {
         ],
       }));
     });
-    socket.on(`upload:finish:${streamIdentifier}`, (data) => {
+    uploadAlertsService.onUploadFinished((data) => {
       setUploadResult((old) => ({
         success: data.success,
         report: [
