@@ -10,6 +10,7 @@ const localazyPubApiService = require("./localazy-pubapi-service");
 const strapiI18nService = require("./strapi-i18n-service");
 const strapiLocalazyI18nService = require("./strapi-localazy-i18n-service");
 const localazyTransferUploadService = require("./localazy-transfer-upload-service");
+const localazyTransferDownloadService = require("./localazy-transfer-download-service");
 
 module.exports = {
   localazyUserService,
@@ -22,4 +23,5 @@ module.exports = {
   strapiI18nService,
   strapiLocalazyI18nService,
   localazyTransferUploadService,
+  localazyTransferDownloadService,
 };
