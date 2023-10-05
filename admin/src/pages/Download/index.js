@@ -24,6 +24,10 @@ import PluginSettingsService from "../../modules/plugin-settings/services/plugin
 import { PLUGIN_ROUTES } from "../../modules/@common/utils/redirect-to-plugin-route";
 import LanguagesSelector from "../../modules/@common/components/LanguagesSelector";
 import ProjectService from "../../modules/@common/services/project-service";
+import DownloadAlertsService from "../../modules/localazy-download/services/download-alerts-service";
+
+const downloadAlertsService = new DownloadAlertsService();
+downloadAlertsService.subscribe();
 
 function Download(props) {
   const { t } = useTranslation();
@@ -36,7 +40,10 @@ function Download(props) {
   const [localesIncompatible, setLocalesIncompatible] = useState(false);
   const [showDownloadFinishedModal, setshowDownloadFinishedModal] =
     useState(false);
-  const [downloadResult, setDownloadResult] = useState({});
+  const [downloadResult, setDownloadResult] = useState({
+    success: false,
+    report: [],
+  });
   const [isDownloading, setIsDownloading] = useState(false);
 
   /**
@@ -72,8 +79,34 @@ function Download(props) {
 
   const onDownloadClick = async () => {
     setIsDownloading(true);
+    setshowDownloadFinishedModal(false);
+    setDownloadResult({
+      success: false,
+      report: [],
+    });
     const result = await LocalazyDownloadService.download();
-    setDownloadResult(result);
+    const { streamIdentifier } = result;
+    downloadAlertsService.setStreamIdentifier(streamIdentifier);
+    downloadAlertsService.onDownload((data) => {
+      setDownloadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+    });
+    downloadAlertsService.onDownloadFinished((data) => {
+      setDownloadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+      setIsDownloading(false);
+      setshowDownloadFinishedModal(true);
+    });
 
     // track download
     ProductAnalyticsService.trackDownloadToStrapi(
@@ -83,9 +116,6 @@ function Download(props) {
         "Target Languages Codes": "all",
       }
     );
-
-    setIsDownloading(false);
-    setshowDownloadFinishedModal(true);
   };
 
   useEffect(() => {

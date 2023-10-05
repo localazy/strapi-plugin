@@ -53,9 +53,6 @@ module.exports = ({ strapi }) => ({
         message,
       });
       strapi.log.info(message);
-      ctx.body = {
-        success,
-      };
       return;
     }
 
