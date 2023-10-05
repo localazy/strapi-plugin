@@ -40,6 +40,7 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
 
 module.exports = ({ strapi }) => ({
   async download(streamIdentifier, ctx) {
+    await new Promise((resolve) => setTimeout(resolve, 1));
     strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
       message: 'Download started',
     });
@@ -87,6 +88,7 @@ module.exports = ({ strapi }) => ({
       success = false;
       const message = `File ${config.LOCALAZY_DEFAULT_FILE_NAME} not found`;
       strapi.log.error(message);
+      await new Promise((resolve) => setTimeout(resolve, 1));
       strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
         success,
         message,
@@ -106,6 +108,7 @@ module.exports = ({ strapi }) => ({
       success = false;
       const message = `Project ${user.project.id} not found`;
       strapi.log.error(message);
+      await new Promise((resolve) => setTimeout(resolve, 1));
       strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
         success,
         message,
@@ -126,6 +129,7 @@ module.exports = ({ strapi }) => ({
       success = false;
       const message = "Source language not found";
       strapi.log.error(message);
+      await new Promise((resolve) => setTimeout(resolve, 1));
       strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
         success,
         message,
@@ -141,6 +145,7 @@ module.exports = ({ strapi }) => ({
     if (!projectLanguagesWithoutSourceLanguage.length) {
       const message = "Your Localazy project is not translated to other languages.";
       strapi.log.info(message);
+      await new Promise((resolve) => setTimeout(resolve, 1));
       strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
         success,
         message,
@@ -184,10 +189,12 @@ module.exports = ({ strapi }) => ({
         if (e.name === "ValidationError") {
           // store unsupported language code
           strapiUnsupportedLanguages.push(isoLocalazy);
+          await new Promise((resolve) => setTimeout(resolve, 1));
           strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
             message: `Language ${isoLocalazy} is not supported by Strapi`,
           });
         } else {
+          await new Promise((resolve) => setTimeout(resolve, 1));
           strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
             message: e.message,
           });
@@ -320,6 +327,7 @@ module.exports = ({ strapi }) => ({
 
                 const message = `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`;
                 strapi.log.info(`Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`);
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
                   message,
                 });
@@ -327,6 +335,7 @@ module.exports = ({ strapi }) => ({
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
                   message: `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`,
                 });
@@ -348,6 +357,7 @@ module.exports = ({ strapi }) => ({
 
                 const message = `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`;
                 strapi.log.info(message);
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
                   message,
                 });
@@ -355,6 +365,7 @@ module.exports = ({ strapi }) => ({
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
+                await new Promise((resolve) => setTimeout(resolve, 1));
                 strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_EVENT}:${streamIdentifier}`, {
                   message: `Cannot update an ${uid}[${baseEntryCurrentLanguageLocalizationInfo.id}] (${isoStrapi}): ${e.message}`,
                 });
@@ -363,6 +374,7 @@ module.exports = ({ strapi }) => ({
           } catch (e) {
             success = false;
             strapi.log.error(e.message);
+            await new Promise((resolve) => setTimeout(resolve, 1));
             strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
               success,
               message: `An error occured while processing download: ${e.message}`,
@@ -372,6 +384,7 @@ module.exports = ({ strapi }) => ({
       }
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 1));
     strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
       success,
       message: 'Download finished',
