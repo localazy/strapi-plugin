@@ -7,9 +7,8 @@ const { UPLOAD_FINISHED_EVENT, DOWNLOAD_FINISHED_EVENT } = require('../constants
 
 module.exports = {
   async upload(ctx) {
+    const streamIdentifier = generateRandomId();
     try {
-      const streamIdentifier = generateRandomId();
-
       const LocalazyTransferUploadService = strapi
         .plugin("localazy")
         .service("localazyTransferUploadService");
@@ -36,9 +35,8 @@ module.exports = {
   },
 
   async download(ctx) {
+    const streamIdentifier = generateRandomId();
     try {
-      const streamIdentifier = generateRandomId();
-
       const LocalazyTransferDownloadService = strapi
         .plugin("localazy")
         .service("localazyTransferDownloadService");
