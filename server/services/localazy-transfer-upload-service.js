@@ -13,13 +13,12 @@ const {
   isoStrapiToLocalazy,
 } = require("../utils/iso-locales-utils");
 const omitDeep = require("../utils/omit-deep");
-const { LOCALAZY_PLUGIN_CHANNEL } = require('../constants/channels');
 const { UPLOAD_EVENT, UPLOAD_FINISHED_EVENT } = require('../constants/events');
 
 module.exports = ({ strapi }) => ({
-  async upload(streamIdentifier, ctx) {
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
+  async upload(JobNotificationService, ctx) {
+    console.time("upload");
+    await JobNotificationService.emit(UPLOAD_EVENT, {
       message: 'Upload started',
     });
 
@@ -49,8 +48,7 @@ module.exports = ({ strapi }) => ({
     if (!contentTransferSetup.has_setup) {
       const message = "Content transfer setup is not set up.";
       success = false;
-      await new Promise((resolve) => setTimeout(resolve, 1));
-      strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
+      await JobNotificationService.emit(UPLOAD_FINISHED_EVENT, {
         success,
         message,
       });
@@ -81,8 +79,7 @@ module.exports = ({ strapi }) => ({
 
       if (!isCollectionTransferEnabled(setup, collectionName)) {
         const message = `Collection ${collectionName} transfer is disabled.`;
-        await new Promise((resolve) => setTimeout(resolve, 1));
-        strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
+        await JobNotificationService.emit(UPLOAD_EVENT, {
           message,
         });
         strapi.log.info(message);
@@ -94,8 +91,7 @@ module.exports = ({ strapi }) => ({
       const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
       if (!pickPaths.length) {
         const message = `No fields for collection ${collectionName} transfer are enabled.`;
-        await new Promise((resolve) => setTimeout(resolve, 1));
-        strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
+        await JobNotificationService.emit(UPLOAD_EVENT, {
           message,
         });
         strapi.log.warn(message);
@@ -161,18 +157,18 @@ module.exports = ({ strapi }) => ({
     // Use `deprecate: "file"` if there is one chunk of transferred data only!
     const hasMoreTransferFilesChunks = importFile.length > 1;
     const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_EVENT}:${streamIdentifier}`, {
+    await JobNotificationService.emit(UPLOAD_EVENT, {
       message: "Uploading collections to Localazy...",
     });
     await LocalazyUploadService.upload(
       importFile,
       uploadConfig
     );
-    await new Promise((resolve) => setTimeout(resolve, 1));
-    strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${UPLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
+    strapi.log.info("Upload finished in");
+    await JobNotificationService.emit(UPLOAD_FINISHED_EVENT, {
       success,
       message: "Upload finished",
     });
+    console.timeEnd("upload");
   },
 });
