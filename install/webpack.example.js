@@ -1,13 +1,10 @@
-"use strict";
-
-/* eslint-disable no-unused-vars */
 module.exports = (config, webpack) => {
-  // Note: we provide webpack above so you should not `require` it
-  // Perform customizations to webpack config
-  // Important: return the modified config
-
-  // return config;
-
+  /**
+   * This is an example of how to extend webpack config in order to use Localazy Strapi Plugin.
+   * Because Strapi is using Webpack 5, it is necessary to disable some Node.js polyfills in the Strapi monorepo.
+   *
+   * If your webpack config does not exist, create one.
+   */
 
   return {
     ...config,
@@ -20,13 +17,11 @@ module.exports = (config, webpack) => {
         fs: false,
         zlib: false,
         https: false,
-        // os: false,
         stream: false,
         path: false,
         timers: false,
         tls: false,
         net: false,
-        // util: false,
       },
     }
   };
