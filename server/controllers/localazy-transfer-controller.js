@@ -4,6 +4,7 @@
 const generateRandomId = require('../utils/generate-random-id');
 const { LOCALAZY_PLUGIN_CHANNEL } = require('../constants/channels');
 const { UPLOAD_FINISHED_EVENT, DOWNLOAD_FINISHED_EVENT } = require('../constants/events');
+const jobNotificationServiceFactory = require('../services/helpers/job-notification-service');
 
 module.exports = {
   async upload(ctx) {
@@ -35,7 +36,7 @@ module.exports = {
   },
 
   async download(ctx) {
-    const streamIdentifier = generateRandomId();
+    const JobNotificationService = new jobNotificationServiceFactory(strapi.StrapIO);
     try {
       const LocalazyTransferDownloadService = strapi
         .plugin("localazy")
@@ -46,14 +47,14 @@ module.exports = {
        * (to let the client receive and subscribe to the messages stream)
        */
       // TODO: let the client send a message to the server to start the download (that it's subscribed to the stream)
-      setTimeout(() => (LocalazyTransferDownloadService.download(streamIdentifier, ctx)), 1000);
+      setTimeout(() => (LocalazyTransferDownloadService.download(JobNotificationService, ctx)), 1000);
 
       ctx.body = {
-        streamIdentifier,
+        streamIdentifier: JobNotificationService.getStreamIdentifier(),
       };
     } catch (e) {
       strapi.log.error(e.message);
-      strapi.StrapIO.emitRaw(LOCALAZY_PLUGIN_CHANNEL, `${DOWNLOAD_FINISHED_EVENT}:${streamIdentifier}`, {
+      await JobNotificationService.emit(DOWNLOAD_FINISHED_EVENT, {
         success: false,
         message: e.message,
       });
