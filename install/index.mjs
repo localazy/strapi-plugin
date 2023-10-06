@@ -59,3 +59,4 @@ installSpinner.start(`Creating example ${file} file in ${chalk.bold.green("src/a
 await updateConfig();
 installSpinner.succeed();
 installSpinner.succeed(`To run the plugin, you need to update your webpack config in ${chalk.bold.green("src/admin/webpack.config.js")} file`);
+installSpinner.succeed(`Don't forget to build the admin panel with ${chalk.bold.green("npm run build")} command`);
