@@ -24,8 +24,12 @@ import redirectToPluginRoute, {
 import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
+import UploadAlertsService from "../../modules/localazy-upload/services/upload-alerts-service";
 
 import "../../i18n";
+
+const uploadAlertsService = new UploadAlertsService();
+uploadAlertsService.subscribe();
 
 function Upload(props) {
   const { t } = useTranslation();
@@ -37,7 +41,10 @@ function Upload(props) {
   const [modelChanged, setModelChanged] = useState(false);
   const [localesIncompatible, setLocalesIncompatible] = useState(false);
   const [showUploadFinishedModal, setShowUploadFinishedModal] = useState(false);
-  const [uploadResult, setUploadResult] = useState({});
+  const [uploadResult, setUploadResult] = useState({
+    success: false,
+    report: [],
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [strapiDefaultLocale, setStrapiDefaultLocale] = useState(null);
   const [localazySourceLanguage, setLocalazySourceLanguage] = useState(null);
@@ -51,8 +58,34 @@ function Upload(props) {
 
   const onUploadClick = async () => {
     setIsUploading(true);
+    setShowUploadFinishedModal(false);
+    setUploadResult({
+      success: false,
+      report: [],
+    });
     const result = await LocalazyUploadService.upload();
-    setUploadResult(result);
+    const { streamIdentifier } = result;
+    uploadAlertsService.setStreamIdentifier(streamIdentifier);
+    uploadAlertsService.onUpload((data) => {
+      setUploadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+    });
+    uploadAlertsService.onUploadFinished((data) => {
+      setUploadResult((old) => ({
+        success: data.success,
+        report: [
+          ...old.report || [],
+          data.message,
+        ],
+      }));
+      setIsUploading(false);
+      setShowUploadFinishedModal(true);
+    });
 
     // track upload
     ProductAnalyticsService.trackUploadToLocalazy(
@@ -62,9 +95,6 @@ function Upload(props) {
         "Source Language Code": localazySourceLanguage.code,
       }
     );
-
-    setIsUploading(false);
-    setShowUploadFinishedModal(true);
   };
 
   useEffect(() => {
@@ -159,6 +189,16 @@ function Upload(props) {
                 {uploadResult.success
                   ? t("upload.upload_success")
                   : t("upload.upload_failed")}
+              </Alert>
+            </Box>
+          )}
+          {isUploading && (
+            <Box marginTop={4} marginBottom={4}>
+              <Alert
+                title={t("upload.upload_in_progress")}
+                variant="warning"
+              >
+                {t("upload.to_see_to_progress")}
               </Alert>
             </Box>
           )}
