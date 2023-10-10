@@ -22,6 +22,8 @@ module.exports = (config, webpack) => {
         timers: false,
         tls: false,
         net: false,
+        url: false,
+        querystring: false,
       },
     }
   };
