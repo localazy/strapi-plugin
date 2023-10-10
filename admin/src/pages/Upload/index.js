@@ -192,6 +192,16 @@ function Upload(props) {
               </Alert>
             </Box>
           )}
+          {isUploading && (
+            <Box marginTop={4} marginBottom={4}>
+              <Alert
+                title={t("upload.upload_in_progress")}
+                variant="warning"
+              >
+                {t("upload.to_see_to_progress")}
+              </Alert>
+            </Box>
+          )}
           {localesIncompatible && (
             <Box marginTop={4} marginBottom={4}>
               <Alert

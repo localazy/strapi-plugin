@@ -230,6 +230,16 @@ function Download(props) {
               </Alert>
             </Box>
           )}
+          {isDownloading && (
+            <Box marginTop={4} marginBottom={4}>
+              <Alert
+                title={t("download.download_in_progress")}
+                variant="warning"
+              >
+                {t("download.to_see_to_progress")}
+              </Alert>
+            </Box>
+          )}
           {localesIncompatible && (
             <Box marginTop={4} marginBottom={4}>
               <Alert
