@@ -1,7 +1,7 @@
 ## Quick Installation
 
 ```
-npx @localazy/strapi-plugin
+npm install @localazy/strapi-plugin@latest && npx @localazy/strapi-plugin
 ```
 
 ## The Official Strapi Localization Plugin by Localazy
@@ -22,7 +22,7 @@ The plugin is available on [NPM](https://www.npmjs.com/package/@localazy/strapi-
 You can also follow the installation commands located in your Strapi project Marketplace or [Strapi Marketplace > Localazy](https://market.strapi.io/plugins/@localazy-strapi-plugin) itself. This is the recommended approach.
 
 ```
-npx @localazy/strapi-plugin
+npm install @localazy/strapi-plugin@latest && npx @localazy/strapi-plugin
 ```
 
 Note: Localazy plugin requires an updated Webpack configuration of your Strapi project. Follow the instructions in the console output during the installation process. Steps are also available in the [Install plugin via NPM](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation#install-plugin-via-npm) section of the Localazy Docs.
