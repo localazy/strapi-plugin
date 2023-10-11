@@ -15,6 +15,6 @@ export default {
   upload_success: "Content successfully imported to the Localazy project.",
   upload_failed:
     "Upload partially failed, please check the report for details...",
-  upload_in_progress: "Upload in progress...",
-  to_see_to_progress: "To see the progress information, do not leave this page.",
+  upload_in_progress: "Upload in progress: Please do not close or refresh this page if you wish to see the progress information.",
+  to_see_to_progress: "The operation will continue running in the background even if you close the page, but you will lose access to the status report.",
 };

@@ -20,6 +20,6 @@ export default {
   ui_languages: "Select languages to download",
   ui_languages_info: "Select translations of which languages wil be downloaded from Localazy",
   ui_languages_placeholder: "Download all languages",
-  download_in_progress: "Download in progress...",
-  to_see_to_progress: "To see the progress information, do not leave this page.",
+  download_in_progress: "Download in progress: Please do not close or refresh this page if you wish to see the progress information.",
+  to_see_to_progress: "The operation will continue running in the background even if you close the page, but you will lose access to the status report.",
 };
