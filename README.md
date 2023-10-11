@@ -27,6 +27,23 @@ npx @localazy/strapi-plugin
 
 Note: Localazy plugin requires an updated Webpack configuration of your Strapi project. Follow the instructions in the console output during the installation process. Steps are also available in the [Install plugin via NPM](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation#install-plugin-via-npm) section of the Localazy Docs.
 
+## Configuration
+
+Additional configuration object may be provided in the `plugins.js` file. The following options are available:
+
+```js
+localazy: {
+    config: {
+      /**
+       * both options may help guard against DoS attacks
+       * if `populateMaxDepth` < 5; the Localazy Strapi Plugin may not work as expected
+       */
+      populateDefaultDepth?: number, // default is 5
+      populateMaxDepth?: number, // default is 10
+    },
+  },
+```
+
 ## Additional Resources
 
 - Localazy Docs: [Introduction to Strapi](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation)
