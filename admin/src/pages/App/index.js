@@ -110,7 +110,7 @@ function App() {
               <>
                 {!isLoggedIn && (
                   <Switch>
-                    <Route path={`${process.env.ADMIN_PATH}plugins/${pluginId}/login`} exact>
+                    <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/login`} exact>
                       <Login
                         title={headerTitle}
                         subtitle={headerSubtitle}
@@ -121,19 +121,19 @@ function App() {
 
                 {isLoggedIn && (
                   <Switch>
-                    <Route path={`${process.env.ADMIN_PATH}plugins/${pluginId}/download`} exact>
+                    <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/download`} exact>
                       <Download
                         title={headerTitle}
                         subtitle={headerSubtitle}
                       />
                     </Route>
-                    <Route path={`${process.env.ADMIN_PATH}plugins/${pluginId}/upload`} exact>
+                    <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/upload`} exact>
                       <Upload
                         title={headerTitle}
                         subtitle={headerSubtitle}
                       />
                     </Route>
-                    <Route path={`${process.env.ADMIN_PATH}plugins/${pluginId}/settings`} exact>
+                    <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/settings`} exact>
                       <Settings
                         title={headerTitle}
                         subtitle={headerSubtitle}

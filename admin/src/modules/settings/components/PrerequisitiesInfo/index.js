@@ -3,8 +3,6 @@ import { Box } from "@strapi/design-system/Box";
 import { useTranslation } from "react-i18next";
 import { Typography } from "@strapi/design-system/Typography";
 
-import "../../../../i18n";
-
 function PrerequisitiesInfo() {
   const { t } = useTranslation();
 

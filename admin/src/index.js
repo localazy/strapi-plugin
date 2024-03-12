@@ -54,9 +54,15 @@ export default {
         defaultMessage: upperCaseName,
       },
       Component: async () => {
-        const component = await import("./pages/Index");
+        try {
+          const component = await import("./pages/Index");
 
-        return component;
+          return component;
+        } catch (e) {
+          console.log(e);
+        }
+
+        return null;
       },
       permissions: [
         // Uncomment to set the permissions of the plugin here

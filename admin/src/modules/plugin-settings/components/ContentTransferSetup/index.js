@@ -198,7 +198,7 @@ function ContentTransferSetup() {
 
   return (
     <>
-      {!isLoading && !isLoggedIn && <Redirect to={`${process.env.ADMIN_PATH}plugins/${pluginId}/login`} />}
+      {!isLoading && !isLoggedIn && <Redirect to={`/plugins/${pluginId}/login`} />}
 
       <HeaderLayout
         title={t("plugin_settings.content_transfer_setup")}

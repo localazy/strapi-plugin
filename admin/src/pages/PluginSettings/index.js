@@ -11,8 +11,6 @@ import LocalazyUserService from "../../modules/user/services/localazy-user-servi
 import { setLocalazyIdentity } from "../../state/localazy-identity";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 
-import "../../i18n";
-
 function PluginSettings() {
   /**
      * Translation function

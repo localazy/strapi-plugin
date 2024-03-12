@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Alert } from "@strapi/design-system/Alert";
 import { useTranslation } from "react-i18next";
 import { Box } from "@strapi/design-system/Box";
-import "../../../../i18n";
 
 function TransferReport(props) {
   const { t } = useTranslation();

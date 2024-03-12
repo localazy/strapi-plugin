@@ -21,8 +21,6 @@ import redirectToPluginRoute, {
 } from "../../modules/@common/utils/redirect-to-plugin-route";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
-import "../../i18n";
-
 function Login(props) {
   const history = useHistory();
   const { t } = useTranslation();
