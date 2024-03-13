@@ -3,9 +3,9 @@
  */
 
 import axios from "axios";
-import { config } from "../../../server";
+import config from "../config";
 
-const BASE_PLUGIN_PATH = config.default.LOCALAZY_PLUGIN_CONNECTOR_API_URL;
+const BASE_PLUGIN_PATH = config.LOCALAZY_PLUGIN_CONNECTOR_API_URL;
 
 const createPluginConnectorAxiosInstance = (baseUrl = null) => {
   if (baseUrl === null) {

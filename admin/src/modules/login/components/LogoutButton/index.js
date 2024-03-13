@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import Exit from "@strapi/icons/Exit";
 import LocalazyUserService from "../../../user/services/localazy-user-service";
 import { setLocalazyIdentity } from "../../../../state/localazy-identity";
-import "../../../../i18n";
 
 function LogoutButton(props) {
   const { t } = useTranslation();

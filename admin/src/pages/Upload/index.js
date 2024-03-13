@@ -26,8 +26,6 @@ import ProductAnalyticsService from "../../modules/@common/services/product-anal
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 import UploadAlertsService from "../../modules/localazy-upload/services/upload-alerts-service";
 
-import "../../i18n";
-
 const uploadAlertsService = new UploadAlertsService();
 uploadAlertsService.subscribe();
 

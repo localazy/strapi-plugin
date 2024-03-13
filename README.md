@@ -27,6 +27,12 @@ npm install @localazy/strapi-plugin@latest && npx @localazy/strapi-plugin
 
 Note: Localazy plugin requires an updated Webpack configuration of your Strapi project. Follow the instructions in the console output during the installation process. Steps are also available in the [Install plugin via NPM](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation#install-plugin-via-npm) section of the Localazy Docs.
 
+Due to the changes in Strapi core code it's also necessary to add an environment variable to your Strapi project. Add the following line to your `.env` file (value is empty):
+
+```
+STRAPI_ADMIN_LOCALAZY_ENV=
+```
+
 ## Configuration
 
 Additional configuration object may be provided in the `plugins.js` file. The following options are available:

@@ -20,8 +20,6 @@ import ProductAnalyticsService from "../../modules/@common/services/product-anal
 import formatNumber from "../../modules/@common/utils/format-number";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
-import "../../i18n";
-
 function Settings(props) {
   const history = useHistory();
   const { t } = useTranslation();

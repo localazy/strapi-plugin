@@ -11,8 +11,7 @@ import { useTranslation } from "react-i18next";
 import LocalazyLoginService from "../../services/localazy-login-service";
 import { getStrapiDefaultLocale } from "../../../@common/utils/get-default-locale";
 import { isoStrapiToLocalazy } from "../../../@common/utils/iso-locales-utils";
-import { config } from "../../../../../../server";
-import "../../../../i18n";
+import config from "../../../../config";
 
 function LoginButton(props) {
   const { t } = useTranslation();
@@ -25,12 +24,12 @@ function LoginButton(props) {
     const localazyFormatLocaleCode = isoStrapiToLocalazy(strapiDefaultLocale.code);
     const keys = await LocalazyLoginService.generateKeys();
     const params = new URLSearchParams({
-      client_id: config.default.LOCALAZY_OAUTH_APP_CLIENT_ID,
+      client_id: config.LOCALAZY_OAUTH_APP_CLIENT_ID,
       custom_id: keys.writeKey,
       allow_create: "true",
       create_locale: localazyFormatLocaleCode,
     });
-    const url = `${config.default.LOCALAZY_OAUTH_URL}?${params.toString()}`;
+    const url = `${config.LOCALAZY_OAUTH_URL}?${params.toString()}`;
     window.open(url);
 
     const pollResult = await LocalazyLoginService.continuousPoll(keys.readKey);

@@ -3,8 +3,6 @@ import { Flex } from '@strapi/design-system/Flex';
 import { Loader } from "@strapi/design-system/Loader";
 import { useTranslation } from "react-i18next";
 
-import "../../../../i18n";
-
 function PluginPageLoader() {
   const { t } = useTranslation();
 

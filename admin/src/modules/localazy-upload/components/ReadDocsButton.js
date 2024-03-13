@@ -1,7 +1,6 @@
 import React from "react";
 import { Button } from "@strapi/design-system/Button";
 import { useTranslation } from "react-i18next";
-import "../../../i18n";
 
 function ReadDocsButton() {
   const { t } = useTranslation();

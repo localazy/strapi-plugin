@@ -17,7 +17,6 @@ import areLocalesCompatible from "../../modules/@common/utils/are-locales-compat
 import hasModelChanged from "../../modules/plugin-settings/functions/has-model-changed";
 import TransferReport from "../../modules/@common/components/TransferReport";
 import ReadDocsButton from "../../modules/localazy-upload/components/ReadDocsButton";
-import "../../i18n";
 import { getLocalazyIdentity } from "../../state/localazy-identity";
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";

@@ -5,8 +5,6 @@ import { useTranslation } from "react-i18next";
 import cloneDeep from "lodash-es/cloneDeep";
 import { Select, Option } from '@strapi/design-system/Select';
 
-import "../../../../i18n";
-
 function LanguagesSelector(props) {
   /**
    * Translation function
