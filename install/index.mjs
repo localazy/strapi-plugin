@@ -39,9 +39,19 @@ const install = () => new Promise((resolve, reject) => {
   }
 });
 
-const updateConfig = () => new Promise((resolve, reject) => {
+const createWebpackConfigSample = () => new Promise((resolve, reject) => {
   try {
     shell.exec(`echo "${template}" > src/admin/${exampleFileName}`, { silent: true }, () => {
+      resolve();
+    });
+  } catch (err) {
+    reject(err);
+  }
+});
+
+const updateEnvConfig = () => new Promise((resolve, reject) => {
+  try {
+    shell.exec(`echo "STRAPI_ADMIN_LOCALAZY_ENV=" >> .env`, { silent: true }, () => {
       resolve();
     });
   } catch (err) {
@@ -56,7 +66,10 @@ await install();
 installSpinner.succeed();
 
 installSpinner.start(`Creating example ${file} file in ${chalk.bold.green("src/admin")} folder`);
-await updateConfig();
+await createWebpackConfigSample();
+installSpinner.succeed();
+installSpinner.start(`Updating ${chalk.bold.green(".env")} file with ${chalk.bold.green("STRAPI_ADMIN_LOCALAZY_ENV")} variable`);
+await updateEnvConfig();
 installSpinner.succeed();
 installSpinner.succeed(`To run the plugin, you need to update your webpack config in ${chalk.bold.green("src/admin/webpack.config.js")} file`);
 installSpinner.succeed(`Don't forget to build the admin panel with ${chalk.bold.green("npm run build")} command`);
