@@ -1,0 +1,38 @@
+name: Release CI
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    name: Prepare Release
+    if: github.event.head.ref != 'release' && !contains(github.event.commits[0].message, '🚀 release:')
+    runs-on: [ self-hosted, Linux ]
+    steps:
+      - name: Prepare release branch and PR
+        uses: localazy/release@v1
+        with:
+          action: prepare
+          app-id: ${{ secrets.AUTH_APP_ID }}
+          app-key: ${{ secrets.AUTH_APP_KEY }}
+
+  release:
+    name: Release
+    if: github.event.head.ref == 'release' || contains(github.event.commits[0].message, '🚀 release:')
+    runs-on: [ self-hosted, Linux ]
+    steps:
+      - name: Release new version
+        uses: localazy/release@v1
+        with:
+          action: release
+          app-id: ${{ secrets.AUTH_APP_ID }}
+          app-key: ${{ secrets.AUTH_APP_KEY }}
+          npm-publish: true
+          npm-access: public
+          npm-token: ${{ secrets.NPM_AUTH_TOKEN }}
