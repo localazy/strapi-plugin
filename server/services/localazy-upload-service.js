@@ -2,7 +2,7 @@
 
 "use strict";
 
-const getLocalazyApi = require("../utils/get-localazy-api");
+const localazyApiClientFactory = require("../utils/localazy-api-client-factory");
 const delay = require("../utils/delay");
 const config = require("../config").default;
 
@@ -19,7 +19,7 @@ module.exports = ({ strapi }) => ({
     };
     try {
       for (const file of files) {
-        const LocalazyApi = await getLocalazyApi();
+        const LocalazyApi = await localazyApiClientFactory();
         const user = await strapi
           .plugin("localazy")
           .service("localazyUserService")

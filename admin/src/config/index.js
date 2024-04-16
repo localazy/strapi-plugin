@@ -14,8 +14,6 @@ if (process.env.STRAPI_ADMIN_LOCALAZY_ENV === "development") {
   config = development;
 }
 
-console.log(config);
-
 export default {
   ...config,
 };

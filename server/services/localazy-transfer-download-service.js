@@ -13,6 +13,7 @@ const isEmpty = require("lodash/isEmpty");
 const RequestInitiatorHelper = require('../utils/request-initiator-helper');
 const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
 const { DOWNLOAD_EVENT, DOWNLOAD_FINISHED_EVENT } = require('../constants/events');
+const localazyApiClientFactory = require("../utils/localazy-api-client-factory");
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -63,9 +64,6 @@ module.exports = ({ strapi }) => ({
     const LocalazyPubApiService = strapi
       .plugin("localazy")
       .service("localazyPubApiService");
-    const LocalazyDownloadService = strapi
-      .plugin("localazy")
-      .service("localazyDownloadService");
     const strapiLocalazyI18nService = strapi
       .plugin("localazy")
       .service("strapiLocalazyI18nService");
@@ -204,11 +202,12 @@ module.exports = ({ strapi }) => ({
       (languageCode) => !strapiUnsupportedLanguages.includes(languageCode)
     );
     const localazyContent = {};
+    const LocalazyApi = await localazyApiClientFactory();
     for (const isoLocalazy of supportedLanguages) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
-      const result = await LocalazyDownloadService.download({
-        projectId: user.project.id,
-        fileId: strapiFile.id,
+      const result = await LocalazyApi.files.listKeys({
+        project: user.project.id,
+        file: strapiFile.id,
         lang: isoStrapi,
       });
       if (!result.success) {
