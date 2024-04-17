@@ -146,17 +146,21 @@ module.exports = ({ strapi }) => ({
       ? isoStrapiToLocalazy(defaultLocale.code)
       : config.LOCALAZY_DEFAULT_LOCALE;
 
-    const chunks = LocalazyUploadService.splitToChunks(flattenContent);
     const importFile = LocalazyUploadService.createImportFileRepresentation(
-      config.LOCALAZY_DEFAULT_FILE_NAME,
-      config.LOCALAZY_DEFAULT_FILE_PATH,
-      config.LOCALAZY_DEFAULT_FILE_EXTENSION,
       locale,
-      chunks
+      flattenContent
     );
-    // Use `deprecate: "file"` if there is one chunk of transferred data only!
-    const hasMoreTransferFilesChunks = importFile.length > 1;
-    const uploadConfig = !hasMoreTransferFilesChunks ? { deprecate: "file" } : {};
+    // Use `deprecate: "file"` if there is one chunk of transferred data only (99900 keys)!
+    const uploadConfig = {
+      contentOptions: {
+        type: config.LOCALAZY_DEFAULT_FILE_EXTENSION,
+      },
+      i18nOptions: { deprecate: "file" },
+      fileOptions: {
+        name: config.LOCALAZY_DEFAULT_FILE_NAME,
+        path: config.LOCALAZY_DEFAULT_FILE_PATH,
+      }
+    };
     await JobNotificationService.emit(UPLOAD_EVENT, {
       message: "Uploading collections to Localazy...",
     });
