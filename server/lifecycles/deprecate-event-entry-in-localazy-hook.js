@@ -41,8 +41,15 @@ module.exports = async (event) => {
     lang: eventEntryLocale,
   });
 
+  if(!projectKeys) {
+    strapi.log.error(`Keys not found for file ${strapiFile.id}`);
+    return {
+      success: false,
+    };
+  }
+
   const pickedFlattenKeys = Object.keys(pickedFlatten);
-  const filteredProjectKeysIds = projectKeys.data
+  const filteredProjectKeysIds = projectKeys
     .filter((key) => pickedFlattenKeys.includes(key.key[0]))
     .map((key) => key.id);
 
