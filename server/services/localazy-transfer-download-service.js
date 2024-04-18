@@ -205,17 +205,16 @@ module.exports = ({ strapi }) => ({
     const LocalazyApi = await localazyApiClientFactory();
     for (const isoLocalazy of supportedLanguages) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
-      const result = await LocalazyApi.files.listKeys({
+      const langKeys = await LocalazyApi.files.listKeys({
         project: user.project.id,
         file: strapiFile.id,
         lang: isoStrapi,
       });
-      if (!result.success) {
+      if (!langKeys) {
         await JobNotificationService.emit(DOWNLOAD_EVENT, {
-          message: result.message,
+          message: `No keys found for language ${isoLocalazy}`,
         });
       }
-      const langKeys = result.data;
       localazyContent[isoLocalazy] = langKeys;
     }
 

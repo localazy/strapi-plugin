@@ -3,8 +3,6 @@
 "use strict";
 
 const localazyApiClientFactory = require("../utils/localazy-api-client-factory");
-const delay = require("../utils/delay");
-const config = require("../config").default;
 
 module.exports = ({ strapi }) => ({
   /**
