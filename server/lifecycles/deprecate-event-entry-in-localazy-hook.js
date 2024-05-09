@@ -2,7 +2,7 @@
 
 const getPickedFlattenKeysForHookEntry = require('../utils/get-picked-flatten-keys-for-hook-entry');
 const config = require("../config").default;
-const getLocalazyApi = require("../utils/get-localazy-api");
+const localazyApiClientFactory = require("../utils/localazy-api-client-factory");
 const delay = require("../utils/delay");
 
 module.exports = async (event) => {
@@ -20,9 +20,6 @@ module.exports = async (event) => {
   const LocalazyPubApiService = strapi
     .plugin("localazy")
     .service("localazyPubApiService");
-  const LocalazyDownloadService = strapi
-    .plugin("localazy")
-    .service("localazyDownloadService");
 
   const user = await LocalazyUserService.getUser();
 
@@ -37,24 +34,31 @@ module.exports = async (event) => {
     return;
   }
 
-  const projectKeys = await LocalazyDownloadService.download({
-    projectId: user.project.id,
-    fileId: strapiFile.id,
+  const LocalazyApi = await localazyApiClientFactory();
+  const projectKeys = await LocalazyApi.files.listKeys({
+    project: user.project.id,
+    file: strapiFile.id,
     lang: eventEntryLocale,
   });
 
+  if(!projectKeys) {
+    strapi.log.error(`Keys not found for file ${strapiFile.id}`);
+    return {
+      success: false,
+    };
+  }
+
   const pickedFlattenKeys = Object.keys(pickedFlatten);
-  const filteredProjectKeysIds = projectKeys.data
+  const filteredProjectKeysIds = projectKeys
     .filter((key) => pickedFlattenKeys.includes(key.key[0]))
     .map((key) => key.id);
 
-  const LocalazyApi = await getLocalazyApi();
   // call in a loop in a sequence, to avoid hitting PubAPI limits
   for (const filteredProjectKeysId of filteredProjectKeysIds) {
     try {
-      await LocalazyApi.updateKey({
-        projectId: user.project.id,
-        keyId: filteredProjectKeysId,
+      await LocalazyApi.keys.update({
+        project: user.project.id,
+        key: filteredProjectKeysId,
         deprecated: 0,
       });
       await delay();

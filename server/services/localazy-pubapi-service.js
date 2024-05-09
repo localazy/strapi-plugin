@@ -1,13 +1,13 @@
 "use strict";
 
-const getLocalazyApi = require("../utils/get-localazy-api");
+const localazyApiClientFactory = require("../utils/localazy-api-client-factory");
 const config = require("../config").default;
 
 module.exports = ({ strapi }) => ({
   async listFiles(projectId) {
     try {
-      const LocalazyApi = await getLocalazyApi();
-      const result = await LocalazyApi.listFiles({ projectId });
+      const LocalazyApi = await localazyApiClientFactory();
+      const result = await LocalazyApi.files.list({ project: projectId });
 
       return result;
     } catch (e) {
@@ -27,8 +27,8 @@ module.exports = ({ strapi }) => ({
   },
   async listProjects(addOrganization = true, addLanguages = true) {
     try {
-      const LocalazyApi = await getLocalazyApi();
-      const result = await LocalazyApi.listProjects({
+      const LocalazyApi = await localazyApiClientFactory();
+      const result = await LocalazyApi.projects.list({
         organization: addOrganization,
         languages: addLanguages,
       });
@@ -45,8 +45,8 @@ module.exports = ({ strapi }) => ({
     return projects.find((project) => project.id === projectId);
   },
   async getWebhooksSecret(projectId) {
-    const LocalazyApi = await getLocalazyApi();
-    const result = await LocalazyApi.getWebhooksSecret({ projectId });
+    const LocalazyApi = await localazyApiClientFactory();
+    const result = await LocalazyApi.webhooks.getSecret({ project: projectId });
 
     return result;
   }

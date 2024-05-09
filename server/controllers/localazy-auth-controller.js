@@ -1,46 +1,22 @@
 "use strict";
 
+const localazyGenericConnectorClientFactory = require("../utils/localazy-generic-connector-client-factory");
+
 module.exports = {
   async generateKeys(ctx) {
-    ctx.body = await strapi
-      .plugin("localazy")
-      .service("localazyAuthService")
-      .generateKeys();
+    const GenericConnectorApi = await localazyGenericConnectorClientFactory();
+    ctx.body = await GenericConnectorApi.public.keys();
   },
 
   async continuousPoll(ctx) {
-    const POLLING_LIMIT = 60;
-    const INTERVAL_PERIOD = 2000; // ms
-    const localazyAuthService = strapi
-      .plugin("localazy")
-      .service("localazyAuthService");
-
-    let counter = 1;
+    // init continuous poll
     const { readKey } = ctx.query;
-    let result = await localazyAuthService.completeLogin(readKey);
+    const GenericConnectorApi = await localazyGenericConnectorClientFactory();
+    const pollResult = await GenericConnectorApi.oauth.continuousPoll({
+      readKey,
+    });
+    const pollResultData = pollResult.data;
 
-    let data = {
-      success: false,
-    };
-    if (!result.completed) {
-      data = await new Promise((resolve, reject) => {
-        const pollInterval = setInterval(async () => {
-          result = await localazyAuthService.completeLogin(readKey);
-
-          if (result.completed) {
-            clearInterval(pollInterval);
-            resolve(result.data);
-          }
-
-          counter += 1;
-          if (counter >= POLLING_LIMIT) {
-            clearInterval(pollInterval);
-            reject(new Error("Sign in attempts timed out."));
-          }
-        }, INTERVAL_PERIOD);
-      });
-    }
-
-    ctx.body = data;
+    ctx.body = pollResultData;
   },
 };

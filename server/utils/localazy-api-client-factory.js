@@ -1,6 +1,6 @@
 "use strict";
 
-const LocalazyApi = require("@localazy/ts-api").default;
+const ApiClient = require("@localazy/api-client").ApiClient;
 const { LOCALAZY_PUBLIC_API_URL } = require("../config").default;
 
 module.exports = async () => {
@@ -14,9 +14,9 @@ module.exports = async () => {
     throw new Error("Localazy user is not logged in.");
   }
 
-  const api = LocalazyApi({
-    projectToken: accessToken,
-    baseUrl: LOCALAZY_PUBLIC_API_URL,
+  const api = new ApiClient({
+    authToken: accessToken,
+    apiUrl: LOCALAZY_PUBLIC_API_URL,
   });
   return api;
 };

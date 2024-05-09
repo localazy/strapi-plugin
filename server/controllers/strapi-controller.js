@@ -16,4 +16,12 @@ module.exports = {
   async postLifecycleLocalazyWebhooks(ctx) {
     strapi.log("done");
   },
+  async getPluginVersion(ctx) {
+    ctx.body = {
+      version: await strapi
+        .plugin("localazy")
+        .service("strapiService")
+        .getPluginVersion()
+    }
+  }
 };

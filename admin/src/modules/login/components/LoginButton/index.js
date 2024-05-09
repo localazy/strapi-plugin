@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button } from "@strapi/design-system/Button";
 import { useTranslation } from "react-i18next";
+import { getOAuthAuthorizationUrl } from "@localazy/generic-connector-client";
 import LocalazyLoginService from "../../services/localazy-login-service";
 import { getStrapiDefaultLocale } from "../../../@common/utils/get-default-locale";
 import { isoStrapiToLocalazy } from "../../../@common/utils/iso-locales-utils";
@@ -23,13 +24,12 @@ function LoginButton(props) {
     const strapiDefaultLocale = await getStrapiDefaultLocale();
     const localazyFormatLocaleCode = isoStrapiToLocalazy(strapiDefaultLocale.code);
     const keys = await LocalazyLoginService.generateKeys();
-    const params = new URLSearchParams({
-      client_id: config.LOCALAZY_OAUTH_APP_CLIENT_ID,
-      custom_id: keys.writeKey,
-      allow_create: "true",
-      create_locale: localazyFormatLocaleCode,
-    });
-    const url = `${config.LOCALAZY_OAUTH_URL}?${params.toString()}`;
+    const url = getOAuthAuthorizationUrl({
+      clientId: config.LOCALAZY_OAUTH_APP_CLIENT_ID,
+      customId: keys.writeKey,
+      allowCreate: true,
+      createLocale: localazyFormatLocaleCode,
+    }, config.LOCALAZY_OAUTH_URL);
     window.open(url);
 
     const pollResult = await LocalazyLoginService.continuousPoll(keys.readKey);

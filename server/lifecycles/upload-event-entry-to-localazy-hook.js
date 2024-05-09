@@ -17,15 +17,20 @@ module.exports = async (event) => {
     .plugin("localazy")
     .service("localazyUploadService");
 
-  const chunks = LocalazyUploadService.splitToChunks(pickedFlatten);
   const importFile = LocalazyUploadService.createImportFileRepresentation(
-    config.LOCALAZY_DEFAULT_FILE_NAME,
-    config.LOCALAZY_DEFAULT_FILE_PATH,
-    config.LOCALAZY_DEFAULT_FILE_EXTENSION,
     eventEntryLocale,
-    chunks
+    pickedFlatten
   );
 
-  const result = await LocalazyUploadService.upload(importFile);
+  const uploadConfig = {
+    contentOptions: {
+      type: config.LOCALAZY_DEFAULT_FILE_EXTENSION,
+    },
+    fileOptions: {
+      name: config.LOCALAZY_DEFAULT_FILE_NAME,
+      path: config.LOCALAZY_DEFAULT_FILE_PATH,
+    }
+  };
+  const result = await LocalazyUploadService.upload(importFile, uploadConfig);
   return result;
 }
