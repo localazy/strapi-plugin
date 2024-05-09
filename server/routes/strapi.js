@@ -27,4 +27,12 @@ module.exports = [
       policies: [],
     },
   },
+  {
+    method: "GET",
+    path: `${ROUTE_PREFIX}/version`,
+    handler: "strapiController.getPluginVersion",
+    config: {
+      policies: [],
+    },
+  },
 ];

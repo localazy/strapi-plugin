@@ -20,4 +20,7 @@ module.exports = ({ strapi }) => ({
     const models = strapi.db.config.models;
     return buildPopulate(models, modelUid);
   },
+  async getPluginVersion() {
+    return require("../../package.json").version;
+  }
 });
