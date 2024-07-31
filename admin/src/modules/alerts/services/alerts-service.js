@@ -8,7 +8,23 @@ export default class AlertsService {
   _streamIdentifier;
 
   constructor() {
-    this._client = SocketIoClient.connect(process.env.STRAPI_ADMIN_BACKEND_URL);
+    const uri = process.env.STRAPI_ADMIN_BACKEND_URL;
+    let path = '/socket.io'; // SocketIoClient defaults to this path too if it is not defined
+
+    // If uri is not undefined nor empty, use the correct path to Strapi's socket
+    if (uri !== undefined && uri.length > 0) {
+      try {
+        const { pathname } = new URL(
+          uri,
+          window.location.href // Mandatory in case uri is not a complete URL (e.g. /cms)
+        );
+        path = `${pathname}${pathname.endsWith('/') ? '' : '/'}socket.io`;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    this._client = SocketIoClient.connect(uri, { path });
   }
 
   setStreamIdentifier(streamIdentifier) {
