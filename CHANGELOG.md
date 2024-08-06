@@ -1,3 +1,5 @@
+## 0.2.7 (2024-08-06)
+
 ## <small>0.2.6 (2024-05-09)</small>
 
 * 🔧 conf: update .nvmrc node version to v18 ([78f1e4a](https://github.com/localazy/strapi-plugin/commit/78f1e4a))
