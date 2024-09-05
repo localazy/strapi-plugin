@@ -27,6 +27,7 @@ jobs:
     steps:
       - uses: localazy/release/prepare@v2
         with:
+          node-version: 20
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
 
@@ -38,6 +39,7 @@ jobs:
     steps:
       - uses: localazy/release/publish@v2
         with:
+          node-version: 20
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
           npm-publish: public
