@@ -1,3 +1,12 @@
+## 0.2.10 (2024-09-05)
+
+### 🧰 Other Commits
+
+- **QA:** switch to Node 20 in GH actions ([8ce744a](https://github.com/localazy/strapi-plugin/commit/8ce744a))
+- **release:** switch to Node 20 in GH actions ([1760ff8](https://github.com/localazy/strapi-plugin/commit/1760ff8))
+- add support for Node 20 ([041c0af](https://github.com/localazy/strapi-plugin/commit/041c0af))
+- support Node 20 ([883c3ef](https://github.com/localazy/strapi-plugin/commit/883c3ef))
+
 ## 0.2.9 (2024-08-06)
 
 ## 0.2.8 (2024-08-06)
