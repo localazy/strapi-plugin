@@ -24,11 +24,11 @@
     "email": "team@localazy.com",
     "url": "https://localazy.com"
   },
-  "bin": "./install/index.mjs",
   "repository": {
     "type": "git",
     "url": "git@github.com:localazy/strapi-plugin.git"
   },
+  "bin": "./install/index.mjs",
   "scripts": {
     "test": "jest --config ./jest.config.js",
     "test:watch": "jest --watch --config ./jest.config.js"
@@ -73,7 +73,7 @@
     }
   ],
   "engines": {
-    "node": ">=14.19.1 <=18.x.x",
+    "node": ">=14.19.1 <=20.x.x",
     "npm": ">=6.0.0"
   },
   "browser": {
