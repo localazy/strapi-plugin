@@ -1,5 +1,4 @@
 {
-  "extends": "@strapi-community",
   "env": {
     "jest/globals": true,
     "es6": true,
