@@ -94,12 +94,12 @@ module.exports = ({ strapi }) => ({
 
     const populate = await StrapiService.getPopulateObject(uid);
     const localizedEntry = await strapi.documents(uid).findOne({
-      documentId: "__TODO__",
+      documentId: localizedEntryId,
       populate
     });
 
     const fullyPopulatedLocalizedEntry = await strapi.documents(uid).findOne({
-      documentId: "__TODO__",
+      documentId: localizedEntryId,
       populate: "deep"
     });
 

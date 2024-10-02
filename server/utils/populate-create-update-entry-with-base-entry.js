@@ -205,7 +205,7 @@ const populateCreateUpdateEntryWithBaseEntry = async (
               const entityId = item.id;
               if (!!entityId) {
                 const entryWithLocalizations = await strapi.documents(attribute.target).findOne({
-                  documentId: "__TODO__",
+                  documentId: entityId,
                   populate: ['localizations']
                 });
 

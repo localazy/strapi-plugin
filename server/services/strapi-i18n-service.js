@@ -50,7 +50,7 @@ module.exports = ({ strapi }) => ({
   async getEntryInLocale(modelUid, baseEntryId, isoStrapi, populate = "*") {
     const StrapiService = strapi.plugin("localazy").service("strapiService");
     const entry = await strapi.documents(modelUid).findOne({
-      documentId: "__TODO__",
+      documentId: baseEntryId,
       populate
     });
     const localizations = entry.localizations;
@@ -135,7 +135,7 @@ module.exports = ({ strapi }) => ({
       }
 
       const updatedEntry = await strapi.documents(uid).update({
-        documentId: "__TODO__",
+        documentId: baseEntryId,
         data,
         populate
       });

@@ -37,14 +37,14 @@ const getEventEntries = async (event) => {
     case 'afterCreate':
     case 'afterUpdate': {
       const entry = [await strapi.documents(event.model.uid).findOne({
-        documentId: "__TODO__",
+        documentId: event.entry.id,
         populate: "deep"
       })];
       return entry;
     }
     case "beforeDelete": {
       const entry = [await strapi.documents(event.model.uid).findOne({
-        documentId: "__TODO__",
+        documentId: event.params.where.id,
         populate: "deep"
       })];
       return entry;
