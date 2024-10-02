@@ -68,7 +68,7 @@ function Upload(props) {
       setUploadResult((old) => ({
         success: data.success,
         report: [
-          ...old.report || [],
+          ...(old.report || []),
           data.message,
         ],
       }));
@@ -77,7 +77,7 @@ function Upload(props) {
       setUploadResult((old) => ({
         success: data.success,
         report: [
-          ...old.report || [],
+          ...(old.report || []),
           data.message,
         ],
       }));

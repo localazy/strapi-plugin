@@ -283,8 +283,9 @@ module.exports = ({ strapi }) => ({
             /**
              * Get original source language entry
              */
-            const baseEntry = await strapi.entityService.findOne(uid, id, {
-              populate: "deep",
+            const baseEntry = await strapi.documents(uid).findOne({
+              documentId: "__TODO__",
+              populate: "deep"
             });
 
             if (isEmpty(baseEntry)) {

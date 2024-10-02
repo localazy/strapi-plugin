@@ -36,21 +36,17 @@ const getEventEntries = async (event) => {
   switch (event.action) {
     case 'afterCreate':
     case 'afterUpdate': {
-      const entry = [await strapi.entityService.findOne(
-        event.model.uid,
-        event.result.id,
-        {
-          populate: "deep",
-        })];
+      const entry = [await strapi.documents(event.model.uid).findOne({
+        documentId: "__TODO__",
+        populate: "deep"
+      })];
       return entry;
     }
     case "beforeDelete": {
-      const entry = [await strapi.entityService.findOne(
-        event.model.uid,
-        event.params.where.id,
-        {
-          populate: "deep",
-        })];
+      const entry = [await strapi.documents(event.model.uid).findOne({
+        documentId: "__TODO__",
+        populate: "deep"
+      })];
       return entry;
     }
     case "beforeDeleteMany": {
@@ -80,12 +76,10 @@ const getEventEntries = async (event) => {
        * If deletion of other than default locale is requested, `entries` will be an empty array
        * If deletion of default locale is requested, `entries` will contain requested entries, and we can proceed with the deprecation process
        */
-      const entries = await strapi.entityService.findMany(
-        event.model.uid,
-        {
-          filters: event.params.where,
-          populate: "deep",
-        });
+      const entries = await strapi.documents(event.model.uid).findMany({
+        filters: event.params.where,
+        populate: "deep",
+      });
 
       if (entries.length === 0) {
         strapi.log.info(`Localazy Plugin: No entries in source language for ${event.action} found; the operation won't proceed`);

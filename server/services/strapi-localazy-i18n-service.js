@@ -93,21 +93,15 @@ module.exports = ({ strapi }) => ({
       .service("strapiI18nService");
 
     const populate = await StrapiService.getPopulateObject(uid);
-    const localizedEntry = await strapi.entityService.findOne(
-      uid,
-      localizedEntryId,
-      {
-        populate,
-      }
-    );
+    const localizedEntry = await strapi.documents(uid).findOne({
+      documentId: "__TODO__",
+      populate
+    });
 
-    const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(
-      uid,
-      localizedEntryId,
-      {
-        populate: "deep",
-      }
-    );
+    const fullyPopulatedLocalizedEntry = await strapi.documents(uid).findOne({
+      documentId: "__TODO__",
+      populate: "deep"
+    });
 
     const updateEntry = await parsedLocalazyEntryToUpdateEntry(
       strapiContentTypesModels,

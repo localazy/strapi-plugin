@@ -101,7 +101,7 @@ module.exports = ({ strapi }) => ({
         (pickPath) => `${modelUid}.${pickPath}`
       );
 
-      let entries = await strapi.entityService.findMany(modelUid, {
+      let entries = await strapi.documents(modelUid).findMany({
         populate: "deep",
       });
       entries = omitDeep(entries, [

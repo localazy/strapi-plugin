@@ -196,113 +196,110 @@ function ContentTransferSetup() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <>
-      {!isLoading && !isLoggedIn && <Redirect to={`/plugins/${pluginId}/login`} />}
-
-      <HeaderLayout
-        title={t("plugin_settings.content_transfer_setup")}
-        subtitle={t("plugin_settings.content_transfer_setup_description")}
-        primaryAction={
-          <Flex gap={2}>
-            <Button
-              variant="secondary"
-              disabled={!hasUnsavedChanges}
-              onClick={onCancelClick}
-            >
-              {t("plugin_settings.cancel")}
-            </Button>
-            <Button
-              startIcon={<Check />}
-              disabled={!hasUnsavedChanges}
-              onClick={() => { saveContentTransferSetup(formModel) }}
-            >
-              {t("plugin_settings.save")}
-            </Button>
-          </Flex>
-        }
-        as="h2"
-      />
-      <Box marginRight={10} marginLeft={10}>
-        {!isLoading && showAlert && (
-          <Box marginBottom={8}>
-            <Alert
-              onClose={() => setShowAlert(false)}
-              closeLabel={t("plugin_settings.close")}
-              title={t("plugin_settings.content_transfer_setup_saved")}
-              variant="success"
-            >
-              {t("plugin_settings.content_transfer_setup_saved_successfully")}
-            </Alert>
-          </Box>
-        )}
-        {!isLoading && showModalChangedAlert && (
-          <Box marginBottom={8}>
-            <Alert
-              onClose={() => setShowModalChangedAlert(false)}
-              closeLabel={t("plugin_settings.close")}
-              title={t("plugin_settings.content_types_model_changed")}
-              variant="default"
-            >
-              {t("plugin_settings.please_update_your_content")}
-            </Alert>
-          </Box>
-        )}
-        {!isLoading && (
-          <Box
-            background="neutral0"
-            padding={7}
-            paddingTop={6}
-            shadow="tableShadow"
-            hasRadius
+  return (<>
+    {!isLoading && !isLoggedIn && <Redirect to={`/plugins/${pluginId}/login`} />}
+    <HeaderLayout
+      title={t("plugin_settings.content_transfer_setup")}
+      subtitle={t("plugin_settings.content_transfer_setup_description")}
+      primaryAction={
+        <Flex gap={2}>
+          <Button
+            variant="secondary"
+            disabled={!hasUnsavedChanges}
+            onClick={onCancelClick}
           >
-            {!formModel.length && (
-              // empty state
-              <ContentTransferSetupEmpty />
-            )}
-            {formModel.map((tree, index) => {
-              return (
-                <Box
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`box_tree_${index}`}
-                  marginBottom={3}
-                >
-                  <Tree
-                    onTreeItemClick={onTreeItemClick}
-                    objects={tree}
-                    initiallyExpanded={index === 0} />
-                </Box>
-              );
-            })}
-            {!!formModel.length && (
-              <Box>
-                <Box
-                  paddingTop={6}
-                  paddingBottom={6}
-                >
-                  <Divider />
-                </Box>
-                <Typography variant="omega">{t("plugin_settings.you_can_upload_download")}</Typography>
-                <Typography variant="omega" fontWeight="semiBold">{t("plugin_settings.only_text_based_content")}</Typography>
-                <br />
-                <br />
-                <Typography variant="omega">{t("plugin_settings.learn_more_in_docs_message_a")}</Typography>
-                <Typography
-                  onClick={onReadDocumentationClick}
-                  variant="omega"
-                  fontWeight="semiBold"
-                  textColor="primary600"
-                  style={{ cursor: "pointer" }}
-                >
-                  {t("plugin_settings.learn_more_in_docs_message_b")}
-                </Typography>
+            {t("plugin_settings.cancel")}
+          </Button>
+          <Button
+            startIcon={<Check />}
+            disabled={!hasUnsavedChanges}
+            onClick={() => { saveContentTransferSetup(formModel) }}
+          >
+            {t("plugin_settings.save")}
+          </Button>
+        </Flex>
+      }
+      as="h2"
+    />
+    <Box marginRight={10} marginLeft={10}>
+      {!isLoading && showAlert && (
+        <Box marginBottom={8}>
+          <Alert
+            onClose={() => setShowAlert(false)}
+            closeLabel={t("plugin_settings.close")}
+            title={t("plugin_settings.content_transfer_setup_saved")}
+            variant="success"
+          >
+            {t("plugin_settings.content_transfer_setup_saved_successfully")}
+          </Alert>
+        </Box>
+      )}
+      {!isLoading && showModalChangedAlert && (
+        <Box marginBottom={8}>
+          <Alert
+            onClose={() => setShowModalChangedAlert(false)}
+            closeLabel={t("plugin_settings.close")}
+            title={t("plugin_settings.content_types_model_changed")}
+            variant="default"
+          >
+            {t("plugin_settings.please_update_your_content")}
+          </Alert>
+        </Box>
+      )}
+      {!isLoading && (
+        <Box
+          background="neutral0"
+          padding={7}
+          paddingTop={6}
+          shadow="tableShadow"
+          hasRadius
+        >
+          {!formModel.length && (
+            // empty state
+            (<ContentTransferSetupEmpty />)
+          )}
+          {formModel.map((tree, index) => {
+            return (
+              <Box
+                // eslint-disable-next-line react/no-array-index-key
+                key={`box_tree_${index}`}
+                marginBottom={3}
+              >
+                <Tree
+                  onTreeItemClick={onTreeItemClick}
+                  objects={tree}
+                  initiallyExpanded={index === 0} />
               </Box>
-            )}
-          </Box>
-        )}
-      </Box>
-    </>
-  );
+            );
+          })}
+          {!!formModel.length && (
+            <Box>
+              <Box
+                paddingTop={6}
+                paddingBottom={6}
+              >
+                <Divider />
+              </Box>
+              <Typography variant="omega">{t("plugin_settings.you_can_upload_download")}</Typography>
+              <Typography variant="omega" fontWeight="semiBold">{t("plugin_settings.only_text_based_content")}</Typography>
+              <br />
+              <br />
+              <Typography variant="omega">{t("plugin_settings.learn_more_in_docs_message_a")}</Typography>
+              <Typography
+                onClick={onReadDocumentationClick}
+                variant="omega"
+                fontWeight="semiBold"
+                textColor="primary600"
+                style={{ cursor: "pointer" }}
+              >
+                {t("plugin_settings.learn_more_in_docs_message_b")}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      )}
+    </Box>
+  </>);
 }
 
 export default ContentTransferSetup;

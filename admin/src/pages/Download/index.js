@@ -90,7 +90,7 @@ function Download(props) {
       setDownloadResult((old) => ({
         success: data.success,
         report: [
-          ...old.report || [],
+          ...(old.report || []),
           data.message,
         ],
       }));
@@ -99,7 +99,7 @@ function Download(props) {
       setDownloadResult((old) => ({
         success: data.success,
         report: [
-          ...old.report || [],
+          ...(old.report || []),
           data.message,
         ],
       }));
