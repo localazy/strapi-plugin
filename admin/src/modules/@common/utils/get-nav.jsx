@@ -1,7 +1,5 @@
 import React from "react";
-import House from "@strapi/icons/House";
-import Download from "@strapi/icons/Download";
-import Upload from "@strapi/icons/Upload";
+import { House, Download, Upload } from "@strapi/icons";
 import pluginId from "../../../pluginId";
 import i18n from "../../../i18n";
 

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { HeaderLayout } from "@strapi/design-system/Layout";
-import { Box } from "@strapi/design-system/Box";
+import {
+  HeaderLayout,
+  Box,
+  Grid,
+  Divider
+ } from "@strapi/design-system";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Grid } from '@strapi/design-system/Grid';
-import { Divider } from '@strapi/design-system/Divider';
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LogoutButton from "../../modules/login/components/LogoutButton";
 import redirectToPluginRoute, {

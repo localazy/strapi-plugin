@@ -2,16 +2,16 @@ import React from "react";
 import { useTranslation, Trans } from "react-i18next";
 import styled from 'styled-components';
 import { Typography, Flex } from "@strapi/design-system";
-import Dot from '@strapi/icons/Dot';
+// import {Dot} from '@strapi/icons';
 
-const CustomBullet = styled(Dot)`
-  width: ${12 / 16}rem;
-  height: ${4 / 16}rem;
-  margin-right: ${4 / 16}rem;
-  * {
-    fill: ${({ theme, $active }) => ($active ? theme.colors.primary600 : theme.colors.neutral600)};
-  }
-`;
+// const CustomBullet = styled(Dot)`
+//   width: ${12 / 16}rem;
+//   height: ${4 / 16}rem;
+//   margin-right: ${4 / 16}rem;
+//   * {
+//     fill: ${({ theme, $active }) => ($active ? theme.colors.primary600 : theme.colors.neutral600)};
+//   }
+// `;
 
 function ContentTransferSetupEmpty() {
   const { t } = useTranslation();
@@ -34,7 +34,7 @@ function ContentTransferSetupEmpty() {
       </Typography>
       <br />
       <Flex marginTop={1} alignItems="center">
-        <CustomBullet />
+        {/* <CustomBullet /> */}
         <Typography
           textColor="neutral600"
           variant="omega"
@@ -43,7 +43,7 @@ function ContentTransferSetupEmpty() {
         </Typography>
       </Flex>
       <Flex marginTop={1} alignItems="center">
-        <CustomBullet />
+        {/* <CustomBullet /> */}
 
         <Typography
           textColor="neutral600"
@@ -53,7 +53,7 @@ function ContentTransferSetupEmpty() {
         </Typography>
       </Flex>
       <Flex marginTop={1} alignItems="center">
-        <CustomBullet />
+        {/* <CustomBullet /> */}
         <Typography
           textColor="neutral600"
           variant="omega"
@@ -62,7 +62,7 @@ function ContentTransferSetupEmpty() {
         </Typography>
       </Flex>
       <Flex marginTop={1} alignItems="center">
-        <CustomBullet />
+        {/* <CustomBullet /> */}
         <Typography
           textColor="neutral600"
           variant="omega"
@@ -71,7 +71,7 @@ function ContentTransferSetupEmpty() {
         </Typography>
       </Flex>
       <Flex marginTop={1} alignItems="center">
-        <CustomBullet />
+        {/* <CustomBullet /> */}
         <Typography
           textColor="neutral600"
           variant="omega"

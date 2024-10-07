@@ -6,12 +6,14 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import { Link } from "@strapi/design-system/Link";
+import {
+  Link,
+  HeaderLayout,
+  Box,
+  Typography
+ } from "@strapi/design-system";
 import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { HeaderLayout } from "@strapi/design-system/Layout";
-import { Box } from "@strapi/design-system/Box";
-import { Typography } from "@strapi/design-system/Typography";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import { setLocalazyIdentity } from "../../state/localazy-identity";
 import LocalazyUserService from "../../modules/user/services/localazy-user-service";

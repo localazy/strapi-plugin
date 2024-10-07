@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Box } from "@strapi/design-system/Box";
-import { Flex } from "@strapi/design-system/Flex";
-import { Switch } from '@strapi/design-system/Switch';
-import { Checkbox } from '@strapi/design-system/Checkbox';
-import DynamicZone from '@strapi/icons/DynamicZone';
-import { Accordion, AccordionToggle, AccordionContent } from '@strapi/design-system/Accordion';
+import {
+  Box,
+  Flex,
+  Switch,
+  Checkbox,
+  Accordion,
+ } from "@strapi/design-system";
+import { Stack } from '@strapi/icons';
 import TreeItem from "../TreeItem";
 import flattenObject from "../../../@common/utils/functions/flatten-deep";
 
@@ -63,7 +65,7 @@ function Tree(props) {
                     onChange={() => onTreeItemClick(flattenedKeys, hasTruthyValue && !hasFalsyValue)}
                   >
                     <Flex alignItems="center">
-                      {!!value?.__component__ && (<Flex alignItems="center" marginRight={2}><DynamicZone width="1rem" height="1rem" /></Flex>)}
+                      {!!value?.__component__ && (<Flex alignItems="center" marginRight={2}><Stack width="1rem" height="1rem" /></Flex>)}
                       {value?.__component__ || key || "-"}
                     </Flex>
                   </Checkbox>)
@@ -103,7 +105,7 @@ function Tree(props) {
                 expanded={isExpanded}
                 onToggle={() => { setIsExpanded(!isExpanded) }}
               >
-                <AccordionToggle
+                <Accordion.Trigger
                   variant="secondary"
                   title={key}
                   togglePosition="left"
@@ -117,9 +119,9 @@ function Tree(props) {
                     />}
                 />
 
-                <AccordionContent>
+                <Accordion.Content>
                   {createTree(key, value, key)}
-                </AccordionContent>
+                </Accordion.Content>
               </Accordion>
             </Box>
           )

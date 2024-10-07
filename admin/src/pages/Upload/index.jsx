@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { HeaderLayout } from "@strapi/design-system/Layout";
+import {
+  HeaderLayout,
+  Grid,
+  Flex,
+  Divider,
+  Button,
+  Box,
+  Alert
+ } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
-import { Grid } from '@strapi/design-system/Grid';
-import { Flex } from '@strapi/design-system/Flex';
-import { Divider } from '@strapi/design-system/Divider';
-import { Button } from "@strapi/design-system/Button";
-import UploadIcon from "@strapi/icons/Upload";
-import { Box } from "@strapi/design-system/Box";
-import { Alert } from "@strapi/design-system/Alert";
+import {Upload as UploadIcon} from "@strapi/icons";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyUploadService from "../../modules/localazy-upload/services/localazy-upload-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";

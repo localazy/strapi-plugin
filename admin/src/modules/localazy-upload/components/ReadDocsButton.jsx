@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@strapi/design-system/Button";
+import { Button } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 
 function ReadDocsButton() {

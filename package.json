@@ -28,8 +28,30 @@
     "type": "git",
     "url": "git@github.com:localazy/strapi-plugin.git"
   },
-  "bin": "./install/index.mjs",
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-admin": {
+      "source": "./admin/src/index.js",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.js",
+      "default": "./dist/admin/index.js"
+    },
+    "./strapi-server": {
+      "source": "./server/index.js",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "strapi-plugin build",
+    "verify": "strapi-plugin verify",
+    "watch": "strapi-plugin watch",
+    "watch:link": "strapi-plugin watch:link",
     "test": "jest --config ./jest.config.js",
     "test:watch": "jest --watch --config ./jest.config.js"
   },
@@ -46,23 +68,25 @@
     "@localazy/api-client": "^2.1.5",
     "@localazy/generic-connector-client": "^0.2.3",
     "@localazy/ts-api": "^1.1.0",
+    "@strapi/design-system": "^2.0.0-rc.11",
     "chalk": "^5.3.0",
     "fs-extra": "^11.1.1",
+    "history": "^5.3.0",
     "i18next": "^22.4.9",
     "isomorphic-fetch": "^3.0.0",
     "js-cookie": "^3.0.1",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
     "ora": "^7.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-hooks-global-state": "^2.1.0",
     "react-i18next": "^12.1.4",
+    "react-router-dom": "^6.26.2",
     "shelljs": "^0.8.5",
     "socket.io-client": "^4.7.2",
     "strapio": "^3.0.2",
-    "styled-components": "^6.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-router-dom": "^6.0.0"
+    "styled-components": "^6.1.13"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.20.11",
@@ -83,8 +107,5 @@
   "engines": {
     "node": ">=14.19.1 <=20.x.x",
     "npm": ">=6.0.0"
-  },
-  "browser": {
-    "crypto": false
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Checkbox } from '@strapi/design-system/Checkbox';
+import { Checkbox } from '@strapi/design-system';
 
 function TreeItem(props) {
   const onChange = (key, currentValue) => {

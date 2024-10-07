@@ -11,7 +11,7 @@ import {
   SubNavSection,
   SubNavSections,
   SubNavLink,
-} from "@strapi/design-system/SubNav";
+} from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import getNav from "../../utils/get-nav";

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Alert } from "@strapi/design-system/Alert";
+import { Alert, Box } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
-import { Box } from "@strapi/design-system/Box";
 
 function TransferReport(props) {
   const { t } = useTranslation();

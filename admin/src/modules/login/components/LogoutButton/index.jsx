@@ -6,9 +6,9 @@
 
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Button } from "@strapi/design-system/Button";
+import { Button } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
-import Exit from "@strapi/icons/Exit";
+import { SignOut } from "@strapi/icons";
 import LocalazyUserService from "../../../user/services/localazy-user-service";
 import { setLocalazyIdentity } from "../../../../state/localazy-identity";
 
@@ -31,7 +31,7 @@ function LogoutButton(props) {
   return (
     <div>
       <Button
-        startIcon={<Exit />}
+        startIcon={<SignOut />}
         variant="secondary"
         loading={isLoading}
         onClick={logout}

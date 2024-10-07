@@ -3,7 +3,7 @@
  */
 
 import axios from "axios";
-import { auth } from "@strapi/helper-plugin";
+// import { useAuth } from '@strapi/strapi/admin';
 import pluginId from "../pluginId";
 
 const BASE_PLUGIN_PATH = `/${pluginId}`;
@@ -20,7 +20,7 @@ const createAxiosInstance = (baseUrl = null) => {
   instance.interceptors.request.use(
     async (config) => {
       config.headers = {
-        Authorization: `Bearer ${auth.getToken()}`,
+        Authorization: `Bearer dunno`,
         Accept: "application/json",
         "Content-Type": "application/json",
         // Add this header to identify the request as initiated by the plugin

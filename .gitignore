@@ -1,3 +1,10 @@
 node_modules
 .vscode/settings.json
 .idea/
+
+############################
+# Build
+############################
+
+dist
+build

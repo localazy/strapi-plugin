@@ -5,9 +5,7 @@
  */
 
 import React from "react";
-import { GridItem } from '@strapi/design-system/Grid';
-import { Box } from "@strapi/design-system/Box";
-import { Typography } from "@strapi/design-system/Typography";
+import { GridItem, Box, Typography } from '@strapi/design-system';
 import PropTypes from "prop-types";
 
 function OverviewItem(props) {

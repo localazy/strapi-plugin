@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import isEqual from "lodash-es/isEqual";
 import cloneDeep from "lodash-es/cloneDeep";
-import { HeaderLayout } from "@strapi/design-system/Layout";
-import Check from "@strapi/icons/Check";
-import { Box } from "@strapi/design-system/Box";
-import { Button } from "@strapi/design-system/Button";
-import { Alert } from "@strapi/design-system/Alert";
-import { Redirect } from "react-router-dom";
-import { Flex } from "@strapi/design-system/Flex";
-import { Divider } from "@strapi/design-system/Divider";
-import { Typography } from "@strapi/design-system/Typography";
+import {
+  HeaderLayout,
+  Box,
+Button,
+Alert,
+Flex,
+Divider,
+Typography,
+ } from "@strapi/design-system";
+import { Check } from "@strapi/icons";
+import { Navigate } from "react-router-dom";
 import set from "lodash-es/set";
 import get from "lodash-es/get";
 import PluginSettingsService from "../../services/plugin-settings-service";
@@ -197,7 +199,7 @@ function ContentTransferSetup() {
   }, []);
 
   return (<>
-    {!isLoading && !isLoggedIn && <Redirect to={`/plugins/${pluginId}/login`} />}
+    {!isLoading && !isLoggedIn && <Navigate to={`/plugins/${pluginId}/login`} />}
     <HeaderLayout
       title={t("plugin_settings.content_transfer_setup")}
       subtitle={t("plugin_settings.content_transfer_setup_description")}

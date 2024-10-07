@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import cloneDeep from "lodash-es/cloneDeep";
-import { Select, Option } from '@strapi/design-system/Select';
+import { MultiSelect, MultiSelectOption } from '@strapi/design-system';
 
 function LanguagesSelector(props) {
   /**
@@ -31,7 +31,7 @@ function LanguagesSelector(props) {
   }, [props.projectLanguages, props.preselectedLanguages]);
 
   return (
-    <Select
+    <MultiSelect
       label={props.label || t("common.select_languages")}
       hint={props.hint || t("common.select_languages")}
       clearLabel={t("plugin_settings.clear")}
@@ -43,14 +43,14 @@ function LanguagesSelector(props) {
       withTags
     >
       {props.projectLanguages.map(lang => (
-        <Option
+        <MultiSelectOption
           key={lang.id}
           value={lang.code}
         >
           {`${lang.name} (${lang.code})`}
-        </Option>
+        </MultiSelectOption>
       ))}
-    </Select>
+    </MultiSelect>
   );
 }
 

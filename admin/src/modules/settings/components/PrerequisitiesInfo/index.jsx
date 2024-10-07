@@ -1,7 +1,6 @@
 import React from "react";
-import { Box } from "@strapi/design-system/Box";
+import { Box, Typography } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
-import { Typography } from "@strapi/design-system/Typography";
 
 function PrerequisitiesInfo() {
   const { t } = useTranslation();

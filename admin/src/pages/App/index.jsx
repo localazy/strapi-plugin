@@ -7,11 +7,12 @@
 
 import React, { useEffect, useState } from "react";
 import { Switch, Router, Route, useLocation } from "react-router-dom";
-import { NotFound } from "@strapi/helper-plugin";
-import { ThemeProvider } from "@strapi/design-system/ThemeProvider";
-import { lightTheme } from "@strapi/design-system/themes";
-import { Box } from "@strapi/design-system/Box";
-import { Layout } from "@strapi/design-system/Layout";
+import {
+  ThemeProvider,
+  lightTheme,
+  Box,
+  Layout,
+ } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import pluginId from "../../pluginId";
@@ -139,7 +140,7 @@ function App() {
                         subtitle={headerSubtitle}
                       />
                     </Route>
-                    <Route component={NotFound} />
+                    {/* <Route component={NotFound} /> */}
                   </Switch>
                 )}
               </>

@@ -6,7 +6,7 @@
 
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { Button } from "@strapi/design-system/Button";
+import { Button } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import { getOAuthAuthorizationUrl } from "@localazy/generic-connector-client";
 import LocalazyLoginService from "../../services/localazy-login-service";

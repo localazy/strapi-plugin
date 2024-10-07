@@ -5,9 +5,11 @@
  */
 
 import React from "react";
-import { GridItem } from '@strapi/design-system/Grid';
-import { Typography } from "@strapi/design-system/Typography";
-import { Link } from "@strapi/design-system/Link";
+import {
+  GridItem,
+  Typography,
+  Link
+ } from '@strapi/design-system';
 import PropTypes from "prop-types";
 
 function OverviewItemLink(props) {

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@strapi/design-system/Box";
+import { Box } from "@strapi/design-system";
 import { Switch, Route } from "react-router-dom";
-import { ThemeProvider } from "@strapi/design-system/ThemeProvider";
-import { lightTheme } from "@strapi/design-system/themes";
+import { ThemeProvider, lightTheme } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import pluginId from "../../pluginId";
 import ContentTransferSetup from "../../modules/plugin-settings/components/ContentTransferSetup";

@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import cloneDeep from "lodash-es/cloneDeep";
 import set from "lodash-es/set";
-import { HeaderLayout } from "@strapi/design-system/Layout";
-import { Button } from "@strapi/design-system/Button";
-import DownloadIcon from "@strapi/icons/Download";
-import { Box } from "@strapi/design-system/Box";
-import { Alert } from "@strapi/design-system/Alert";
+import {
+  HeaderLayout,
+  Button,
+  Box,
+  Alert,
+  Flex,
+  Divider,
+  Typography
+ } from "@strapi/design-system";
+import {Download as DownloadIcon} from "@strapi/icons";
 import { useTranslation } from "react-i18next";
-import { Flex } from '@strapi/design-system/Flex';
-import { Divider } from '@strapi/design-system/Divider';
-import { Typography } from "@strapi/design-system/Typography";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LocalazyDownloadService from "../../modules/localazy-download/services/localazy-download-service";
 import areLocalesCompatible from "../../modules/@common/utils/are-locales-compatible";
