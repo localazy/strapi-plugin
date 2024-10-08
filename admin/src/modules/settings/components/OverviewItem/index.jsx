@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import { GridItem, Box, Typography } from '@strapi/design-system';
+import { Box, Typography } from '@strapi/design-system';
 import PropTypes from "prop-types";
 
 function OverviewItem(props) {
 
   return (
-    <GridItem padding={1} col={6} s={12}>
+    <Grid.Item padding={1} col={6} s={12}>
       <Box>
         <Typography
           variant="sigma"
@@ -30,7 +30,7 @@ function OverviewItem(props) {
           {props.value}
         </Typography>
       </Box>
-    </GridItem>
+    </Grid.Item>
   );
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box } from "@strapi/design-system";
-import { Switch, Route } from "react-router-dom";
-import { ThemeProvider, lightTheme } from "@strapi/design-system";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { DesignSystemProvider, lightTheme } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import pluginId from "../../pluginId";
 import ContentTransferSetup from "../../modules/plugin-settings/components/ContentTransferSetup";
@@ -35,18 +35,20 @@ function PluginSettings() {
     <>
       {isLoading && <Loader>{t("common.loading_content")}</Loader>}
       {!isLoading && (
-        <ThemeProvider theme={lightTheme}>
+        <DesignSystemProvider theme={lightTheme}>
           <Box padding={8}>
-            <Switch>
-              <Route path={`/settings/${pluginId}/content-transfer-setup`} exact>
-                <ContentTransferSetup />
-              </Route>
-              <Route path={`/settings/${pluginId}/global-settings`} exact>
-                <GlobalSettings />
-              </Route>
-            </Switch>
+            <Router>
+              <Routes>
+                <Route path={`/settings/${pluginId}/content-transfer-setup`} exact>
+                  <ContentTransferSetup />
+                </Route>
+                <Route path={`/settings/${pluginId}/global-settings`} exact>
+                  <GlobalSettings />
+                </Route>
+              </Routes>
+            </Router>
           </Box>
-        </ThemeProvider>
+        </DesignSystemProvider>
       )}
     </>
   );

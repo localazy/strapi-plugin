@@ -6,12 +6,16 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Switch, Router, Route, useLocation } from "react-router-dom";
 import {
-  ThemeProvider,
+  Routes,
+  Route,
+  useLocation,
+  BrowserRouter as Router
+     } from "react-router-dom";
+import {
+  DesignSystemProvider,
   lightTheme,
-  Box,
-  Layout,
+  Box
  } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import Loader from "../../modules/@common/components/PluginPageLoader";
@@ -34,6 +38,7 @@ import {
 } from "../../state/localazy-identity";
 import history from "../../modules/@common/utils/history";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
+import { Layout } from "@strapi/strapi";
 
 import "../../i18n";
 
@@ -103,25 +108,25 @@ function App() {
 
   return (
     <Router history={history}>
-      <ThemeProvider theme={lightTheme}>
+      <DesignSystemProvider theme={lightTheme}>
         <Box background="neutral100">
           <Layout sideNav={renderSideNav && <SideNav />}>
             {isLoadingApp && <Loader>{t("common.loading_content")}</Loader>}
             {!isLoadingApp && (
               <>
                 {!isLoggedIn && (
-                  <Switch>
+                  <Routes>
                     <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/login`} exact>
                       <Login
                         title={headerTitle}
                         subtitle={headerSubtitle}
                       />
                     </Route>
-                  </Switch>
+                  </Routes>
                 )}
 
                 {isLoggedIn && (
-                  <Switch>
+                  <Routes>
                     <Route path={`${process.env.ADMIN_PATH}/plugins/${pluginId}/download`} exact>
                       <Download
                         title={headerTitle}
@@ -141,13 +146,13 @@ function App() {
                       />
                     </Route>
                     {/* <Route component={NotFound} /> */}
-                  </Switch>
+                  </Routes>
                 )}
               </>
             )}
           </Layout>
         </Box>
-      </ThemeProvider>
+      </DesignSystemProvider>
     </Router>
   );
 }

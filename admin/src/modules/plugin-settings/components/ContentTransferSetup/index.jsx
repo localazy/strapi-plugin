@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import isEqual from "lodash-es/isEqual";
 import cloneDeep from "lodash-es/cloneDeep";
 import {
-  HeaderLayout,
   Box,
 Button,
 Alert,
@@ -25,6 +24,7 @@ import { getLocalazyIdentity } from "../../../../state/localazy-identity";
 import Tree from "../Tree";
 import ContentTransferSetupEmpty from "../ContentTransferSetupEmpty";
 import pluginId from "../../../../pluginId";
+import { HeaderLayout } from "@strapi/strapi";
 
 import "../../../../i18n";
 

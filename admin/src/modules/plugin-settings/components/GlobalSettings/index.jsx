@@ -2,16 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import cloneDeep from "lodash-es/cloneDeep";
 import {
-  HeaderLayout,
   Box,
 Button,
-ToggleInput,
+Toggle,
 Select,
 Option,
 Alert,
 Flex,
 Divider,
 Typography,
+SingleSelect,
+SingleSelectOption,
+MultiSelect,
+MultiSelectOption,
  } from "@strapi/design-system";
 import {Check} from "@strapi/icons";
 import { Navigate } from "react-router-dom";
@@ -178,7 +181,7 @@ function GlobalSettings() {
             </Typography>
             {/* Allow automated upload to Localazy */}
             <br /><br />
-            <ToggleInput
+            <Toggle
               label={t("plugin_settings.allow_automated_upload_to_localazy")}
               hint={t("plugin_settings.allow_automated_upload_to_localazy_info")}
               offLabel={t("plugin_settings.off")}
@@ -187,7 +190,7 @@ function GlobalSettings() {
               onChange={e => patchFormModel("upload.allowAutomated", e.target.checked)} />
             {/* Automated upload triggers */}
             <br /><br />
-            <Select
+            <MultiSelect
               label={t("plugin_settings.automated_upload_triggers")}
               hint={t("plugin_settings.automated_upload_triggers_info")}
               clearLabel={t("plugin_settings.clear")}
@@ -199,12 +202,12 @@ function GlobalSettings() {
               multi
               withTags
             >
-              <Option value="created">{t("plugin_settings.creating_new_data_entry")}</Option>
-              <Option value="updated">{t("plugin_settings.editing_data_entry")}</Option>
-            </Select>
+              <MultiSelectOption value="created">{t("plugin_settings.creating_new_data_entry")}</MultiSelectOption>
+              <MultiSelectOption value="updated">{t("plugin_settings.editing_data_entry")}</MultiSelectOption>
+            </MultiSelect>
             {/* Deprecate source keys on deletion */}
             <br /><br />
-            <ToggleInput
+            <Toggle
               label={t("plugin_settings.deprecate_source_keys_on_delete")}
               hint={t("plugin_settings.deprecate_source_keys_on_delete_info")}
               offLabel={t("plugin_settings.off")}
@@ -223,7 +226,7 @@ function GlobalSettings() {
             </Typography>
             {/* Processing of download webhook */}
             <br /><br />
-            <ToggleInput
+            <Toggle
               label={t("plugin_settings.processing_of_download_webhook")}
               hint={t("plugin_settings.processing_of_download_webhook_info")}
               offLabel={t("plugin_settings.off")}
@@ -233,7 +236,7 @@ function GlobalSettings() {
               onChange={e => patchFormModel("download.processDownloadWebhook", e.target.checked)} />
             {/* Webhook actions author */}
             <br /><br />
-            <Select
+            <SingleSelect
               label={t("plugin_settings.webhook_author")}
               hint={t("plugin_settings.webhook_author_info")}
               clearLabel={t("plugin_settings.clear")}
@@ -243,14 +246,14 @@ function GlobalSettings() {
               onChange={(value) => patchFormModel("download.webhookAuthorId", value)}
             >
               {users.map(user => (
-                <Option
+                <SingleSelectOption
                   key={user.id}
                   value={user.id}
                 >
                   {`${user.firstname} ${user.lastname} (${user.email})`}
-                </Option>
+                </SingleSelectOption>
               ))}
-            </Select>
+            </SingleSelect>
             {/* Webhook languages selector */}
             <br /><br />
             <LanguagesSelector

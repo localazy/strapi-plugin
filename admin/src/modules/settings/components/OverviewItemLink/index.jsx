@@ -6,7 +6,6 @@
 
 import React from "react";
 import {
-  GridItem,
   Typography,
   Link
  } from '@strapi/design-system';
@@ -14,7 +13,7 @@ import PropTypes from "prop-types";
 
 function OverviewItemLink(props) {
   return (
-    <GridItem padding={1} col={6} s={12}>
+    <Grid.Item padding={1} col={6} s={12}>
       <Link href={props.to} isExternal>
         <Typography
           variant="sigma"
@@ -24,7 +23,7 @@ function OverviewItemLink(props) {
           {props.label}
         </Typography>
       </Link>
-    </GridItem>
+    </Grid.Item>
   );
 }
 

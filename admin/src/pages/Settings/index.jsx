@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
-  HeaderLayout,
   Box,
   Grid,
   Divider
  } from "@strapi/design-system";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import LogoutButton from "../../modules/login/components/LogoutButton";
@@ -23,7 +22,7 @@ import formatNumber from "../../modules/@common/utils/format-number";
 import PluginSettingsService from "../../modules/plugin-settings/services/plugin-settings-service";
 
 function Settings(props) {
-  const history = useHistory();
+  const history = useNavigate();
   const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(true);

@@ -8,11 +8,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import {
   Link,
-  HeaderLayout,
   Box,
   Typography
  } from "@strapi/design-system";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Loader from "../../modules/@common/components/PluginPageLoader";
 import { setLocalazyIdentity } from "../../state/localazy-identity";
@@ -24,7 +23,7 @@ import redirectToPluginRoute, {
 import ProductAnalyticsService from "../../modules/@common/services/product-analytics-service";
 
 function Login(props) {
-  const history = useHistory();
+  const history = useNavigate();
   const { t } = useTranslation();
 
   /**

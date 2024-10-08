@@ -21,6 +21,6 @@ module.exports = ({ strapi }) => ({
     return buildPopulate(models, modelUid);
   },
   async getPluginVersion() {
-    return require("../../package.json").version;
+    return require("../../../package.json").version;
   }
 });
