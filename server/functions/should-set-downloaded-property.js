@@ -26,6 +26,12 @@ const getDynamicZonePropertyName = (parsedKey) => {
   return parsedKey[dynamicZoneKeySegmentIndex - 1];
 };
 
+/**
+ *
+ * @param {*} modelContentTransferSetup
+ * @param {*} parsedKeyRest
+ * @returns "yes" | "no" | "json"
+ */
 const shouldSetDownloadedProperty = (
   modelContentTransferSetup,
   parsedKeyRest,
@@ -50,11 +56,38 @@ const shouldSetDownloadedProperty = (
     const slicedParsedKeyRest = parsedKeyRest.slice(dynamicZoneKeySegmentIndex + 1);
     const filteredSlicedParsedKeyRest = slicedParsedKeyRest.filter((segment) => isNaN(parseInt(segment)));
 
-    return !!get(dzContentTransferSetupComponentModel, filteredSlicedParsedKeyRest);
+    if(get(dzContentTransferSetupComponentModel, filteredSlicedParsedKeyRest) === true) {
+      return "yes";
+    }
+
+    // json fields
+    while(filteredSlicedParsedKeyRest.length > 0) {
+      // last segment out
+      filteredSlicedParsedKeyRest.pop();
+      if(get(dzContentTransferSetupComponentModel, filteredSlicedParsedKeyRest) === true) {
+        return "json";
+      }
+    }
+
+    return "no";
   } else {
     const filteredParsedKeyRest = parsedKeyRest
       .filter((partialKey) => isNaN(parseInt(partialKey)));
-    return !!get(modelContentTransferSetup, filteredParsedKeyRest);
+
+    if(get(modelContentTransferSetup, filteredParsedKeyRest) === true) {
+      return "yes";
+    }
+
+    // json fields
+    while(filteredParsedKeyRest.length > 0) {
+      // last segment out
+      filteredParsedKeyRest.pop();
+      if(get(modelContentTransferSetup, filteredParsedKeyRest) === true) {
+        return "json";
+      }
+    }
+
+    return "no";
   }
 };
 

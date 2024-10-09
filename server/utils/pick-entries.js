@@ -22,7 +22,12 @@ const pickEntries = (flatten, pickPaths) => {
     if (isDynamicZoneKey(key)) {
       filteredKey = filteredKey.replace(/\[\d+;[\w-]+\./g, `[`);
     }
-    if (mappedPickPaths.includes(filteredKey)) {
+    // if (mappedPickPaths.includes(filteredKey)) {
+      if (
+        mappedPickPaths.includes(filteredKey) ||
+        // include JSON fields
+        mappedPickPaths.some((pickPath) => filteredKey.startsWith(`${pickPath}.`))
+      ) {
       pickedEntries[key] = flatten[key];
     }
   });
