@@ -3,6 +3,10 @@
 const flattenObject = (object, prefix = "") => {
   const result = {};
 
+  if (typeof object === "string" || typeof object === "number" || typeof object === "boolean") {
+    return object;
+  }
+
   for (const objectKey in object) {
     if (objectKey === "id") {
       continue;
