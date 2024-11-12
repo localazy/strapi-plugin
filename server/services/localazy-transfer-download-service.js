@@ -9,6 +9,7 @@ const {
 } = require("../utils/iso-locales-utils");
 const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
+const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 const RequestInitiatorHelper = require('../utils/request-initiator-helper');
 const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
@@ -251,13 +252,34 @@ module.exports = ({ strapi }) => ({
             continue;
           }
 
-          const parsedKeyRestWithoutComponents = parsedKey.rest;
+          let parsedKeyRestWithoutComponents = parsedKey.rest;
           if (shouldSetDownloadedPropertyResult === "json") {
             const setKey = [
               isoStrapi,
               parsedKey.uid,
               parsedKey.id,
             ];
+
+            // handle dynamic zones and components here
+            let updatedParsedKeyRestWithoutComponents = parsedKeyRestWithoutComponents;
+            let segmentsToAdd = [];
+            for (const segment of parsedKeyRestWithoutComponents) {
+              const hasEntry = get(modelContentTransferSetup, [...segmentsToAdd, segment]);
+              const hasEntryNotFinal = hasEntry && typeof hasEntry !== "boolean";
+              // const isDZ = Array.isArray(hasEntry) && hasEntry.every((entry) => entry.__component__);
+              // processed till here in iterations and `segment` is numeric
+              const isComponent = parseInt(segment) > 0;
+
+              if (hasEntryNotFinal || (!hasEntry && isComponent)) {
+                segmentsToAdd.push(segment);
+                setKey.push(segment);
+                updatedParsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents.slice(1);
+              } else {
+                break;
+              }
+            }
+            parsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents;
+
             let foundJsonFieldIndex = jsonFields.findIndex((jsonField) => {
               return jsonField.setKey.join() === setKey.join();
             });
@@ -268,6 +290,7 @@ module.exports = ({ strapi }) => ({
                 jsonValue: {},
               });
             }
+
             foundJsonFieldIndex = foundJsonFieldIndex === -1 ? jsonFields.length - 1 : foundJsonFieldIndex;
             const foundJsonField = jsonFields[foundJsonFieldIndex];
             // rest from index 1
@@ -294,7 +317,6 @@ module.exports = ({ strapi }) => ({
      */
     for (const jsonField of jsonFields) {
       set(parsedLocalazyContent, [...jsonField.setKey, jsonField.jsonKey], jsonField.jsonValue);
-      // set(parsedLocalazyContent, [...jsonField.setKey, jsonField.jsonKey], JSON.stringify(jsonField.jsonValue));
     }
 
     /**
