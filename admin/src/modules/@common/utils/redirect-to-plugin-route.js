@@ -18,5 +18,5 @@ export default (route) => {
     return;
   }
 
-  history.push(`${process.env.ADMIN_PATH}/plugins/${pluginId}/${route}`);
+  history.push(`${process.env.ADMIN_PATH}plugins/${pluginId}/${route}`);
 };
