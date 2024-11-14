@@ -1,3 +1,18 @@
+## 0.2.12 (2024-11-14)
+### 🔀 Pull Requests
+
+- [Feat add json fields support #65](https://github.com/localazy/strapi-plugin/pull/65)
+
+### ✨ Features
+
+- add json fields support ([5ef1f08](https://github.com/localazy/strapi-plugin/commit/5ef1f08)) ([#65](https://github.com/localazy/strapi-plugin/pull/65))
+
+### 🐛 Bug Fixes
+
+- **JSON:** `null` values upload ([5ef1f08](https://github.com/localazy/strapi-plugin/commit/5ef1f08)) ([#65](https://github.com/localazy/strapi-plugin/pull/65))
+- doubled backslashed in URL ([5ef1f08](https://github.com/localazy/strapi-plugin/commit/5ef1f08)) ([#65](https://github.com/localazy/strapi-plugin/pull/65))
+- string array is split into letters ([5ef1f08](https://github.com/localazy/strapi-plugin/commit/5ef1f08)) ([#65](https://github.com/localazy/strapi-plugin/pull/65))
+
 ## 0.2.11 (2024-11-14)
 ### 🔀 Pull Requests
 
