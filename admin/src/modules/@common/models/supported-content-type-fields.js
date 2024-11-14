@@ -3,6 +3,7 @@ const SUPPORTED_CONTENT_TYPE_FIELDS = [
   "text",
   "richtext",
   "email",
+  "json",
 ];
 
 export default SUPPORTED_CONTENT_TYPE_FIELDS;

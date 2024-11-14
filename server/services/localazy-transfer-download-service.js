@@ -9,6 +9,7 @@ const {
 } = require("../utils/iso-locales-utils");
 const shouldSetDownloadedProperty = require("../functions/should-set-downloaded-property");
 const set = require("lodash/set");
+const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 const RequestInitiatorHelper = require('../utils/request-initiator-helper');
 const PluginSettingsServiceHelper = require('../services/helpers/plugin-settings-service-helper');
@@ -223,6 +224,7 @@ module.exports = ({ strapi }) => ({
      */
     const parsedLocalazyContent = {};
     const strapiContentTypesModels = await StrapiService.getModels();
+    const jsonFields = [];
     for (const [isoLocalazy, keys] of Object.entries(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
@@ -244,18 +246,77 @@ module.exports = ({ strapi }) => ({
           parsedKey.uid
         );
 
-        if (typeof modelContentTransferSetup !== "undefined" && shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest)) {
-          const parsedKeyRestWithoutComponents = parsedKey.rest;
-          const setKey = [
-            isoStrapi,
-            parsedKey.uid,
-            parsedKey.id,
-            ...parsedKeyRestWithoutComponents,
-          ];
+        if (typeof modelContentTransferSetup !== "undefined") {
+          const shouldSetDownloadedPropertyResult = shouldSetDownloadedProperty(modelContentTransferSetup, parsedKey.rest);
+          if (shouldSetDownloadedPropertyResult === "no") {
+            continue;
+          }
 
-          set(parsedLocalazyContent, setKey, value);
+          let parsedKeyRestWithoutComponents = parsedKey.rest;
+          if (shouldSetDownloadedPropertyResult === "json") {
+            const setKey = [
+              isoStrapi,
+              parsedKey.uid,
+              parsedKey.id,
+            ];
+
+            // handle dynamic zones and components here
+            let updatedParsedKeyRestWithoutComponents = parsedKeyRestWithoutComponents;
+            let segmentsToAdd = [];
+            for (const segment of parsedKeyRestWithoutComponents) {
+              const hasEntry = get(modelContentTransferSetup, [...segmentsToAdd, segment]);
+              const hasEntryNotFinal = hasEntry && typeof hasEntry !== "boolean";
+              // const isDZ = Array.isArray(hasEntry) && hasEntry.every((entry) => entry.__component__);
+              // processed till here in iterations and `segment` is numeric
+              const isComponent = parseInt(segment) > 0;
+
+              if (hasEntryNotFinal || (!hasEntry && isComponent)) {
+                segmentsToAdd.push(segment);
+                setKey.push(segment);
+                updatedParsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents.slice(1);
+              } else {
+                break;
+              }
+            }
+            parsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents;
+
+            let foundJsonFieldIndex = jsonFields.findIndex((jsonField) => {
+              return jsonField.setKey.join() === setKey.join();
+            });
+            if (foundJsonFieldIndex === -1) {
+              jsonFields.push({
+                setKey,
+                jsonKey: parsedKeyRestWithoutComponents[0],
+                jsonValue: {},
+              });
+            }
+
+            foundJsonFieldIndex = foundJsonFieldIndex === -1 ? jsonFields.length - 1 : foundJsonFieldIndex;
+            const foundJsonField = jsonFields[foundJsonFieldIndex];
+            // rest from index 1
+            const restSliced = parsedKeyRestWithoutComponents.slice(1);
+            set(foundJsonField, ['jsonValue', ...restSliced], value);
+            jsonFields[foundJsonFieldIndex] = foundJsonField;
+          }
+
+          if (shouldSetDownloadedPropertyResult === "yes") {
+            const setKey = [
+              isoStrapi,
+              parsedKey.uid,
+              parsedKey.id,
+              ...parsedKeyRestWithoutComponents,
+            ];
+            set(parsedLocalazyContent, setKey, value);
+          }
         }
       }
+    }
+
+    /**
+     * Set json fields if applicable
+     */
+    for (const jsonField of jsonFields) {
+      set(parsedLocalazyContent, [...jsonField.setKey, jsonField.jsonKey], jsonField.jsonValue);
     }
 
     /**
