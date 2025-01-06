@@ -1,0 +1,69 @@
+{
+  "name": "strapi-plugin-v5",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-admin": {
+      "types": "./dist/admin/src/index.d.ts",
+      "source": "./admin/src/index.ts",
+      "import": "./dist/admin/index.mjs",
+      "require": "./dist/admin/index.js",
+      "default": "./dist/admin/index.js"
+    },
+    "./strapi-server": {
+      "types": "./dist/server/src/index.d.ts",
+      "source": "./server/src/index.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "strapi-plugin build",
+    "test:ts:back": "run -T tsc -p server/tsconfig.json",
+    "test:ts:front": "run -T tsc -p admin/tsconfig.json",
+    "verify": "strapi-plugin verify",
+    "watch": "strapi-plugin watch",
+    "watch:link": "strapi-plugin watch:link"
+  },
+  "dependencies": {
+    "@strapi/design-system": "^2.0.0-rc.14",
+    "@strapi/icons": "^2.0.0-rc.14",
+    "react-intl": "^7.1.0"
+  },
+  "devDependencies": {
+    "@strapi/sdk-plugin": "^5.2.8",
+    "@strapi/strapi": "^5.6.0",
+    "@strapi/typescript-utils": "^5.6.0",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "prettier": "^3.4.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1",
+    "styled-components": "^6.1.14",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "@strapi/sdk-plugin": "^5.2.8",
+    "@strapi/strapi": "^5.6.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.1",
+    "styled-components": "^6.1.14"
+  },
+  "strapi": {
+    "kind": "plugin",
+    "name": "strapi-plugin-v5",
+    "displayName": "",
+    "description": ""
+  }
+}
