@@ -1,7 +1,7 @@
 import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
-import { Localazy } from './modules/@common/components/Icons/Localazy';
+import Localazy from './modules/@common/components/Icons/Localazy';
 
 export default {
   register(app: any) {

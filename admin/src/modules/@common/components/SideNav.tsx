@@ -1,22 +1,15 @@
-/*
- *
- * SideNav
- *
- */
-
-import React from "react";
 import {
   SubNav,
   SubNavHeader,
   SubNavSection,
   SubNavSections,
   SubNavLink,
-} from "@strapi/design-system/SubNav";
+} from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
-import getNav from "../../utils/get-nav";
+import getNav from "../utils/get-nav";
 
-function SideNav() {
+const SideNav = () => {
   const { t } = useTranslation();
 
   const navigation = getNav();
@@ -27,15 +20,18 @@ function SideNav() {
       <SubNavSections>
         <SubNavSection label={t("common.navigation")}>
           {navigation.map((navItem) => (
-            <SubNavLink
-              as={NavLink}
+            <>
+              {/* <House /> */}
+              <SubNavLink
+                as={NavLink}
               to={navItem.to}
               active={navItem.active}
-              icon={navItem.icon() || ""}
+              icon={navItem.icon}
               key={navItem.id}
             >
               {navItem.label}
             </SubNavLink>
+            </>
           ))}
         </SubNavSection>
       </SubNavSections>

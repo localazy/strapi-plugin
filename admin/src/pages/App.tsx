@@ -1,5 +1,9 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { DesignSystemProvider, lightTheme } from "@strapi/design-system";
+import {
+  DesignSystemProvider,
+   lightTheme,
+   Box
+} from "@strapi/design-system";
 import { useEffect, useState } from 'react';
 import { getLocalazyIdentity, setLocalazyIdentity } from '../state/localazy-identity';
 import LocalazyUserService from '../modules/user/services/localazy-user-service';
@@ -13,6 +17,8 @@ import getHeaderTitle from '../modules/@common/utils/get-header-title';
 import getHeaderSubtitle from '../modules/@common/utils/get-header-subtitle';
 import Login from './Login';
 import history from "../modules/@common/utils/history";
+import { Layouts } from "@strapi/strapi/admin";
+import SideNav from '../modules/@common/components/SideNav';
 
 // import and load resources
 import '../i18n';
@@ -45,7 +51,8 @@ const App = () => {
       const identity = await LocalazyUserService.getIdentity();
       setLocalazyIdentity(identity || emptyIdentity);
       setIsLoggedIn(hasLocalazyIdentity());
-      setRenderSideNav(hasLocalazyIdentity());
+      // setRenderSideNav(hasLocalazyIdentity());
+      setRenderSideNav(true);
 
       setIsLoadingApp(false);
 
@@ -67,6 +74,8 @@ const App = () => {
 
   return (
     <DesignSystemProvider theme={lightTheme}>
+      <Box background="neutral100">
+        <Layouts.Root sideNav={renderSideNav && <SideNav />}>
       {isLoadingApp && <Loader />}
       {!isLoadingApp && (
       <Routes>
@@ -81,7 +90,9 @@ const App = () => {
         {/* <Route index element={<HomePage />} /> */}
         {/* <Route path="*" element={<Page.Error />} /> */}
         </Routes>
-      )}
+        )}
+      </Layouts.Root>
+      </Box>
     </DesignSystemProvider>
   );
 };
