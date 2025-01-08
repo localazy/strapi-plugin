@@ -23,7 +23,11 @@ type LoginProps = {
   isLoading: boolean;
 }
 
-const Login = (props: LoginProps) => {
+const Login: React.FC<LoginProps> = ({
+  title,
+  subtitle,
+  isLoading = false,
+}) => {
   const { t } = useTranslation();
 
   /**
@@ -53,12 +57,12 @@ const Login = (props: LoginProps) => {
   return (
     <>
       <Layouts.Header
-        title={props.title}
-        subtitle={props.subtitle}
+        title={title}
+        subtitle={subtitle}
         as="h1"
       />
-      {props.isLoading && (<Loader />)}
-      {!props.isLoading && (
+      {isLoading && (<Loader />)}
+      {!isLoading && (
         <Box
           marginLeft={10}
           marginRight={10}
@@ -95,15 +99,5 @@ const Login = (props: LoginProps) => {
     </>
   );
 }
-
-Login.propTypes = {
-  title: PropTypes.string.isRequired,
-  subtitle: PropTypes.string.isRequired,
-  isLoading: PropTypes.bool,
-};
-
-Login.defaultProps = {
-  isLoading: false,
-};
 
 export default Login;
