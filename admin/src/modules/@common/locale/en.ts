@@ -5,7 +5,7 @@ export default {
   navigation: "Navigation",
   upload_to_localazy: "Upload to Localazy",
   download_to_strapi: "Download to Strapi",
-  settings: "Overview",
+  overview: "Overview",
   loading_content: "Loading content...",
   report_will_be_available_after_an_action:
     "Report will be available after performing an action...",

@@ -7,7 +7,6 @@ const LocalazyUserRoutes = [
     handler: "LocalazyUserController.getUser",
     config: {
       policies: [],
-      // auth: false,
     },
   },
   {
@@ -16,7 +15,6 @@ const LocalazyUserRoutes = [
     handler: "LocalazyUserController.updateUser",
     config: {
       policies: [],
-      auth: false,
     },
   },
   {
@@ -25,7 +23,6 @@ const LocalazyUserRoutes = [
     handler: "LocalazyUserController.deleteUser",
     config: {
       policies: [],
-      auth: false,
     },
   },
 ];

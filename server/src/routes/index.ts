@@ -1,35 +1,25 @@
-import LocalazyUserRoutes from "./localazy-user";
-// import localazyAuthRoutes from "./localazy-auth";
-// import pluginSettingsRoutes from "./plugin-settings";
-// import strapiRoutes from "./strapi";
+import LocalazyUserRoutes from "./localazy-user-routes";
+import LocalazyAuthRoutes from "./localazy-auth-routes";
+import PluginSettingsRoutes from "./plugin-settings";
+import StrapiRoutes from "./strapi-routes";
 // import localazyTransferRoutes from "./localazy-transfer";
-// import localazyProjectRoutes from "./localazy-project";
+import LocalazyProjectRoutes from "./localazy-project-routes";
 // import localazyPublicTransferRoutes from "./localazy-public-transfer";
 
 export default {
   "content-api": {
     type: "content-api",
-    routes: [/*...strapiRoutes*/],
+    routes: [...StrapiRoutes],
   },
   admin: {
     type: "admin",
-    routes: [{
-      method: 'GET',
-      path: '/pass-data',
-      handler: (ctx) => {
-        ctx.body = 'You are in the my-plugin-content-type controller!';
-      },
-      config: {
-        policies: [],
-        auth: false,
-      },
-      },
-      // ...localazyAuthRoutes,
+    routes: [
+      ...LocalazyAuthRoutes,
       ...LocalazyUserRoutes,
-      // ...pluginSettingsRoutes,
-      // ...strapiRoutes,
+      ...PluginSettingsRoutes,
+      ...StrapiRoutes,
       // ...localazyTransferRoutes,
-      // ...localazyProjectRoutes,
+      ...LocalazyProjectRoutes,
     ],
   },
   // localazyPublicTransferRoutes,

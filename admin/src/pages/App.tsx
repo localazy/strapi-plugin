@@ -19,6 +19,7 @@ import Login from './Login';
 import history from "../modules/@common/utils/history";
 import { Layouts } from "@strapi/strapi/admin";
 import SideNav from '../modules/@common/components/SideNav';
+import Overview from './Overview';
 
 // import and load resources
 import '../i18n';
@@ -51,8 +52,7 @@ const App = () => {
       const identity = await LocalazyUserService.getIdentity();
       setLocalazyIdentity(identity || emptyIdentity);
       setIsLoggedIn(hasLocalazyIdentity());
-      // setRenderSideNav(hasLocalazyIdentity());
-      setRenderSideNav(true);
+      setRenderSideNav(hasLocalazyIdentity());
 
       setIsLoadingApp(false);
 
@@ -82,12 +82,19 @@ const App = () => {
         <Route
           path={`login`}
           element={<Login
-            title={headerTitle}
-            subtitle={headerSubtitle}
-            isLoading={isLoadingApp} />
+          title={headerTitle}
+          subtitle={headerSubtitle}
+          isLoading={isLoadingApp} />
           }
         />
-        {/* <Route index element={<HomePage />} /> */}
+        <Route
+          path={`overview`}
+          element={<Overview
+          title={headerTitle}
+          subtitle={headerSubtitle}
+          isLoadingProp={isLoadingApp} />
+          }
+        />
         {/* <Route path="*" element={<Page.Error />} /> */}
         </Routes>
         )}

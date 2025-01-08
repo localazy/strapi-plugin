@@ -18,11 +18,11 @@ const getNav: () => NavItem[] = () => {
   const { t } = useTranslation();
   return [
     {
-      id: "settings",
-      label: t("common.settings"),
-      description: t("settings.description"),
+      id: "overview",
+      label: t("common.overview"),
+      description: t("overview.description"),
       icon: <House />,
-      to: `${BASE_PATH}/settings`,
+      to: `${BASE_PATH}/overview`,
       active: false,
     },
     {
