@@ -8,7 +8,7 @@ import en_login from "./modules/login/locale/en";
 import en_overview from "./modules/overview/locale/en";
 // import en_download from "./modules/localazy-download/locale/en";
 // import en_upload from "./modules/localazy-upload/locale/en";
-// import en_plugin_settings from "./modules/plugin-settings/locale/en";
+import en_plugin_settings from "./modules/plugin-settings/locale/en";
 
 const initI18nParams = () => {
   return {
@@ -25,14 +25,12 @@ const initI18nParams = () => {
           overview: en_overview,
           // download: en_download,
           // upload: en_upload,
-          // plugin_settings: en_plugin_settings,
+          plugin_settings: en_plugin_settings,
         },
       },
     },
   };
 }
-
-console.log(":LOADING I18N");
 
 i18n
   // detect user language

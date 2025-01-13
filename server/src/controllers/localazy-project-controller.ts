@@ -2,7 +2,6 @@ import { Core } from "@strapi/strapi";
 
 const LocalazyProjectController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getConnectedProject(ctx) {
-    console.log("--- getConnectedProject ---");
     const LocalazyUserService = strapi
       .plugin("strapi-plugin-v5")
       .service("LocalazyUserService");

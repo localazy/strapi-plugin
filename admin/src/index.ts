@@ -77,11 +77,9 @@ const addSettingsSection = (app: any) => {
         },
         to: `/settings/${PLUGIN_ID}/content-transfer-setup`,
         Component: async () => {
-          // TODO: import the component
-          return null;
-          // const component = await import("./pages/PluginSettings");
+          const { ContentTransferSetup } = await import("./pages/ContentTransferSetup");
 
-          // return component;
+          return ContentTransferSetup;
         },
         permissions: [],
       },
