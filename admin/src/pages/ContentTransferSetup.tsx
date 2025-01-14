@@ -7,21 +7,17 @@ import { Check } from "@strapi/icons";
 import { Box, Button, Alert, Flex, Divider, Typography } from "@strapi/design-system";
 import set from "lodash-es/set";
 import get from "lodash-es/get";
-import { useNavigate } from "react-router-dom";
 import PluginSettingsService from "../modules/plugin-settings/services/plugin-settings-service";
 import StrapiModelService from "../modules/plugin-settings/services/strapi-model-service";
 import getFilteredModelsSchemas from "../modules/plugin-settings/utils/get-filtered-models-schemas";
 import getModelsTree from "../modules/plugin-settings/utils/get-models-tree";
 import hasModelChanged from "../modules/plugin-settings/functions/has-model-changed";
 import buildContentTransferSetupSchema from "../modules/plugin-settings/functions/build-content-transfer-setup-schema";
-import { getLocalazyIdentity, setLocalazyIdentity } from "../state/localazy-identity";
 import { Tree } from "../modules/plugin-settings/components/Tree";
 import { ContentTransferSetupEmpty } from "../modules/plugin-settings/components/ContentTransferSetupEmpty";
-import { PLUGIN_ID } from "../pluginId";
-import { emptyIdentity } from '../modules/user/model/localazy-identity';
-import LocalazyUserService from "../modules/user/services/localazy-user-service";
 
-import "../i18n";
+// import and load resources
+import '../i18n';
 
 // TODO: ADD TYPES
 
@@ -30,13 +26,6 @@ const ContentTransferSetup: React.FC = () => {
    * Translation function
    */
   const { t } = useTranslation();
-
-  /**
-   * Is user logged in
-   */
-  const localazyIdentity = getLocalazyIdentity();
-  const hasLocalazyIdentity = () => !!localazyIdentity.accessToken;
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   /**
    * Component state
@@ -91,6 +80,8 @@ const ContentTransferSetup: React.FC = () => {
   };
 
   const onTreeItemClick = (keys: any, currentValue: any) => {
+    console.log("keys", keys);
+    console.log("currentValue", currentValue);
     setFormModel((prevState: any) => {
       // model of a subtree is the same for each of the keys
       const modelName = keys[0].split(".")[0];
@@ -137,16 +128,6 @@ const ContentTransferSetup: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
-      const identity = await LocalazyUserService.getIdentity();
-      setLocalazyIdentity(identity || emptyIdentity);
-
-      setIsLoggedIn(hasLocalazyIdentity());
-
-      if (!hasLocalazyIdentity()) {
-        setIsLoading(false);
-
-        return;
-      }
 
       /**
        * Fetch current models schemas
@@ -197,11 +178,6 @@ const ContentTransferSetup: React.FC = () => {
       setHasUnsavedChanges(localHasModelChanged)
 
       setIsLoading(false);
-
-      if (!isLoggedIn) {
-        const navigate = useNavigate();
-        navigate(`/plugins/${PLUGIN_ID}/login`);
-      }
     }
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -272,7 +248,6 @@ const ContentTransferSetup: React.FC = () => {
             {formModel.map((tree, index) => {
               return (
                 <Box
-                  // eslint-disable-next-line react/no-array-index-key
                   key={`box_tree_${index}`}
                   marginBottom={3}
                 >

@@ -7,7 +7,7 @@ import LocalazyLoginService from "../services/localazy-login-service";
 import { getStrapiDefaultLocale } from "../../@common/utils/get-default-locale";
 import { isoStrapiToLocalazy } from "../../@common/utils/iso-locales-utils";
 import config from "../../../config";
-import { LocalazyIdentity } from "src/modules/user/model/localazy-identity";
+import { LocalazyIdentity } from "../../user/model/localazy-identity";
 import { Locales } from "@localazy/api-client";
 
 interface LoginButtonProps {

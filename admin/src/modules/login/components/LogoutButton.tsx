@@ -3,7 +3,8 @@ import { Button } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import { SignOut } from "@strapi/icons";
 import LocalazyUserService from "../../user/services/localazy-user-service";
-import { setLocalazyIdentity } from "../../../state/localazy-identity";
+import { useLocalazyIdentity } from "../../../state/localazy-identity";
+import { emptyIdentity } from "../../user/model/localazy-identity";
 
 interface LogoutButtonProps {
   onResultFetched: () => void;
@@ -12,13 +13,15 @@ interface LogoutButtonProps {
 const LogoutButton: React.FC<LogoutButtonProps> = (props) => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+  const { setIdentity } = useLocalazyIdentity();
+
   const logout = async () => {
     setIsLoading(true);
 
     // delete identity from db
     // delete identity from app state
     LocalazyUserService.deleteIdentity();
-    setLocalazyIdentity();
+    setIdentity(emptyIdentity);
 
     setIsLoading(false);
 
@@ -39,4 +42,4 @@ const LogoutButton: React.FC<LogoutButtonProps> = (props) => {
   );
 }
 
-export default LogoutButton;
+export { LogoutButton };

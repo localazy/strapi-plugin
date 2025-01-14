@@ -1,11 +1,9 @@
 // TODO: ADD TYPES
 
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import cloneDeep from "lodash-es/cloneDeep";
-import { Select, Option } from '@strapi/design-system/Select';
-
+import { Field, MultiSelect, MultiSelectOption } from "@strapi/design-system";
 interface LanguageSelectorProps {
   label: string;
   hint: string;
@@ -15,7 +13,7 @@ interface LanguageSelectorProps {
   onChange: (values: any) => void;
 }
 
-const LanguagesSelector = (props: LanguageSelectorProps) => {
+const LanguagesSelector: React.FC<LanguageSelectorProps> = (props: LanguageSelectorProps) => {
   /**
    * Translation function
    */
@@ -41,37 +39,33 @@ const LanguagesSelector = (props: LanguageSelectorProps) => {
   }, [props.projectLanguages, props.preselectedLanguages]);
 
   return (
-    <Select
-      label={props.label || t("common.select_languages")}
+    <Field.Root
       hint={props.hint || t("common.select_languages")}
-      clearLabel={t("plugin_settings.clear")}
-      placeholder={props.placeholder || t("common.select_languages")}
-      onClear={() => setSelectedLanguages([])}
-      value={selectedLanguages || []}
-      onChange={(values: any) => onChange(values)}
-      multi
-      withTags
     >
-      {props.projectLanguages.map((lang: any) => (
-        <Option
-          key={lang.id}
-          value={lang.code}
-        >
-          {`${lang.name} (${lang.code})`}
-        </Option>
-      ))}
-    </Select>
+      <Field.Label>
+        {props.label || t("common.select_languages")}
+      </Field.Label>
+      <MultiSelect
+        clearLabel={t("plugin_settings.clear")}
+        placeholder={props.placeholder || t("common.select_languages")}
+        onClear={() => setSelectedLanguages([])}
+        value={selectedLanguages || []}
+        onChange={(values: any) => onChange(values)}
+        multi
+        withTags
+      >
+          {props.projectLanguages.map((lang: any) => (
+            <MultiSelectOption
+              key={lang.id}
+              value={lang.code}
+            >
+              {`${lang.name} (${lang.code})`}
+            </MultiSelectOption>
+          ))}
+        </MultiSelect>
+      <Field.Hint />
+    </Field.Root>
   );
 }
 
-LanguagesSelector.propTypes = {
-  label: PropTypes.string,
-  hint: PropTypes.string,
-  placeholder: PropTypes.string,
-  projectLanguages: PropTypes.array.isRequired,
-  preselectedLanguages: PropTypes.array.isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
-
-export default LanguagesSelector;
+export { LanguagesSelector };

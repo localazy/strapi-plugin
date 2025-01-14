@@ -2,6 +2,8 @@ import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
 import Localazy from './modules/@common/components/Icons/Localazy';
+import FetchIdentity from "./modules/login/components/FetchIdentity";
+import React from 'react';
 
 export default {
   register(app: any) {
@@ -35,8 +37,24 @@ const addMenuLink = (app: any) => {
     },
     Component: async () => {
       const { App } = await import('./pages/App');
+      const { LocalazyIdentityProvider } = await import('./state/localazy-identity');
 
-      return App;
+      const WrappedApp = () =>
+        React.createElement(
+          LocalazyIdentityProvider,
+          {
+            children: React.createElement(
+              React.Fragment,
+              {},
+              [
+                React.createElement(FetchIdentity, {}),
+                React.createElement(App, {})
+              ]
+            )
+          }
+        );
+
+      return WrappedApp;
     },
   });
 }
@@ -60,11 +78,16 @@ const addSettingsSection = (app: any) => {
         },
         to: `/settings/${PLUGIN_ID}/global-settings`,
         Component: async () => {
-          // TODO: import the component
-          return null;
-          // const component = await import("./pages/PluginSettings");
+          const { GlobalSettings } = await import("./pages/GlobalSettings");
+          const { LocalazyIdentityProvider } = await import("./state/localazy-identity");
 
-          // return component;
+          const WrappedGlobalSettings = () =>
+            React.createElement(
+              LocalazyIdentityProvider,
+              { children: React.createElement(GlobalSettings, {}) }
+            );
+
+          return WrappedGlobalSettings;
         },
         permissions: [],
       },
@@ -78,8 +101,18 @@ const addSettingsSection = (app: any) => {
         to: `/settings/${PLUGIN_ID}/content-transfer-setup`,
         Component: async () => {
           const { ContentTransferSetup } = await import("./pages/ContentTransferSetup");
+          const { LocalazyIdentityProvider } = await import("./state/localazy-identity");
 
-          return ContentTransferSetup;
+          const WrappedContentTransferSetup = () =>
+            React.createElement(
+              LocalazyIdentityProvider,
+              { children: React.createElement(React.Fragment, {}, [
+                React.createElement(FetchIdentity, {}),
+                React.createElement(ContentTransferSetup, {})
+              ]) }
+            );
+
+          return WrappedContentTransferSetup;
         },
         permissions: [],
       },

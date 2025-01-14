@@ -3,13 +3,13 @@ import getNav from "./get-nav";
 import { PLUGIN_ID } from "../../../pluginId";
 import { useTranslation } from 'react-i18next';
 
-export default (location: Pick<Location, "pathname"> | null = null) => {
+const useHeaderTitle = () => {
   const { t } = useTranslation();
 
-  const _location = location || useLocation();
+  const location = useLocation();
 
   // segment after pluginId
-  const pluginSegment = _location?.pathname.split(`/${PLUGIN_ID}/`)[1];
+  const pluginSegment = location?.pathname.split(`/${PLUGIN_ID}/`)[1];
 
   if (!pluginSegment) {
     return t("common.localazy_plugin_hand");
@@ -20,4 +20,8 @@ export default (location: Pick<Location, "pathname"> | null = null) => {
   );
 
   return currentNavItem?.label || t("common.localazy_plugin_hand");
-};
+}
+
+export {
+  useHeaderTitle
+}

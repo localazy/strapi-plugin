@@ -1,7 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { PLUGIN_ID } from "../../../pluginId";
-import history from "./history";
 
-export enum PLUGIN_ROUTES {
+enum PLUGIN_ROUTES {
   ROOT = "",
   LOGIN = "login",
   UPLOAD = "upload",
@@ -11,12 +11,25 @@ export enum PLUGIN_ROUTES {
   CONTENT_TRANSFER_SETUP = "content-transfer-setup",
 };
 
-export default (route: PLUGIN_ROUTES) => {
-  if (route === PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP) {
-    history.push(`${process.env.ADMIN_PATH}/settings/${PLUGIN_ID}/${route}`);
+const useRedirectToPluginRoute = () => {
+  const navigate = useNavigate();
 
-    return;
+  const navigateToPluginRoute = (route: PLUGIN_ROUTES) => {
+    if (route === PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP) {
+      navigate(`/settings/${PLUGIN_ID}/${route}`);
+      return;
+    }
+
+    navigate(`/plugins/${PLUGIN_ID}/${route}`);
+  };
+
+  return {
+    navigateToPluginRoute,
   }
+};
 
-  history.push(`${process.env.ADMIN_PATH}/plugins/${PLUGIN_ID}/${route}`);
+
+export {
+  PLUGIN_ROUTES,
+  useRedirectToPluginRoute,
 };

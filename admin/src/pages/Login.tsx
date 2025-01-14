@@ -1,5 +1,4 @@
 
-import PropTypes from "prop-types";
 import {
   Link,
   Box,
@@ -7,10 +6,11 @@ import {
  } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import Loader from "../modules/@common/components/PluginPageLoader";
-import { setLocalazyIdentity } from "../state/localazy-identity";
+import { useLocalazyIdentity } from "../state/localazy-identity";
 import LocalazyUserService from "../modules/user/services/localazy-user-service";
 import LoginButton from "../modules/login/components/LoginButton";
-import redirectToPluginRoute, {
+import {
+  useRedirectToPluginRoute,
   PLUGIN_ROUTES,
 } from "../modules/@common/utils/redirect-to-plugin-route";
 import ProductAnalyticsService from "../modules/@common/services/product-analytics-service";
@@ -29,11 +29,13 @@ const Login: React.FC<LoginProps> = ({
   isLoading = false,
 }) => {
   const { t } = useTranslation();
-
+  const { navigateToPluginRoute } = useRedirectToPluginRoute();
   /**
    * Localazy Strapi documentation link
    */
   const localazyStrapiDocsLink = "https://localazy.com/docs/strapi";
+
+  const { setIdentity, identity,isLoggedIn } = useLocalazyIdentity();
 
   /**
    * Handle fetched identity on login
@@ -41,16 +43,16 @@ const Login: React.FC<LoginProps> = ({
    */
   const onLoginResultFetched = async (result: LocalazyIdentity) => {
     await LocalazyUserService.updateIdentity(result);
-    setLocalazyIdentity(result);
+    setIdentity(result);
 
-    if (result.accessToken) {
+    if (isLoggedIn) {
       // track user login
       ProductAnalyticsService.trackAppConnected(
-        result.user.id,
-        result.project,
+        identity.user.id,
+        identity.project,
       );
 
-      redirectToPluginRoute(PLUGIN_ROUTES.DOWNLOAD);
+      navigateToPluginRoute(PLUGIN_ROUTES.DOWNLOAD);
     }
   };
 

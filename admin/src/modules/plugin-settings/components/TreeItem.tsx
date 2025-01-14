@@ -25,7 +25,7 @@ const TreeItem: React.FC<TreeItemProps> = ({
       {typeof value === "boolean" && (
         <Checkbox
           checked={value}
-          onChange={() => onChange([passedKey], value)}
+          onCheckedChange={() => onChange([passedKey], value)}
         >
           {label || "-"}
         </Checkbox>

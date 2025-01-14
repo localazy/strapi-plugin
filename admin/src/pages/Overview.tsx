@@ -3,11 +3,12 @@ import { Layouts } from "@strapi/strapi/admin";
 import { Box, Grid, Divider } from "@strapi/design-system";
 import { useTranslation } from "react-i18next";
 import Loader from "../modules/@common/components/PluginPageLoader";
-import LogoutButton from "../modules/login/components/LogoutButton";
-import redirectToPluginRoute, {
+import {LogoutButton} from "../modules/login/components/LogoutButton";
+import {
+  useRedirectToPluginRoute,
   PLUGIN_ROUTES,
 } from "../modules/@common/utils/redirect-to-plugin-route";
-import { getLocalazyIdentity } from "../state/localazy-identity";
+import { useLocalazyIdentity } from "../state/localazy-identity";
 import OverviewItem from "../modules/overview/components/OverviewItem";
 import OverviewItemLink from "../modules/overview/components/OverviewItemLink";
 import PrerequisitiesInfo from "../modules/overview/components/PrerequisitiesInfo";
@@ -29,11 +30,13 @@ const Overview: React.FC<OverviewProps> = ({
   isLoadingProp = false,
 }) => {
   const { t } = useTranslation();
+  const { navigateToPluginRoute } = useRedirectToPluginRoute();
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const localazyIdentity = getLocalazyIdentity();
-  const projectUrl = localazyIdentity.project.url;
+  const { identity } = useLocalazyIdentity();
+
+  const projectUrl = identity.project.url;
 
   const [connectedProject, setConnectedProject] = useState<Project | null>(null);
 
@@ -57,11 +60,11 @@ const Overview: React.FC<OverviewProps> = ({
   const onLoggedOut = () => {
     // track user logout
     ProductAnalyticsService.trackAppDisconnected(
-      localazyIdentity.user.id,
-      localazyIdentity.project,
+      identity.user.id,
+      identity.project,
     );
 
-    redirectToPluginRoute(PLUGIN_ROUTES.LOGIN);
+    navigateToPluginRoute(PLUGIN_ROUTES.LOGIN);
   };
 
   return (
@@ -96,13 +99,13 @@ const Overview: React.FC<OverviewProps> = ({
             <Grid.Item>
               <OverviewItem
                 label={t("overview.connected_user")}
-                value={localazyIdentity.user.name}
+                value={identity.user.name}
               />
             </Grid.Item>
             <Grid.Item>
               <OverviewItem
                 label={t("overview.connected_project")}
-                value={localazyIdentity.project.name}
+                value={identity.project.name}
               />
             </Grid.Item>
             <Grid.Item>

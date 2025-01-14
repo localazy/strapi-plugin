@@ -5,7 +5,7 @@ import { TreeItem } from "./TreeItem";
 import { flattenObject } from "../../@common/functions/flatten-deep";
 
 interface TreeProps {
-  objects: Record<string, any>;
+  objects: any[];
   onTreeItemClick: (key: string[], currentValue: boolean) => void;
   initiallyExpanded: boolean;
 }
@@ -20,6 +20,16 @@ const Tree: React.FC<TreeProps> = ({
   useEffect(() => {
     setIsExpanded(initiallyExpanded);
   }, [initiallyExpanded]);
+
+  const getCheckedState = (hasTruthyValue: boolean, hasFalsyValue: boolean) => {
+    if(hasTruthyValue && !hasFalsyValue) {
+      return true;
+    }
+    if(hasTruthyValue && hasFalsyValue) {
+      return "indeterminate";
+    }
+    return false;
+  }
 
   const createTree = (name: string, branch: any[], path = "") => {
     const isBranchObject = typeof branch === "object" && branch !== null;
@@ -60,9 +70,8 @@ const Tree: React.FC<TreeProps> = ({
                 {isSubbranchObject && (
                   <Checkbox
                     disabled={hasAllNullValue}
-                    checked={hasTruthyValue && !hasFalsyValue}
-                    indeterminate={hasTruthyValue && hasFalsyValue}
-                    onChange={() => onTreeItemClick(flattenedKeys, hasTruthyValue && !hasFalsyValue)}
+                    checked={getCheckedState(hasTruthyValue, hasFalsyValue)}
+                    onCheckedChange={() => onTreeItemClick(flattenedKeys, hasTruthyValue)}
                   >
                     <Flex alignItems="center">
                       {!!value?.__component__ && (<Flex alignItems="center" marginRight={2}><DynamicZoneField width="1rem" height="1rem" /></Flex>)}
@@ -99,35 +108,36 @@ const Tree: React.FC<TreeProps> = ({
       {Object.entries(objects).map(([key, value]) => {
         return (
           value.__model__ !== undefined && (
-            <Box borderColor="neutral200" hasRadius>
-              <Accordion
+            <Box
+              borderColor="neutral200"
+              hasRadius
+              key={`key`}
+            >
+              <Accordion.Root
                 size="S"
-                expanded={isExpanded}
-                onToggle={() => { setIsExpanded(!isExpanded) }}
               >
-                <Accordion.Toggle
-                  variant="secondary"
-                  title={key}
-                  togglePosition="left"
-                  action={
-                    <Switch
+                <Accordion.Item value={key}>
+                <Switch
                       label={`switch_tree_${key}`}
-                      onChange={() =>
+                      onCheckedChange={() =>
                         onTreeItemClick([`${key}.__model__`], value.__model__)
                       }
-                      selected={!!value.__model__}
-                    />}
-                />
+                      checked={!!value.__model__}
+                    />
+                  <Accordion.Header>
+                  <Accordion.Trigger description={key}>
+                    {key}
+                  </Accordion.Trigger>
+                </Accordion.Header>
 
                 <Accordion.Content>
                   {createTree(key, value, key)}
                 </Accordion.Content>
-              </Accordion>
+                </Accordion.Item>
+              </Accordion.Root>
             </Box>
           )
-
         )
-
       }
       )}
     </Box>
