@@ -7,7 +7,7 @@ import en_common from "./modules/@common/locale/en";
 import en_login from "./modules/login/locale/en";
 import en_overview from "./modules/overview/locale/en";
 // import en_download from "./modules/localazy-download/locale/en";
-// import en_upload from "./modules/localazy-upload/locale/en";
+import en_upload from "./modules/localazy-upload/locale/en";
 import en_plugin_settings from "./modules/plugin-settings/locale/en";
 
 const initI18nParams = () => {
@@ -24,7 +24,7 @@ const initI18nParams = () => {
           login: en_login,
           overview: en_overview,
           // download: en_download,
-          // upload: en_upload,
+          upload: en_upload,
           plugin_settings: en_plugin_settings,
         },
       },

@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import { createStrapiApiAxiosInstance } from "../api/strapi-api-base";
 
+// TODO: ADD TYPES
+
 const strapiApiInstance = createStrapiApiAxiosInstance("/i18n");
 export default class I18nService {
   static async getLocales() {

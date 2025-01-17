@@ -4,5 +4,10 @@
   "compilerOptions": {
     "rootDir": "../",
     "baseUrl": "."
-  }
+  },
+  "types": [
+    "@david-vaclavek/deep-keys",
+    "strapio",
+    "strapi"
+  ]
 }

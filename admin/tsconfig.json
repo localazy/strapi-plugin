@@ -6,6 +6,6 @@
     "baseUrl": "."
   },
   "types": [
-    "@david-vaclavek/deep-keys"
+    "@david-vaclavek/deep-keys",
   ]
 }

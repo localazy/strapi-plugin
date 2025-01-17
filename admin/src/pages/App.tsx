@@ -18,6 +18,7 @@ import Overview from './Overview';
 
 // import and load resources
 import '../i18n';
+import { Upload } from './Upload';
 
 const App = () => {
   const location = useLocation();
@@ -60,6 +61,13 @@ const App = () => {
         title={headerTitle}
         subtitle={headerSubtitle}
         isLoadingProp={false} />
+        }
+      />
+      <Route
+        path={`upload`}
+        element={<Upload
+        title={headerTitle}
+        subtitle={headerSubtitle} />
         }
       />
       {/* <Route path="*" element={<Page.Error />} /> */}

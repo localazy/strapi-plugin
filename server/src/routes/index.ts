@@ -1,8 +1,8 @@
 import LocalazyUserRoutes from "./localazy-user-routes";
 import LocalazyAuthRoutes from "./localazy-auth-routes";
-import PluginSettingsRoutes from "./plugin-settings";
+import PluginSettingsRoutes from "./plugin-settings-routes";
 import StrapiRoutes from "./strapi-routes";
-// import localazyTransferRoutes from "./localazy-transfer";
+import LocalazyTransferRoutes from "./localazy-transfer-routes";
 import LocalazyProjectRoutes from "./localazy-project-routes";
 // import localazyPublicTransferRoutes from "./localazy-public-transfer";
 
@@ -18,7 +18,7 @@ export default {
       ...LocalazyUserRoutes,
       ...PluginSettingsRoutes,
       ...StrapiRoutes,
-      // ...localazyTransferRoutes,
+      ...LocalazyTransferRoutes,
       ...LocalazyProjectRoutes,
     ],
   },
