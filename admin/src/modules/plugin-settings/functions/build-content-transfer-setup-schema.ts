@@ -1,24 +1,13 @@
-import set from "lodash-es/set";
-import get from "lodash-es/get";
-import findModelValueByKey from "../utils/find-model-value-by-key";
-import getContentTransferSetupKeysSets from "./get-content-transfer-setup-keys-sets";
+import set from 'lodash-es/set';
+import get from 'lodash-es/get';
+import findModelValueByKey from '../utils/find-model-value-by-key';
+import getContentTransferSetupKeysSets from './get-content-transfer-setup-keys-sets';
 
 // TODO: ADD TYPES
 
-export default (
-  localizableTree = [],
-  storedSetupSchema = [],
-  allModelsTree = []
-) => {
-  const {
-    oLocalizableTree,
-    oStoredSetupSchema,
-    newKeys,
-    filteredStoredSetupSchemaKeys
-  } = getContentTransferSetupKeysSets(
-    localizableTree,
-    storedSetupSchema,
-  );
+export default (localizableTree = [], storedSetupSchema = [], allModelsTree = []) => {
+  const { oLocalizableTree, oStoredSetupSchema, newKeys, filteredStoredSetupSchemaKeys } =
+    getContentTransferSetupKeysSets(localizableTree, storedSetupSchema);
 
   const destinationObject: Record<string, any> = {};
   filteredStoredSetupSchemaKeys.forEach((key) => {
@@ -40,17 +29,14 @@ export default (
   });
 
   const destinationArray = [];
-  const sortedDestinationObjectKeys = Object.keys(destinationObject).sort(
-    (a, b) => {
-      if (a < b) return -1;
+  const sortedDestinationObjectKeys = Object.keys(destinationObject).sort((a, b) => {
+    if (a < b) return -1;
 
-      if (a > b) return 1;
+    if (a > b) return 1;
 
-      return 0;
-    }
-  );
+    return 0;
+  });
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const key of sortedDestinationObjectKeys) {
     destinationArray.push(destinationObject[key]);
   }

@@ -1,21 +1,18 @@
-const KEY = "identity";
+const KEY = 'identity';
 
 const emptyIdentity = {
-  accessToken: "",
+  accessToken: '',
   project: {
-    id: "",
-    image: "",
-    name: "",
-    url: "",
+    id: '',
+    image: '',
+    name: '',
+    url: '',
   },
-  scope: "",
+  scope: '',
   user: {
-    id: "",
-    name: "",
+    id: '',
+    name: '',
   },
 };
 
-export {
-  KEY,
-  emptyIdentity,
-};
+export { KEY, emptyIdentity };

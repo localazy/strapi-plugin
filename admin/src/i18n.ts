@@ -1,19 +1,19 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
 
 // TODO: Add locales
 
-import en_common from "./modules/@common/locale/en";
-import en_login from "./modules/login/locale/en";
-import en_overview from "./modules/overview/locale/en";
+import en_common from './modules/@common/locale/en';
+import en_login from './modules/login/locale/en';
+import en_overview from './modules/overview/locale/en';
 // import en_download from "./modules/localazy-download/locale/en";
-import en_upload from "./modules/localazy-upload/locale/en";
-import en_plugin_settings from "./modules/plugin-settings/locale/en";
+import en_upload from './modules/localazy-upload/locale/en';
+import en_plugin_settings from './modules/plugin-settings/locale/en';
 
 const initI18nParams = () => {
   return {
     debug: false, // set `true` to see more logs
-    fallbackLng: "en",
+    fallbackLng: 'en',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
@@ -30,7 +30,7 @@ const initI18nParams = () => {
       },
     },
   };
-}
+};
 
 i18n
   // detect user language

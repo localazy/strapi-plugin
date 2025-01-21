@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import { useLocalazyIdentity } from "../../../state/localazy-identity";
-import LocalazyUserService from "../../user/services/localazy-user-service";
-import { emptyIdentity } from "../../user/model/localazy-identity";
-import { PLUGIN_ROUTES, useRedirectToPluginRoute } from "../../../modules/@common/utils/redirect-to-plugin-route";
+import React, { useEffect } from 'react';
+import { useLocalazyIdentity } from '../../../state/localazy-identity';
+import LocalazyUserService from '../../user/services/localazy-user-service';
+import { emptyIdentity } from '../../user/model/localazy-identity';
+import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../../../modules/@common/utils/redirect-to-plugin-route';
 
 const FetchIdentity: React.FC = () => {
-  const { setIdentity, isLoggedIn } = useLocalazyIdentity();
+  const { setIdentity } = useLocalazyIdentity();
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
 
   useEffect(() => {
@@ -20,12 +20,12 @@ const FetchIdentity: React.FC = () => {
           navigateToPluginRoute(PLUGIN_ROUTES.LOGIN);
         }
       } catch (error) {
-        console.error("Error fetching identity:", error);
+        console.error('Error fetching identity:', error);
       }
     };
 
     fetchIdentity();
-  }, [setIdentity]);
+  }, [setIdentity, navigateToPluginRoute]);
 
   return null; // This component doesn't render anything
 };

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Button } from "@strapi/design-system";
-import { useTranslation } from "react-i18next";
-import { SignOut } from "@strapi/icons";
-import LocalazyUserService from "../../user/services/localazy-user-service";
-import { useLocalazyIdentity } from "../../../state/localazy-identity";
-import { emptyIdentity } from "../../user/model/localazy-identity";
+import { useState } from 'react';
+import { Button } from '@strapi/design-system';
+import { useTranslation } from 'react-i18next';
+import { SignOut } from '@strapi/icons';
+import LocalazyUserService from '../../user/services/localazy-user-service';
+import { useLocalazyIdentity } from '../../../state/localazy-identity';
+import { emptyIdentity } from '../../user/model/localazy-identity';
 
 interface LogoutButtonProps {
   onResultFetched: () => void;
@@ -30,16 +30,11 @@ const LogoutButton: React.FC<LogoutButtonProps> = (props) => {
 
   return (
     <div>
-      <Button
-        startIcon={<SignOut />}
-        variant="secondary"
-        loading={isLoading}
-        onClick={logout}
-      >
-        {t("login.logout_from_localazy")}
+      <Button startIcon={<SignOut />} variant='secondary' loading={isLoading} onClick={logout}>
+        {t('login.logout_from_localazy')}
       </Button>
     </div>
   );
-}
+};
 
 export { LogoutButton };

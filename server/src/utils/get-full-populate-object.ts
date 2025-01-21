@@ -11,13 +11,14 @@
 
 // TODO: ADD TYPES
 
-import isEmpty from "lodash-es/isEmpty";
-import merge from "lodash-es/merge";
+import isEmpty from 'lodash-es/isEmpty';
+import merge from 'lodash-es/merge';
 const DEFAULT_MAX_POPULATE_DEPTH = 10;
 const DEFAULT_POPULATE_DEPTH = 5;
 
 const getModelPopulationAttributes = (model: any) => {
-  if (model.uid === "plugin::upload.file") {
+  if (model.uid === 'plugin::upload.file') {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { related, ...attributes } = model.attributes;
     return attributes;
   }
@@ -25,21 +26,26 @@ const getModelPopulationAttributes = (model: any) => {
   return model.attributes;
 };
 
-export type FullPopulateObject = {
-  populate: any;
-} | boolean | undefined;
+export type FullPopulateObject =
+  | {
+      populate: any;
+    }
+  | boolean
+  | undefined;
 
-const getFullPopulateObject = (modelUid: string, maxDepth: number = DEFAULT_POPULATE_DEPTH, ignore: string[] = []): FullPopulateObject => {
-  const skipCreatorFields = strapi
-    .plugin("strapi-plugin-v5")
-    ?.config("skipCreatorFields");
+const getFullPopulateObject = (
+  modelUid: string,
+  maxDepth: number = DEFAULT_POPULATE_DEPTH,
+  ignore: string[] = []
+): FullPopulateObject => {
+  const skipCreatorFields = strapi.plugin('strapi-plugin-v5')?.config('skipCreatorFields');
 
   let localDepth = maxDepth;
 
   if (localDepth <= 1) {
     return true;
   }
-  if (modelUid === "admin::user" && skipCreatorFields) {
+  if (modelUid === 'admin::user' && skipCreatorFields) {
     return undefined;
   }
 
@@ -48,41 +54,33 @@ const getFullPopulateObject = (modelUid: string, maxDepth: number = DEFAULT_POPU
   if (model === undefined) {
     return undefined;
   }
-  if (ignore && !ignore.includes(model.collectionName))
-    ignore.push(model.collectionName);
-  for (const [key, value] of Object.entries<any>(
-    getModelPopulationAttributes(model)
-  )) {
+  if (ignore && !ignore.includes(model.collectionName)) ignore.push(model.collectionName);
+  for (const [key, value] of Object.entries<any>(getModelPopulationAttributes(model))) {
     if (ignore?.includes(key)) continue;
     if (value) {
-      if (value.type === "component") {
+      if (value.type === 'component') {
         populate[key] = getFullPopulateObject(value.component, maxDepth - 1);
-      } else if (value.type === "dynamiczone") {
+      } else if (value.type === 'dynamiczone') {
         const dynamicPopulate = value.components.reduce((prev: any, cur: any) => {
           const curPopulate = getFullPopulateObject(cur, maxDepth - 1);
           return merge(prev, { [cur]: curPopulate });
         }, {});
         populate[key] = isEmpty(dynamicPopulate) ? true : { on: dynamicPopulate };
-      } else if (value.type === "relation") {
+      } else if (value.type === 'relation') {
         const relationPopulate = getFullPopulateObject(
           value.target,
-          key === "localizations" && maxDepth > 2 ? 1 : maxDepth - 1,
+          key === 'localizations' && maxDepth > 2 ? 1 : maxDepth - 1,
           ignore
         );
         if (relationPopulate) {
           populate[key] = relationPopulate;
         }
-      } else if (value.type === "media") {
+      } else if (value.type === 'media') {
         populate[key] = true;
       }
     }
   }
   return isEmpty(populate) ? true : { populate };
-
 };
 
-export {
-  getFullPopulateObject,
-  DEFAULT_POPULATE_DEPTH,
-  DEFAULT_MAX_POPULATE_DEPTH,
-};
+export { getFullPopulateObject, DEFAULT_POPULATE_DEPTH, DEFAULT_MAX_POPULATE_DEPTH };

@@ -1,6 +1,6 @@
-import { createStrapiApiAxiosInstance } from "../../@common/api/strapi-api-base";
+import { createStrapiApiAxiosInstance } from '../../@common/api/strapi-api-base';
 
-const BASE_PATH = "/strapi";
+const BASE_PATH = '/strapi';
 const strapiApiAxiosInstance = createStrapiApiAxiosInstance();
 
 export default class StrapiModelService {

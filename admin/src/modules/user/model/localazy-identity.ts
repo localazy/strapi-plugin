@@ -16,14 +16,14 @@ export interface LocalazyIdentity {
 export const emptyIdentity: LocalazyIdentity = {
   accessToken: '',
   project: {
-      id: '',
-      image: '',
-      name: '',
-      url: '',
+    id: '',
+    image: '',
+    name: '',
+    url: '',
   },
   scope: '',
   user: {
-      id: '',
-      name: '',
+    id: '',
+    name: '',
   },
 };

@@ -1,6 +1,6 @@
 // TODO: ADD TYPES
 
-import isGenerallyApplicableContentType from "./is-generally-applicable-content-type";
+import isGenerallyApplicableContentType from './is-generally-applicable-content-type';
 
 const isLocalazyApplicableContentType = (model: any) => {
   const isGenerallyApplicable = isGenerallyApplicableContentType(model);
@@ -20,15 +20,13 @@ const isLocalazyApplicableContentType = (model: any) => {
 
   if (model.pluginOptions) {
     // cannot be translatable
-    if (!model.pluginOptions["i18n"]) {
+    if (!model.pluginOptions['i18n']) {
       return false;
     }
 
     // decide whether it is translatable
-    if (model.pluginOptions["i18n"]) {
-      return model.pluginOptions["i18n"].localized
-        ? model.pluginOptions["i18n"].localized
-        : false;
+    if (model.pluginOptions['i18n']) {
+      return model.pluginOptions['i18n'].localized ? model.pluginOptions['i18n'].localized : false;
     }
   }
 

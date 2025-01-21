@@ -1,7 +1,7 @@
 import type { Core } from '@strapi/strapi';
 
-import { KEY, emptyIdentity } from "../db/model/localazy-user";
-import getStrapiStore from "../db/model/utils/get-strapi-store";
+import { KEY, emptyIdentity } from '../db/model/localazy-user';
+import getStrapiStore from '../db/model/utils/get-strapi-store';
 
 const LocalazyUserService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getUser() {

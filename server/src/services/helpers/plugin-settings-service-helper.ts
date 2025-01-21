@@ -1,4 +1,4 @@
-import { Core } from "@strapi/strapi";
+import { Core } from '@strapi/strapi';
 
 class PluginSettingsServiceHelper {
   private strapi: Core.Strapi;
@@ -7,7 +7,7 @@ class PluginSettingsServiceHelper {
 
   constructor(strapi: Core.Strapi) {
     this.strapi = strapi;
-    this.pluginSettingsService = strapi.plugin("strapi-plugin-v5").service("pluginSettingsService");
+    this.pluginSettingsService = strapi.plugin('strapi-plugin-v5').service('pluginSettingsService');
   }
 
   async setup() {
@@ -15,17 +15,19 @@ class PluginSettingsServiceHelper {
   }
 
   shouldAllowAutomatedUpload() {
-    return typeof this.pluginSettings?.upload?.allowAutomated === "boolean" ? this.pluginSettings.upload.allowAutomated : false;
+    return typeof this.pluginSettings?.upload?.allowAutomated === 'boolean'
+      ? this.pluginSettings.upload.allowAutomated
+      : false;
   }
 
   shouldAllowAutomatedCreatedTrigger() {
     const automatedTriggers = this.getAutomatedUploadTriggers();
-    return this.shouldAllowAutomatedUpload() && automatedTriggers.includes("created");
+    return this.shouldAllowAutomatedUpload() && automatedTriggers.includes('created');
   }
 
   shouldAllowAutomatedUpdatedTrigger() {
     const automatedTriggers = this.getAutomatedUploadTriggers();
-    return this.shouldAllowAutomatedUpload() && automatedTriggers.includes("updated");
+    return this.shouldAllowAutomatedUpload() && automatedTriggers.includes('updated');
   }
 
   getAutomatedUploadTriggers() {
@@ -33,11 +35,15 @@ class PluginSettingsServiceHelper {
   }
 
   shouldAllowDeprecateOnDeletion() {
-    return typeof this.pluginSettings?.upload?.allowDeprecate === "boolean" ? this.pluginSettings.upload.allowDeprecate : false;
+    return typeof this.pluginSettings?.upload?.allowDeprecate === 'boolean'
+      ? this.pluginSettings.upload.allowDeprecate
+      : false;
   }
 
   shouldAllowWebhookDownloadProcess() {
-    return typeof this.pluginSettings?.download?.processDownloadWebhook === "boolean" ? this.pluginSettings.download.processDownloadWebhook : true;
+    return typeof this.pluginSettings?.download?.processDownloadWebhook === 'boolean'
+      ? this.pluginSettings.download.processDownloadWebhook
+      : true;
   }
 
   getWebhookAuthorId() {

@@ -5,7 +5,5 @@
     "rootDir": "../",
     "baseUrl": "."
   },
-  "types": [
-    "@david-vaclavek/deep-keys",
-  ]
+  "types": ["@david-vaclavek/deep-keys"]
 }

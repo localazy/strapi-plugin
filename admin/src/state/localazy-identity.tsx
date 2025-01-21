@@ -1,11 +1,11 @@
-import { emptyIdentity, LocalazyIdentity } from "../modules/user/model/localazy-identity";
-import React, { createContext, useContext, useState, ReactNode, useMemo } from "react";
+import { emptyIdentity, LocalazyIdentity } from '../modules/user/model/localazy-identity';
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react';
 
 interface LocalazyIdentityContextType {
   identity: LocalazyIdentity;
   setIdentity: React.Dispatch<React.SetStateAction<LocalazyIdentity>>;
   isLoggedIn: boolean;
-};
+}
 
 const LocalazyIdentityContextType = createContext<LocalazyIdentityContextType | undefined>(undefined);
 
@@ -14,7 +14,11 @@ const LocalazyIdentityProvider = ({ children }: { children: ReactNode }) => {
   // TODO: resolve why useMemo is not reactive
   const isLoggedIn = useMemo(() => !!identity.accessToken, [identity.accessToken]);
 
-  return <LocalazyIdentityContextType.Provider value={{ identity, setIdentity, isLoggedIn }}>{children}</LocalazyIdentityContextType.Provider>;
+  return (
+    <LocalazyIdentityContextType.Provider value={{ identity, setIdentity, isLoggedIn }}>
+      {children}
+    </LocalazyIdentityContextType.Provider>
+  );
 };
 
 const useLocalazyIdentity = () => {
@@ -25,7 +29,4 @@ const useLocalazyIdentity = () => {
   return context;
 };
 
-export {
-  useLocalazyIdentity,
-  LocalazyIdentityProvider,
-};
+export { useLocalazyIdentity, LocalazyIdentityProvider };

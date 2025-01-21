@@ -1,5 +1,5 @@
-import I18nService from "../services/i18n-service";
-import ProjectService from "../services/project-service";
+import I18nService from '../services/i18n-service';
+import ProjectService from '../services/project-service';
 
 // TODO: ADD TYPES
 
@@ -22,9 +22,7 @@ export async function getLocalazySourceLanguage() {
   }
 
   const sourceLanguageId = connectedProject.sourceLanguage;
-  const sourceLanguage = connectedProject.languages.find(
-    (language: any) => language.id === sourceLanguageId
-  );
+  const sourceLanguage = connectedProject.languages.find((language: any) => language.id === sourceLanguageId);
 
   if (!sourceLanguage) {
     return null;

@@ -1,17 +1,22 @@
-import { getFullPopulateObject, DEFAULT_POPULATE_DEPTH, DEFAULT_MAX_POPULATE_DEPTH } from '../utils/get-full-populate-object';
+import {
+  getFullPopulateObject,
+  DEFAULT_POPULATE_DEPTH,
+  DEFAULT_MAX_POPULATE_DEPTH,
+} from '../utils/get-full-populate-object';
 
 const deepPopulateHook = (event: any) => {
   const pLevel = event.params?.pLevel;
 
   // if pLevel is not defined, do nothing
-  if (typeof pLevel === "undefined") {
+  if (typeof pLevel === 'undefined') {
     return;
   }
 
-  const populateDefaultDepth = strapi.plugin("strapi-plugin-v5")?.config('populateDefaultDepth') ?? DEFAULT_POPULATE_DEPTH;
+  const populateDefaultDepth =
+    strapi.plugin('strapi-plugin-v5')?.config('populateDefaultDepth') ?? DEFAULT_POPULATE_DEPTH;
   // 0 is not a valid depth
   let depth = pLevel ?? populateDefaultDepth ?? 1;
-  const maxDepth = strapi.plugin("strapi-plugin-v5")?.config('populateMaxDepth') ?? DEFAULT_MAX_POPULATE_DEPTH;
+  const maxDepth = strapi.plugin('strapi-plugin-v5')?.config('populateMaxDepth') ?? DEFAULT_MAX_POPULATE_DEPTH;
   if (depth > maxDepth) {
     depth = maxDepth;
   }
@@ -22,6 +27,6 @@ const deepPopulateHook = (event: any) => {
       event.params.populate = modelObject.populate;
     }
   }
-}
+};
 
 export default deepPopulateHook;

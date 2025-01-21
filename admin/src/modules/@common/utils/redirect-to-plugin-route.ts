@@ -1,15 +1,15 @@
-import { useNavigate } from "react-router-dom";
-import { PLUGIN_ID } from "../../../pluginId";
+import { useNavigate } from 'react-router-dom';
+import { PLUGIN_ID } from '../../../pluginId';
 
 enum PLUGIN_ROUTES {
-  ROOT = "",
-  LOGIN = "login",
-  UPLOAD = "upload",
-  DOWNLOAD = "download",
-  OVERVIEW = "overview",
+  ROOT = '',
+  LOGIN = 'login',
+  UPLOAD = 'upload',
+  DOWNLOAD = 'download',
+  OVERVIEW = 'overview',
   // settings routes
-  CONTENT_TRANSFER_SETUP = "content-transfer-setup",
-};
+  CONTENT_TRANSFER_SETUP = 'content-transfer-setup',
+}
 
 const useRedirectToPluginRoute = () => {
   const navigate = useNavigate();
@@ -25,11 +25,7 @@ const useRedirectToPluginRoute = () => {
 
   return {
     navigateToPluginRoute,
-  }
+  };
 };
 
-
-export {
-  PLUGIN_ROUTES,
-  useRedirectToPluginRoute,
-};
+export { PLUGIN_ROUTES, useRedirectToPluginRoute };

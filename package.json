@@ -32,7 +32,11 @@
     "test:ts:front": "run -T tsc -p admin/tsconfig.json",
     "verify": "strapi-plugin verify",
     "watch": "strapi-plugin watch",
-    "watch:link": "strapi-plugin watch:link"
+    "watch:link": "strapi-plugin watch:link",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "devDependencies": {
     "@david-vaclavek/deep-keys": "^0.5.0",
@@ -46,9 +50,20 @@
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
     "axios": "^1.7.9",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "history": "^5.3.0",
+    "husky": "^9.1.7",
     "i18next": "^24.2.1",
+    "lint-staged": "^15.4.1",
     "lodash-es": "^4.17.21",
     "prettier": "^3.4.2",
     "react": "^19.0.0",
@@ -76,5 +91,11 @@
     "name": "strapi-plugin-v5",
     "displayName": "",
     "description": ""
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }

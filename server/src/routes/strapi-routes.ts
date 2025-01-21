@@ -1,34 +1,34 @@
-const ROUTE_PREFIX = "/strapi";
+const ROUTE_PREFIX = '/strapi';
 
-const StrapiRoutes  = [
+const StrapiRoutes = [
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}/models`,
-    handler: "StrapiController.getModels",
+    handler: 'StrapiController.getModels',
     config: {
       policies: [],
     },
   },
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}/localizable-models`,
-    handler: "StrapiController.getLocalizableModels",
+    handler: 'StrapiController.getLocalizableModels',
     config: {
       policies: [],
     },
   },
   {
-    method: "POST",
+    method: 'POST',
     path: `${ROUTE_PREFIX}/lifecycle/localazy-webhooks`,
-    handler: "StrapiController.postLifecycleLocalazyWebhooks",
+    handler: 'StrapiController.postLifecycleLocalazyWebhooks',
     config: {
       policies: [],
     },
   },
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}/version`,
-    handler: "StrapiController.getPluginVersion",
+    handler: 'StrapiController.getPluginVersion',
     config: {
       policies: [],
     },

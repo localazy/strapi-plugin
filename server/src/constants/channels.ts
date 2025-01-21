@@ -1,3 +1,3 @@
 export enum ChannelType {
-  LOCALAZY_PLUGIN = "localazy-plugin",
+  LOCALAZY_PLUGIN = 'localazy-plugin',
 }

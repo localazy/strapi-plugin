@@ -1,17 +1,14 @@
-/* eslint-disable no-useless-catch */
-import { createStrapiApiAxiosInstance } from "../../@common/api/strapi-api-base";
+import { createStrapiApiAxiosInstance } from '../../@common/api/strapi-api-base';
 
 // TODO: ADD TYPES
 
-const BASE_PATH = "/plugin-settings";
+const BASE_PATH = '/plugin-settings';
 const axiosInstance = createStrapiApiAxiosInstance();
 
 export default class PluginSettingsService {
   static async getContentTransferSetup() {
     try {
-      const result = await axiosInstance.get(
-        `${BASE_PATH}/content-transfer-setup`
-      );
+      const result = await axiosInstance.get(`${BASE_PATH}/content-transfer-setup`);
 
       return result.data;
     } catch (e) {
@@ -21,10 +18,7 @@ export default class PluginSettingsService {
 
   static async updateContentTransferSetup(data: any) {
     try {
-      const result = await axiosInstance.put(
-        `${BASE_PATH}/content-transfer-setup`,
-        data
-      );
+      const result = await axiosInstance.put(`${BASE_PATH}/content-transfer-setup`, data);
 
       return result.data;
     } catch (e) {
@@ -44,10 +38,7 @@ export default class PluginSettingsService {
 
   static async updatePluginSettings(data: any) {
     try {
-      const result = await axiosInstance.put(
-        `${BASE_PATH}/plugin-settings`,
-        data
-      );
+      const result = await axiosInstance.put(`${BASE_PATH}/plugin-settings`, data);
 
       return result.data;
     } catch (e) {

@@ -1,8 +1,7 @@
-/* eslint-disable no-useless-catch */
-import { createStrapiApiAxiosInstance } from "../../@common/api/strapi-api-base";
-import { LocalazyIdentity } from "../model/localazy-identity";
+import { createStrapiApiAxiosInstance } from '../../@common/api/strapi-api-base';
+import { LocalazyIdentity } from '../model/localazy-identity';
 
-const BASE_PATH = "/user";
+const BASE_PATH = '/user';
 const strapiApiInstance = createStrapiApiAxiosInstance();
 
 export default class LocalazyUserService {

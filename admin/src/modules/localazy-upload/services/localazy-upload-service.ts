@@ -1,7 +1,6 @@
-import { createStrapiApiAxiosInstance } from "../../@common/api/strapi-api-base";
+import { createStrapiApiAxiosInstance } from '../../@common/api/strapi-api-base';
 
-
-const BASE_PATH = "/transfer";
+const BASE_PATH = '/transfer';
 
 export default class LocalazyUploadService {
   static async upload(data = {}) {

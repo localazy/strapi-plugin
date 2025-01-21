@@ -1,18 +1,18 @@
-const ROUTE_PREFIX = "/transfer";
+const ROUTE_PREFIX = '/transfer';
 
 const LocalazyTransferRoutes = [
   {
-    method: "POST",
+    method: 'POST',
     path: `${ROUTE_PREFIX}/upload`,
-    handler: "LocalazyTransferController.upload",
+    handler: 'LocalazyTransferController.upload',
     config: {
       policies: [],
     },
   },
   {
-    method: "POST",
+    method: 'POST',
     path: `${ROUTE_PREFIX}/download`,
-    handler: "LocalazyTransferController.download",
+    handler: 'LocalazyTransferController.download',
     config: {
       policies: [],
     },

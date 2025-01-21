@@ -1,6 +1,6 @@
-import I18nService from "../services/i18n-service";
-import ProjectService from "../services/project-service";
-import { isoLocalazyToStrapi } from "./iso-locales-utils";
+import I18nService from '../services/i18n-service';
+import ProjectService from '../services/project-service';
+import { isoLocalazyToStrapi } from './iso-locales-utils';
 
 // TODO: ADD TYPES
 
@@ -23,9 +23,7 @@ export default async (defaultLocale: any = null, sourceLanguage: any = null) => 
       }
 
       const sourceLanguageId = connectedProject.sourceLanguage;
-      sourceLanguage = connectedProject.languages.find(
-        (language: any) => language.id === sourceLanguageId
-      );
+      sourceLanguage = connectedProject.languages.find((language: any) => language.id === sourceLanguageId);
     }
 
     if (!sourceLanguage) {

@@ -59,7 +59,6 @@ const bootstrap = ({ strapi }: { strapi: Core.Strapi }) => {
     // TODO: implement sockets
     // const StrapiIOInstance = await strapio(strapi);
     // console.log('StrapiIOInstance', StrapiIOInstance);
-
     // strapi.StrapIO = StrapiIOInstance;
   });
 };

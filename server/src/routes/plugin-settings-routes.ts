@@ -1,38 +1,38 @@
-const ROUTE_PREFIX = "/plugin-settings";
+const ROUTE_PREFIX = '/plugin-settings';
 
 const PluginSettingsRoutes = [
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}/content-transfer-setup`,
-    handler: "PluginSettingsController.getContentTransferSetup",
+    handler: 'PluginSettingsController.getContentTransferSetup',
     config: {
       policies: [],
     },
   },
   {
-    method: "PUT",
+    method: 'PUT',
     path: `${ROUTE_PREFIX}/content-transfer-setup`,
-    handler: "PluginSettingsController.updateContentTransferSetup",
+    handler: 'PluginSettingsController.updateContentTransferSetup',
     config: {
       policies: [],
     },
   },
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}/plugin-settings`,
-    handler: "PluginSettingsController.getPluginSettings",
+    handler: 'PluginSettingsController.getPluginSettings',
     config: {
       policies: [],
     },
   },
   {
-    method: "PUT",
+    method: 'PUT',
     path: `${ROUTE_PREFIX}/plugin-settings`,
-    handler: "PluginSettingsController.updatePluginSettings",
+    handler: 'PluginSettingsController.updatePluginSettings',
     config: {
       policies: [],
     },
-  }
+  },
 ];
 
 export default PluginSettingsRoutes;

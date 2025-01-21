@@ -1,13 +1,13 @@
 // TODO: ADD TYPES
 
 enum SUPPORTED_MODEL_TYPES {
-  contentType = "contentType",
-  component = "component",
+  contentType = 'contentType',
+  component = 'component',
 }
 
 enum UNSUPPORTED_UID_PREFIXES {
-  strapi = "strapi::core",
-  usersPermissions = "plugin::users-permissions.user",
+  strapi = 'strapi::core',
+  usersPermissions = 'plugin::users-permissions.user',
 }
 
 const isGenerallyApplicableContentType = (model: any) => {
@@ -22,14 +22,14 @@ const isGenerallyApplicableContentType = (model: any) => {
   }
 
   // is not applicable
-  // eslint-disable-next-line no-underscore-dangle
+
   if (!model.__schema__) {
     return false;
   }
 
   if (model.pluginOptions) {
-    if (model.pluginOptions["content-type-builder"]) {
-      return model.pluginOptions["content-type-builder"].visible;
+    if (model.pluginOptions['content-type-builder']) {
+      return model.pluginOptions['content-type-builder'].visible;
     }
   }
 

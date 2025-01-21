@@ -3,7 +3,7 @@ const isoStrapiToLocalazy = (isoStrapi) => {
     return null;
   }
 
-  const split = isoStrapi.split("-");
+  const split = isoStrapi.split('-');
   const language = split[0];
 
   const hasRegionAndScript = split.length === 3;
@@ -24,7 +24,7 @@ const isoStrapiToLocalazy = (isoStrapi) => {
     return isItRegion ? `${language}_${regionOrScript}` : `${language}#${regionOrScript}`;
   }
 
-  return isoStrapi.replace("-", "_");
+  return isoStrapi.replace('-', '_');
 };
 
 const isoLocalazyToStrapi = (isoLocalazy) => {
@@ -32,12 +32,12 @@ const isoLocalazyToStrapi = (isoLocalazy) => {
     return null;
   }
 
-  const scriptIndex = isoLocalazy.indexOf("#");
+  const scriptIndex = isoLocalazy.indexOf('#');
   const hasScript = scriptIndex > -1;
   if (hasScript) {
     const script = isoLocalazy.substring(scriptIndex + 1);
     const isoLocalazyWithoutScript = isoLocalazy.substring(0, scriptIndex);
-    const split = isoLocalazyWithoutScript.split("_");
+    const split = isoLocalazyWithoutScript.split('_');
     const language = split[0];
     const region = split[1];
 
@@ -49,7 +49,7 @@ const isoLocalazyToStrapi = (isoLocalazy) => {
     return isoStrapi;
   }
 
-  return isoLocalazy.replace("_", "-");
+  return isoLocalazy.replace('_', '-');
 };
 
 export { isoStrapiToLocalazy, isoLocalazyToStrapi };

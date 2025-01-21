@@ -1,6 +1,6 @@
-import { Core } from "@strapi/strapi";
-import LocalazyApiClientFactory from "../utils/localazy-api-client-factory";
-import config from "../config";
+import { Core } from '@strapi/strapi';
+import LocalazyApiClientFactory from '../utils/localazy-api-client-factory';
+import config from '../config';
 
 const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async listFiles(projectId) {
@@ -50,7 +50,7 @@ const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
     const result = await LocalazyApi.webhooks.getSecret({ project: projectId });
 
     return result;
-  }
+  },
 });
 
 export default LocalazyPubAPIService;

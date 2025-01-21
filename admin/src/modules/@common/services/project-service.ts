@@ -1,6 +1,5 @@
-/* eslint-disable no-useless-catch */
-import { createStrapiApiAxiosInstance } from "../api/strapi-api-base";
-import { Project } from "@localazy/api-client";
+import { createStrapiApiAxiosInstance } from '../api/strapi-api-base';
+import { Project } from '@localazy/api-client';
 
 const strapiApiInstance = createStrapiApiAxiosInstance();
 export default class ProjectService {

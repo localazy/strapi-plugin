@@ -1,4 +1,4 @@
-export const KEY = "plugin-settings";
+export const KEY = 'plugin-settings';
 
 export type PluginSettings = {
   defaultRoute: string | null;

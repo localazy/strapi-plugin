@@ -2,7 +2,7 @@ import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
 import Localazy from './modules/@common/components/Icons/Localazy';
-import FetchIdentity from "./modules/login/components/FetchIdentity";
+import FetchIdentity from './modules/login/components/FetchIdentity';
 import React from 'react';
 
 export default {
@@ -40,24 +40,17 @@ const addMenuLink = (app: any) => {
       const { LocalazyIdentityProvider } = await import('./state/localazy-identity');
 
       const WrappedApp = () =>
-        React.createElement(
-          LocalazyIdentityProvider,
-          {
-            children: React.createElement(
-              React.Fragment,
-              {},
-              [
-                React.createElement(FetchIdentity, {}),
-                React.createElement(App, {})
-              ]
-            )
-          }
-        );
+        React.createElement(LocalazyIdentityProvider, {
+          children: React.createElement(React.Fragment, {}, [
+            React.createElement(FetchIdentity, {}),
+            React.createElement(App, {}),
+          ]),
+        });
 
       return WrappedApp;
     },
   });
-}
+};
 
 const addSettingsSection = (app: any) => {
   app.createSettingSection(
@@ -78,14 +71,11 @@ const addSettingsSection = (app: any) => {
         },
         to: `/settings/${PLUGIN_ID}/global-settings`,
         Component: async () => {
-          const { GlobalSettings } = await import("./pages/GlobalSettings");
-          const { LocalazyIdentityProvider } = await import("./state/localazy-identity");
+          const { GlobalSettings } = await import('./pages/GlobalSettings');
+          const { LocalazyIdentityProvider } = await import('./state/localazy-identity');
 
           const WrappedGlobalSettings = () =>
-            React.createElement(
-              LocalazyIdentityProvider,
-              { children: React.createElement(GlobalSettings, {}) }
-            );
+            React.createElement(LocalazyIdentityProvider, { children: React.createElement(GlobalSettings, {}) });
 
           return WrappedGlobalSettings;
         },
@@ -100,17 +90,16 @@ const addSettingsSection = (app: any) => {
         },
         to: `/settings/${PLUGIN_ID}/content-transfer-setup`,
         Component: async () => {
-          const { ContentTransferSetup } = await import("./pages/ContentTransferSetup");
-          const { LocalazyIdentityProvider } = await import("./state/localazy-identity");
+          const { ContentTransferSetup } = await import('./pages/ContentTransferSetup');
+          const { LocalazyIdentityProvider } = await import('./state/localazy-identity');
 
           const WrappedContentTransferSetup = () =>
-            React.createElement(
-              LocalazyIdentityProvider,
-              { children: React.createElement(React.Fragment, {}, [
+            React.createElement(LocalazyIdentityProvider, {
+              children: React.createElement(React.Fragment, {}, [
                 React.createElement(FetchIdentity, {}),
-                React.createElement(ContentTransferSetup, {})
-              ]) }
-            );
+                React.createElement(ContentTransferSetup, {}),
+              ]),
+            });
 
           return WrappedContentTransferSetup;
         },
@@ -118,7 +107,7 @@ const addSettingsSection = (app: any) => {
       },
     ]
   );
-}
+};
 
 const addPlugin = (app: any) => {
   app.registerPlugin({
@@ -127,4 +116,4 @@ const addPlugin = (app: any) => {
     isReady: false,
     name: PLUGIN_ID,
   });
-}
+};

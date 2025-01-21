@@ -1,8 +1,8 @@
-import { Core } from "@strapi/strapi";
+import { Core } from '@strapi/strapi';
 
-import {KEY as CONTENT_TRANSFER_SETUP_KEY, emptyContentTransferSetup} from "../db/model/content-transfer-setup";
-import {KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings} from "../db/model/plugin-settings";
-import getStrapiStore from "../db/model/utils/get-strapi-store";
+import { KEY as CONTENT_TRANSFER_SETUP_KEY, emptyContentTransferSetup } from '../db/model/content-transfer-setup';
+import { KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings } from '../db/model/plugin-settings';
+import getStrapiStore from '../db/model/utils/get-strapi-store';
 
 const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getContentTransferSetup() {
@@ -28,7 +28,7 @@ const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
 
   async getPluginSettings(): Promise<PluginSettings> {
     const pluginStore = getStrapiStore(strapi);
-    const settings = await pluginStore.get({ key: PLUGIN_SETTINGS_KEY }) as PluginSettings;
+    const settings = (await pluginStore.get({ key: PLUGIN_SETTINGS_KEY })) as PluginSettings;
 
     return settings || emptyPluginSettings;
   },

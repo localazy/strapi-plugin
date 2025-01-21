@@ -1,6 +1,6 @@
-import prodConfig from "./production";
-import localConfig from "./local";
-import devConfig from "./development";
+import prodConfig from './production';
+import localConfig from './local';
+import devConfig from './development';
 
 type Config = {
   LOCALAZY_OAUTH_URL: string;
@@ -21,11 +21,11 @@ const loadConfig = (): Config => {
   // depending on the STRAPI_ADMIN_LOCALAZY_ENV, use the correct config
   let config = prodConfig;
 
-  if (process.env.STRAPI_ADMIN_LOCALAZY_ENV === "local") {
+  if (process.env.STRAPI_ADMIN_LOCALAZY_ENV === 'local') {
     config = localConfig;
   }
 
-  if (process.env.STRAPI_ADMIN_LOCALAZY_ENV === "development") {
+  if (process.env.STRAPI_ADMIN_LOCALAZY_ENV === 'development') {
     config = devConfig;
   }
 

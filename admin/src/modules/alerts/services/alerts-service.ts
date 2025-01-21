@@ -1,12 +1,12 @@
-import SocketIoClient from "socket.io-client";
-import { LOCALAZY_PLUGIN_CHANNEL } from "../constants/channels";
+import SocketIoClient from 'socket.io-client';
+import { LOCALAZY_PLUGIN_CHANNEL } from '../constants/channels';
 
 // TODO: ADD TYPES
 
 export default class AlertsService {
   _client: any;
 
-  _streamIdentifier: string = "";
+  _streamIdentifier: string = '';
 
   constructor() {
     const uri = process.env.STRAPI_ADMIN_BACKEND_URL;
@@ -33,7 +33,7 @@ export default class AlertsService {
   }
 
   subscribe(channel = null) {
-    this._client.emit("subscribe", channel || LOCALAZY_PLUGIN_CHANNEL);
+    this._client.emit('subscribe', channel || LOCALAZY_PLUGIN_CHANNEL);
   }
 
   on(event: string, callback: any) {

@@ -1,5 +1,5 @@
-import AlertsService from "../../alerts/services/alerts-service";
-import { UPLOAD_EVENT, UPLOAD_FINISHED_EVENT } from "../../alerts/constants/events";
+import AlertsService from '../../alerts/services/alerts-service';
+import { UPLOAD_EVENT, UPLOAD_FINISHED_EVENT } from '../../alerts/constants/events';
 
 // TODO: ADD TYPES
 

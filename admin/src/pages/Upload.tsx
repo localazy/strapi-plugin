@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Layouts } from "@strapi/strapi/admin";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import { Layouts } from '@strapi/strapi/admin';
+import { useTranslation } from 'react-i18next';
 import { Grid, Flex, Divider, Button, Box, Alert } from '@strapi/design-system';
-import { Upload as UploadIcon } from "@strapi/icons";
-import Loader from "../modules/@common/components/PluginPageLoader";
-import LocalazyUploadService from "../modules/localazy-upload/services/localazy-upload-service";
-import areLocalesCompatible from "../modules/@common/utils/are-locales-compatible";
-import { getStrapiDefaultLocale, getLocalazySourceLanguage } from "../modules/@common/utils/get-default-locale";
-import hasModelChanged from "../modules/plugin-settings/functions/has-model-changed";
-import { TransferReport } from "../modules/@common/components/TransferReport";
-import OverviewItem from "../modules/overview/components/OverviewItem";
-import PrerequisitiesInfo from "../modules/overview/components/PrerequisitiesInfo";
-import { ReadDocsButton } from "../modules/localazy-upload/components/ReadDocsButton";
-import { PLUGIN_ROUTES } from "../modules/@common/utils/redirect-to-plugin-route";
-import { useLocalazyIdentity } from "../state/localazy-identity";
-import ProductAnalyticsService from "../modules/@common/services/product-analytics-service";
-import PluginSettingsService from "../modules/plugin-settings/services/plugin-settings-service";
-import UploadAlertsService from "../modules/localazy-upload/services/upload-alerts-service";
-import { useRedirectToPluginRoute } from "../modules/@common/utils/redirect-to-plugin-route";
+import { Upload as UploadIcon } from '@strapi/icons';
+import Loader from '../modules/@common/components/PluginPageLoader';
+import LocalazyUploadService from '../modules/localazy-upload/services/localazy-upload-service';
+import areLocalesCompatible from '../modules/@common/utils/are-locales-compatible';
+import { getStrapiDefaultLocale, getLocalazySourceLanguage } from '../modules/@common/utils/get-default-locale';
+import hasModelChanged from '../modules/plugin-settings/functions/has-model-changed';
+import { TransferReport } from '../modules/@common/components/TransferReport';
+import OverviewItem from '../modules/overview/components/OverviewItem';
+import PrerequisitiesInfo from '../modules/overview/components/PrerequisitiesInfo';
+import { ReadDocsButton } from '../modules/localazy-upload/components/ReadDocsButton';
+import { PLUGIN_ROUTES } from '../modules/@common/utils/redirect-to-plugin-route';
+import { useLocalazyIdentity } from '../state/localazy-identity';
+import ProductAnalyticsService from '../modules/@common/services/product-analytics-service';
+import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
+import UploadAlertsService from '../modules/localazy-upload/services/upload-alerts-service';
+import { useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
 
 // TODO: ADD TYPES
 
@@ -31,8 +31,8 @@ interface UploadProps {
 
 const Upload: React.FC<UploadProps> = (props: UploadProps) => {
   const { t } = useTranslation();
-  const {identity} = useLocalazyIdentity();
-  const {navigateToPluginRoute} = useRedirectToPluginRoute();
+  const { identity } = useLocalazyIdentity();
+  const { navigateToPluginRoute } = useRedirectToPluginRoute();
   /**
    * Component state
    */
@@ -68,32 +68,22 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
     uploadAlertsService.onUpload((data: any) => {
       setUploadResult((old: any) => ({
         success: data.success,
-        report: [
-          ...old.report || [],
-          data.message,
-        ],
+        report: [...(old.report || []), data.message],
       }));
     });
     uploadAlertsService.onUploadFinished((data: any) => {
       setUploadResult((old: any) => ({
         success: data.success,
-        report: [
-          ...old.report || [],
-          data.message,
-        ],
+        report: [...(old.report || []), data.message],
       }));
       setIsUploading(false);
       setShowUploadFinishedModal(true);
     });
 
     // track upload
-    ProductAnalyticsService.trackUploadToLocalazy(
-      identity.user.id,
-      identity.project,
-      {
-        "Source Language Code": localazySourceLanguage.code,
-      }
-    );
+    ProductAnalyticsService.trackUploadToLocalazy(identity.user.id, identity.project, {
+      'Source Language Code': localazySourceLanguage.code,
+    });
   };
 
   useEffect(() => {
@@ -123,59 +113,52 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
       <Layouts.Header
         title={props.title}
         subtitle={props.subtitle}
-        primaryAction={<Button
-          startIcon={<UploadIcon />}
-          disabled={isLoading || modelChanged || localesIncompatible}
-          loading={isUploading}
-          onClick={onUploadClick}
-        >
-          {t("upload.upload_to_localazy")}
-        </Button>}
-        as="h2"
+        primaryAction={
+          <Button
+            startIcon={<UploadIcon />}
+            disabled={isLoading || modelChanged || localesIncompatible}
+            loading={isUploading}
+            onClick={onUploadClick}
+          >
+            {t('upload.upload_to_localazy')}
+          </Button>
+        }
+        as='h2'
       />
-      {isLoading && <Loader/>}
+      {isLoading && <Loader />}
       {!isLoading && (
         <Box paddingRight={10} paddingLeft={10}>
           <Box
-            background="neutral0"
+            background='neutral0'
             paddingTop={6}
             paddingRight={7}
             paddingBottom={6}
             paddingLeft={7}
             hasRadius
-            shadow="tableShadow"
+            shadow='tableShadow'
           >
             <Grid.Root
               gap={{
                 desktop: 5,
                 tablet: 2,
-                mobile: 1
+                mobile: 1,
               }}
             >
               <Grid.Item>
-                <OverviewItem
-                  label={t("upload.default_strapi_language")}
-                  value={strapiDefaultLocale.name}
-                />
+                <OverviewItem label={t('upload.default_strapi_language')} value={strapiDefaultLocale.name} />
               </Grid.Item>
               <Grid.Item>
-                <OverviewItem
-                  label={t("upload.localazy_source_language")}
-                  value={localazySourceLanguage.name}
-                />
+                <OverviewItem label={t('upload.localazy_source_language')} value={localazySourceLanguage.name} />
               </Grid.Item>
             </Grid.Root>
-            <Box
-              paddingTop={4}
-              paddingBottom={4}
-            >
+            <Box paddingTop={4} paddingBottom={4}>
               <Divider />
             </Box>
             <PrerequisitiesInfo />
             <Box marginTop={4}>
-              <Flex gap="2">
-                <Button variant="secondary" onClick={onChangeSettingsClick}>
-                  {t("upload.change_settings")}
+              <Flex gap='2'>
+                <Button variant='secondary' onClick={onChangeSettingsClick}>
+                  {t('upload.change_settings')}
                 </Button>
                 <ReadDocsButton />
               </Flex>
@@ -185,23 +168,18 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
             <Box marginTop={4} marginBottom={4}>
               <Alert
                 onClose={() => setShowUploadFinishedModal(false)}
-                closeLabel={t("upload.close")}
-                title={t("upload.upload_result")}
-                variant={uploadResult.success ? "success" : "danger"}
+                closeLabel={t('upload.close')}
+                title={t('upload.upload_result')}
+                variant={uploadResult.success ? 'success' : 'danger'}
               >
-                {uploadResult.success
-                  ? t("upload.upload_success")
-                  : t("upload.upload_failed")}
+                {uploadResult.success ? t('upload.upload_success') : t('upload.upload_failed')}
               </Alert>
             </Box>
           )}
           {isUploading && (
             <Box marginTop={4} marginBottom={4}>
-              <Alert
-                title={t("upload.upload_in_progress")}
-                variant="warning"
-              >
-                {t("upload.to_see_to_progress")}
+              <Alert title={t('upload.upload_in_progress')} variant='warning'>
+                {t('upload.to_see_to_progress')}
               </Alert>
             </Box>
           )}
@@ -209,11 +187,11 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
             <Box marginTop={4} marginBottom={4}>
               <Alert
                 onClose={() => setLocalesIncompatible(false)}
-                closeLabel={t("upload.close")}
-                title={t("upload.languages_incompatible")}
-                variant="danger"
+                closeLabel={t('upload.close')}
+                title={t('upload.languages_incompatible')}
+                variant='danger'
               >
-                {t("upload.languages_incompatible_message")}
+                {t('upload.languages_incompatible_message')}
               </Alert>
             </Box>
           )}
@@ -221,21 +199,19 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
             <Box marginTop={4} marginBottom={4}>
               <Alert
                 onClose={() => setModelChanged(false)}
-                closeLabel={t("upload.close")}
-                title={t("upload.content_types_model_changed")}
-                variant="default"
+                closeLabel={t('upload.close')}
+                title={t('upload.content_types_model_changed')}
+                variant='default'
               >
-                {t("upload.please_update_your_content")}
+                {t('upload.please_update_your_content')}
               </Alert>
             </Box>
           )}
-          {uploadResult.report && uploadResult.report.length > 0 && (
-            <TransferReport report={uploadResult.report} />
-          )}
+          {uploadResult.report && uploadResult.report.length > 0 && <TransferReport report={uploadResult.report} />}
         </Box>
       )}
     </>
   );
-}
+};
 
 export { Upload };

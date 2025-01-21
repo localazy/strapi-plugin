@@ -1,5 +1,5 @@
-import { SUPPORTED_CONTENT_TYPE_FIELDS } from "../../@common/models/supported-content-type-fields";
-import { SUPPORTED_CUSTOM_FIELD_PLUGINS } from "../../@common/models/supported-custom-field-plugins";
+import { SUPPORTED_CONTENT_TYPE_FIELDS } from '../../@common/models/supported-content-type-fields';
+import { SUPPORTED_CUSTOM_FIELD_PLUGINS } from '../../@common/models/supported-custom-field-plugins';
 
 // TODO: ADD TYPES
 
@@ -15,8 +15,12 @@ export default (models: any[]) => {
       const type = model.__schema__.attributes[attributeKey].type;
       const customField = model.__schema__.attributes[attributeKey].customField;
 
-      if (!(SUPPORTED_CONTENT_TYPE_FIELDS.includes(type.toLowerCase())
-        || (type.toLowerCase() === "customfield" && SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(customField)))) {
+      if (
+        !(
+          SUPPORTED_CONTENT_TYPE_FIELDS.includes(type.toLowerCase()) ||
+          (type.toLowerCase() === 'customfield' && SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(customField))
+        )
+      ) {
         return null;
       }
 

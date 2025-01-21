@@ -1,8 +1,8 @@
-import cloneDeepWith from "lodash/cloneDeepWith";
+import cloneDeepWith from 'lodash/cloneDeepWith';
 
 const omitDeep = (collection: any, excludeKeys: any) => {
   function omitFn(value: any) {
-    if (value && typeof value === "object") {
+    if (value && typeof value === 'object') {
       excludeKeys.forEach((key: any) => {
         delete value[key];
       });
@@ -17,6 +17,6 @@ const omitDeep = (collection: any, excludeKeys: any) => {
     return clonedData;
   }
   return cloneDeepWith(collection, omitFn);
-}
+};
 
 export { omitDeep };

@@ -2,8 +2,8 @@
  * axios with a custom config.
  */
 
-import axios from "axios";
-import { PLUGIN_ID } from "../../../pluginId";
+import axios from 'axios';
+import { PLUGIN_ID } from '../../../pluginId';
 
 const BASE_PLUGIN_PATH = `/${PLUGIN_ID}`;
 
@@ -15,7 +15,7 @@ const getToken = (): string => {
 
   const parsedToken = JSON.parse(token);
   return parsedToken;
-}
+};
 
 const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   const token = getToken();
@@ -34,13 +34,13 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   instance.interceptors.request.use(
     async (config) => {
       config.headers.set({
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
         // Add this header to identify the request as initiated by the plugin
-        "X-Localazy-Initiated-By": "strapi-plugin-localazy",
+        'X-Localazy-Initiated-By': 'strapi-plugin-localazy',
       });
       if (token) {
-        config.headers.set("Authorization", `Bearer ${token}`);
+        config.headers.set('Authorization', `Bearer ${token}`);
       }
 
       return config;
@@ -68,7 +68,4 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   return instance;
 };
 
-export {
-  createStrapiApiAxiosInstance,
-  getToken,
-};
+export { createStrapiApiAxiosInstance, getToken };

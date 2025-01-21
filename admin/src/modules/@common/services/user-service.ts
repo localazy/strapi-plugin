@@ -1,7 +1,6 @@
-/* eslint-disable no-useless-catch */
-import { createStrapiApiAxiosInstance } from "../api/strapi-api-base";
+import { createStrapiApiAxiosInstance } from '../api/strapi-api-base';
 
-const BASE_PATH = "/user";
+const BASE_PATH = '/user';
 const strapiApiInstance = createStrapiApiAxiosInstance();
 export default class UserService {
   static async generateKeys() {

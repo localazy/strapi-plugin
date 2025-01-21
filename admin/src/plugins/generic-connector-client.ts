@@ -1,5 +1,5 @@
-import { GenericConnectorClient, Services } from "@localazy/generic-connector-client";
-import config from "../config/index";
+import { GenericConnectorClient, Services } from '@localazy/generic-connector-client';
+import config from '../config/index';
 
 const client = new GenericConnectorClient({
   pluginId: Services.STRAPI,

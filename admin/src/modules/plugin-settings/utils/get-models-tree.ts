@@ -1,5 +1,5 @@
-import { SUPPORTED_CONTENT_TYPE_FIELDS } from "../../@common/models/supported-content-type-fields";
-import { SUPPORTED_CUSTOM_FIELD_PLUGINS } from "../../@common/models/supported-custom-field-plugins";
+import { SUPPORTED_CONTENT_TYPE_FIELDS } from '../../@common/models/supported-content-type-fields';
+import { SUPPORTED_CUSTOM_FIELD_PLUGINS } from '../../@common/models/supported-custom-field-plugins';
 
 // TODO: ADD TYPES
 
@@ -15,12 +15,10 @@ const getModelsTree = (allModels: any[], localizableModels: any[] = []) => {
     isComponentAttributesObjectTranslatable = null
   ) => {
     const currentModelTree: any = {};
-    // eslint-disable-next-line no-restricted-syntax
+
     for (const attribute in attributes) {
-      if (attributes[attribute].type === "component") {
-        const nestedModel = allModels.find(
-          (model) => model.uid === attributes[attribute].component
-        );
+      if (attributes[attribute].type === 'component') {
+        const nestedModel = allModels.find((model) => model.uid === attributes[attribute].component);
 
         currentModelTree[attribute] = {
           ...getModelTree(
@@ -31,7 +29,7 @@ const getModelsTree = (allModels: any[], localizableModels: any[] = []) => {
               : isComponentAttributesObjectTranslatable
           ),
         };
-      } else if (attributes[attribute].type === "dynamiczone") {
+      } else if (attributes[attribute].type === 'dynamiczone') {
         const components = attributes[attribute].components;
         currentModelTree[attribute] = [];
         components.forEach((c: string) => {
@@ -45,13 +43,15 @@ const getModelsTree = (allModels: any[], localizableModels: any[] = []) => {
               : isComponentAttributesObjectTranslatable
           );
           currentModelTree[attribute].push({
-            "__component__": c,
+            __component__: c,
             ...modelTree,
           });
         });
       } else if (
-        SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type)
-        || (attributes[attribute].type === "customField" && SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(attributes[attribute].customField))) {
+        SUPPORTED_CONTENT_TYPE_FIELDS.includes(attributes[attribute].type) ||
+        (attributes[attribute].type === 'customField' &&
+          SUPPORTED_CUSTOM_FIELD_PLUGINS.includes(attributes[attribute].customField))
+      ) {
         // field might not be localizable
         if (isComponentAttributes) {
           if (isComponentAttributesObjectTranslatable) {
@@ -77,7 +77,6 @@ const getModelsTree = (allModels: any[], localizableModels: any[] = []) => {
     return currentModelTree;
   };
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const model of localizableModels) {
     if (model.__schema__.collectionName) {
       const modelTree = {

@@ -1,10 +1,10 @@
-const ROUTE_PREFIX = "/project";
+const ROUTE_PREFIX = '/project';
 
 const LocalazyProjectRoutes = [
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}`,
-    handler: "LocalazyProjectController.getConnectedProject",
+    handler: 'LocalazyProjectController.getConnectedProject',
     config: {
       policies: [],
     },

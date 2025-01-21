@@ -1,4 +1,3 @@
-
 import LocalazyUserController from './localazy-user-controller';
 import LocalazyAuthController from './localazy-auth-controller';
 import StrapiController from './strapi-controller';

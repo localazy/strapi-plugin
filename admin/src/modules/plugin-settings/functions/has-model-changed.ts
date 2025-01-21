@@ -1,9 +1,9 @@
-import get from "lodash-es/get";
-import PluginSettingsService from "../services/plugin-settings-service";
-import StrapiModelService from "../services/strapi-model-service";
-import getModelsTree from "../utils/get-models-tree";
-import findModelValueByKey from "../utils/find-model-value-by-key";
-import getContentTransferSetupKeysSets from "./get-content-transfer-setup-keys-sets";
+import get from 'lodash-es/get';
+import PluginSettingsService from '../services/plugin-settings-service';
+import StrapiModelService from '../services/strapi-model-service';
+import getModelsTree from '../utils/get-models-tree';
+import findModelValueByKey from '../utils/find-model-value-by-key';
+import getContentTransferSetupKeysSets from './get-content-transfer-setup-keys-sets';
 
 // TODO: ADD TYPES
 
@@ -28,22 +28,16 @@ export default async (
   }
 
   if (!storedSetupSchema) {
-    storedSetupSchema = (await PluginSettingsService.getContentTransferSetup())
-      .setup;
+    storedSetupSchema = (await PluginSettingsService.getContentTransferSetup()).setup;
   }
 
   if (!allModelsTree) {
     allModelsTree = getModelsTree(models, models);
   }
 
-  const {
-    oStoredSetupSchema,
-    removedKeys,
-    newKeys,
-    filteredStoredSetupSchemaKeys
-  } = getContentTransferSetupKeysSets(
+  const { oStoredSetupSchema, removedKeys, newKeys, filteredStoredSetupSchemaKeys } = getContentTransferSetupKeysSets(
     localizableTree,
-    storedSetupSchema || [],
+    storedSetupSchema || []
   );
 
   if (newKeys.length || removedKeys.length) {
@@ -53,22 +47,16 @@ export default async (
   /**
    * Check if the values are different (type might have changed; boolean to null or vice versa)
    */
-  // eslint-disable-next-line no-restricted-syntax
+
   for (const key of filteredStoredSetupSchemaKeys) {
     const localizableTreeValueToSet = get(oStoredSetupSchema, key);
     const allModelsTreeValueToSet = findModelValueByKey(allModelsTree, key);
 
-    if (
-      typeof localizableTreeValueToSet === "boolean" &&
-      allModelsTreeValueToSet === null
-    ) {
+    if (typeof localizableTreeValueToSet === 'boolean' && allModelsTreeValueToSet === null) {
       return true;
     }
 
-    if (
-      localizableTreeValueToSet === null &&
-      typeof allModelsTreeValueToSet === "boolean"
-    ) {
+    if (localizableTreeValueToSet === null && typeof allModelsTreeValueToSet === 'boolean') {
       return true;
     }
   }

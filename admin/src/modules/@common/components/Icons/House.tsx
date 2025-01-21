@@ -1,5 +1,5 @@
-import { House } from "@strapi/icons";
+import { House } from '@strapi/icons';
 
-const HouseIcon = () => <House />
+const HouseIcon = () => <House />;
 
 export { HouseIcon };

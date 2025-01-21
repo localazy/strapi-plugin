@@ -1,26 +1,26 @@
-const ROUTE_PREFIX = "/user";
+const ROUTE_PREFIX = '/user';
 
 const LocalazyUserRoutes = [
   {
-    method: "GET",
+    method: 'GET',
     path: `${ROUTE_PREFIX}`,
-    handler: "LocalazyUserController.getUser",
+    handler: 'LocalazyUserController.getUser',
     config: {
       policies: [],
     },
   },
   {
-    method: "PUT",
+    method: 'PUT',
     path: `${ROUTE_PREFIX}`,
-    handler: "LocalazyUserController.updateUser",
+    handler: 'LocalazyUserController.updateUser',
     config: {
       policies: [],
     },
   },
   {
-    method: "DELETE",
+    method: 'DELETE',
     path: `${ROUTE_PREFIX}`,
-    handler: "LocalazyUserController.deleteUser",
+    handler: 'LocalazyUserController.deleteUser',
     config: {
       policies: [],
     },

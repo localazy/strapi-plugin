@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import isEqual from "lodash-es/isEqual";
-import cloneDeep from "lodash-es/cloneDeep";
-import { Layouts } from "@strapi/strapi/admin";
-import { Check } from "@strapi/icons";
-import { Box, Button, Alert, Flex, Divider, Typography } from "@strapi/design-system";
-import set from "lodash-es/set";
-import get from "lodash-es/get";
-import PluginSettingsService from "../modules/plugin-settings/services/plugin-settings-service";
-import StrapiModelService from "../modules/plugin-settings/services/strapi-model-service";
-import getFilteredModelsSchemas from "../modules/plugin-settings/utils/get-filtered-models-schemas";
-import getModelsTree from "../modules/plugin-settings/utils/get-models-tree";
-import hasModelChanged from "../modules/plugin-settings/functions/has-model-changed";
-import buildContentTransferSetupSchema from "../modules/plugin-settings/functions/build-content-transfer-setup-schema";
-import { Tree } from "../modules/plugin-settings/components/Tree";
-import { ContentTransferSetupEmpty } from "../modules/plugin-settings/components/ContentTransferSetupEmpty";
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import isEqual from 'lodash-es/isEqual';
+import cloneDeep from 'lodash-es/cloneDeep';
+import { Layouts } from '@strapi/strapi/admin';
+import { Check } from '@strapi/icons';
+import { Box, Button, Alert, Flex, Divider, Typography } from '@strapi/design-system';
+import set from 'lodash-es/set';
+import get from 'lodash-es/get';
+import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
+import StrapiModelService from '../modules/plugin-settings/services/strapi-model-service';
+import getFilteredModelsSchemas from '../modules/plugin-settings/utils/get-filtered-models-schemas';
+import getModelsTree from '../modules/plugin-settings/utils/get-models-tree';
+import hasModelChanged from '../modules/plugin-settings/functions/has-model-changed';
+import buildContentTransferSetupSchema from '../modules/plugin-settings/functions/build-content-transfer-setup-schema';
+import { Tree } from '../modules/plugin-settings/components/Tree';
+import { ContentTransferSetupEmpty } from '../modules/plugin-settings/components/ContentTransferSetupEmpty';
 
 // import and load resources
 import '../i18n';
@@ -62,7 +62,7 @@ const ContentTransferSetup: React.FC = () => {
   const onCancelClick = () => {
     setFormModel(cloneDeep(originalFormModel));
     setHasUnsavedChanges(false);
-  }
+  };
 
   /**
    * Save the content transfer setup
@@ -80,11 +80,11 @@ const ContentTransferSetup: React.FC = () => {
   };
 
   const onTreeItemClick = (keys: any, currentValue: any) => {
-    console.log("keys", keys);
-    console.log("currentValue", currentValue);
+    console.log('keys', keys);
+    console.log('currentValue', currentValue);
     setFormModel((prevState: any) => {
       // model of a subtree is the same for each of the keys
-      const modelName = keys[0].split(".")[0];
+      const modelName = keys[0].split('.')[0];
       let arrayIndex;
       const model = prevState.find((m: any, index: any) => {
         if (Object.keys(m).includes(modelName)) {
@@ -103,7 +103,7 @@ const ContentTransferSetup: React.FC = () => {
       const newState = cloneDeep(prevState);
       keys.forEach((key: any) => {
         // * if there's a "__component__" in the key; skip
-        if (key.includes("__component__")) {
+        if (key.includes('__component__')) {
           return;
         }
 
@@ -120,9 +120,9 @@ const ContentTransferSetup: React.FC = () => {
     });
   };
 
-  const link = "https://localazy.com/docs/strapi";
+  const link = 'https://localazy.com/docs/strapi';
   const onReadDocumentationClick = () => {
-    window.open(link, "_blank");
+    window.open(link, '_blank');
   };
 
   useEffect(() => {
@@ -140,8 +140,7 @@ const ContentTransferSetup: React.FC = () => {
       /**
        * Fetch stored content transfer setup
        */
-      const storedContentTransferSetup =
-        await PluginSettingsService.getContentTransferSetup();
+      const storedContentTransferSetup = await PluginSettingsService.getContentTransferSetup();
 
       /**
        * Build and set accordion expanded state model
@@ -153,7 +152,6 @@ const ContentTransferSetup: React.FC = () => {
        * Build and set form model
        */
       const allModelsTree = getModelsTree(models, models);
-
 
       const localizableTree = getModelsTree(models, localizableModels);
       setTreeModelsSchemas(localizableTree as any);
@@ -167,7 +165,7 @@ const ContentTransferSetup: React.FC = () => {
       setFormModel(computedFormModel as any);
       setOriginalFormModel(cloneDeep(computedFormModel as any));
 
-      console.log("computedFormModel");
+      console.log('computedFormModel');
       console.log(computedFormModel);
 
       /**
@@ -175,49 +173,46 @@ const ContentTransferSetup: React.FC = () => {
        */
       const localHasModelChanged = await hasModelChanged(localizableTree, storedContentTransferSetup.setup);
       setShowModalChangedAlert(localHasModelChanged);
-      setHasUnsavedChanges(localHasModelChanged)
+      setHasUnsavedChanges(localHasModelChanged);
 
       setIsLoading(false);
     }
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <Layouts.Header
-        title={t("plugin_settings.content_transfer_setup")}
-        subtitle={t("plugin_settings.content_transfer_setup_description")}
+        title={t('plugin_settings.content_transfer_setup')}
+        subtitle={t('plugin_settings.content_transfer_setup_description')}
         primaryAction={
           <Flex gap={2}>
-            <Button
-              variant="secondary"
-              disabled={!hasUnsavedChanges}
-              onClick={onCancelClick}
-            >
-              {t("plugin_settings.cancel")}
+            <Button variant='secondary' disabled={!hasUnsavedChanges} onClick={onCancelClick}>
+              {t('plugin_settings.cancel')}
             </Button>
             <Button
               startIcon={<Check />}
               disabled={!hasUnsavedChanges}
-              onClick={() => { saveContentTransferSetup(formModel) }}
+              onClick={() => {
+                saveContentTransferSetup(formModel);
+              }}
             >
-              {t("plugin_settings.save")}
+              {t('plugin_settings.save')}
             </Button>
           </Flex>
         }
-        as="h2"
+        as='h2'
       />
       <Box marginRight={10} marginLeft={10}>
         {!isLoading && showAlert && (
           <Box marginBottom={8}>
             <Alert
               onClose={() => setShowAlert(false)}
-              closeLabel={t("plugin_settings.close")}
-              title={t("plugin_settings.content_transfer_setup_saved")}
-              variant="success"
+              closeLabel={t('plugin_settings.close')}
+              title={t('plugin_settings.content_transfer_setup_saved')}
+              variant='success'
             >
-              {t("plugin_settings.content_transfer_setup_saved_successfully")}
+              {t('plugin_settings.content_transfer_setup_saved_successfully')}
             </Alert>
           </Box>
         )}
@@ -225,60 +220,47 @@ const ContentTransferSetup: React.FC = () => {
           <Box marginBottom={8}>
             <Alert
               onClose={() => setShowModalChangedAlert(false)}
-              closeLabel={t("plugin_settings.close")}
-              title={t("plugin_settings.content_types_model_changed")}
-              variant="default"
+              closeLabel={t('plugin_settings.close')}
+              title={t('plugin_settings.content_types_model_changed')}
+              variant='default'
             >
-              {t("plugin_settings.please_update_your_content")}
+              {t('plugin_settings.please_update_your_content')}
             </Alert>
           </Box>
         )}
         {!isLoading && (
-          <Box
-            background="neutral0"
-            padding={7}
-            paddingTop={6}
-            shadow="tableShadow"
-            hasRadius
-          >
+          <Box background='neutral0' padding={7} paddingTop={6} shadow='tableShadow' hasRadius>
             {!formModel.length && (
               // empty state
               <ContentTransferSetupEmpty />
             )}
             {formModel.map((tree, index) => {
               return (
-                <Box
-                  key={`box_tree_${index}`}
-                  marginBottom={3}
-                >
-                  <Tree
-                    onTreeItemClick={onTreeItemClick}
-                    objects={tree}
-                    initiallyExpanded={index === 0} />
+                <Box key={`box_tree_${index}`} marginBottom={3}>
+                  <Tree onTreeItemClick={onTreeItemClick} objects={tree} initiallyExpanded={index === 0} />
                 </Box>
               );
             })}
             {!!formModel.length && (
               <Box>
-                <Box
-                  paddingTop={6}
-                  paddingBottom={6}
-                >
+                <Box paddingTop={6} paddingBottom={6}>
                   <Divider />
                 </Box>
-                <Typography variant="omega">{t("plugin_settings.you_can_upload_download")}</Typography>
-                <Typography variant="omega" fontWeight="semiBold">{t("plugin_settings.only_text_based_content")}</Typography>
+                <Typography variant='omega'>{t('plugin_settings.you_can_upload_download')}</Typography>
+                <Typography variant='omega' fontWeight='semiBold'>
+                  {t('plugin_settings.only_text_based_content')}
+                </Typography>
                 <br />
                 <br />
-                <Typography variant="omega">{t("plugin_settings.learn_more_in_docs_message_a")}</Typography>
+                <Typography variant='omega'>{t('plugin_settings.learn_more_in_docs_message_a')}</Typography>
                 <Typography
                   onClick={onReadDocumentationClick}
-                  variant="omega"
-                  fontWeight="semiBold"
-                  textColor="primary600"
-                  style={{ cursor: "pointer" }}
+                  variant='omega'
+                  fontWeight='semiBold'
+                  textColor='primary600'
+                  style={{ cursor: 'pointer' }}
                 >
-                  {t("plugin_settings.learn_more_in_docs_message_b")}
+                  {t('plugin_settings.learn_more_in_docs_message_b')}
                 </Typography>
               </Box>
             )}
@@ -287,6 +269,6 @@ const ContentTransferSetup: React.FC = () => {
       </Box>
     </>
   );
-}
+};
 
 export { ContentTransferSetup };

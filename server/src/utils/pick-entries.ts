@@ -6,17 +6,13 @@ const isDynamicZoneKey = (key) => {
 const pickEntries = (flatten, pickPaths) => {
   // * Dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
   const pickedEntries = {};
-  const mappedPickPaths = pickPaths.map((pickPath) =>
-    pickPath.replace(/\[\d+\]/g, "")
-  );
+  const mappedPickPaths = pickPaths.map((pickPath) => pickPath.replace(/\[\d+\]/g, ''));
 
   // filter out "__component"
-  const filteredFlatten = Object.fromEntries(
-    Object.entries(flatten).filter(([key]) => !key.includes("__component"))
-  );
+  const filteredFlatten = Object.fromEntries(Object.entries(flatten).filter(([key]) => !key.includes('__component')));
   Object.keys(filteredFlatten).forEach((key) => {
     let filteredKey = key;
-    filteredKey = filteredKey.replace(/\[\d+\]/g, "");
+    filteredKey = filteredKey.replace(/\[\d+\]/g, '');
     if (isDynamicZoneKey(key)) {
       filteredKey = filteredKey.replace(/\[\d+;[\w-]+\./g, `[`);
     }

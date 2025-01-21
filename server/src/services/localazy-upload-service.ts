@@ -1,5 +1,5 @@
 import type { Core } from '@strapi/strapi';
-import localazyApiClientFactory from "../utils/localazy-api-client-factory";
+import localazyApiClientFactory from '../utils/localazy-api-client-factory';
 
 const LocalazyUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
@@ -10,10 +10,7 @@ const LocalazyUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async upload(file, config = {}) {
     try {
       const LocalazyApi = await localazyApiClientFactory();
-      const user = await strapi
-        .plugin("strapi-plugin-v5")
-        .service("LocalazyUserService")
-        .getUser();
+      const user = await strapi.plugin('strapi-plugin-v5').service('LocalazyUserService').getUser();
 
       const result = await LocalazyApi.import.json({
         project: user.project.id,
@@ -34,10 +31,7 @@ const LocalazyUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
     }
   },
 
-  createImportFileRepresentation(
-    sourceLang,
-    strings
-  ) {
+  createImportFileRepresentation(sourceLang, strings) {
     const file = {
       [sourceLang]: {
         ...strings,

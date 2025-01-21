@@ -1,11 +1,8 @@
-const KEY = "content-transfer-setup";
+const KEY = 'content-transfer-setup';
 
 const emptyContentTransferSetup = {
   has_setup: false,
   setup: [],
 };
 
-export {
-  KEY,
-  emptyContentTransferSetup,
-};
+export { KEY, emptyContentTransferSetup };

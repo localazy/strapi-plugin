@@ -1,5 +1,5 @@
 import type { Core } from '@strapi/strapi';
-import LocalazyGenericConnectorClientFactory  from "../utils/localazy-generic-connector-client-factory";
+import LocalazyGenericConnectorClientFactory from '../utils/localazy-generic-connector-client-factory';
 
 const LocalazyAuthController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async generateKeys(ctx) {
