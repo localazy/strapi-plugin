@@ -2,6 +2,12 @@ import { getFullPopulateObject, DEFAULT_POPULATE_DEPTH, DEFAULT_MAX_POPULATE_DEP
 
 const deepPopulateHook = (event: any) => {
   const pLevel = event.params?.pLevel;
+
+  // if pLevel is not defined, do nothing
+  if (typeof pLevel === "undefined") {
+    return;
+  }
+
   const populateDefaultDepth = strapi.plugin("strapi-plugin-v5")?.config('populateDefaultDepth') ?? DEFAULT_POPULATE_DEPTH;
   // 0 is not a valid depth
   let depth = pLevel ?? populateDefaultDepth ?? 1;
