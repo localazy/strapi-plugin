@@ -98,12 +98,11 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         (pickPath) => `${modelUid}.${pickPath}`
       );
 
-      console.log('pickPathsWithUid', pickPathsWithUid);
-
-      let entries = await strapi.entityService.findMany(modelUid, {
-        // TODO: START HERE
-        // populate: "deep",
-        populate: "*.*.*.*",
+      // https://docs.strapi.io/dev-docs/api/document-service#examples-1;
+      let entries = await strapi.documents(modelUid).findMany({
+        // TODO: Resolve pLevel parameter type
+        /* @ts-ignore */
+        pLevel: 6,
       });
       entries = omitDeep(entries, [
         // "__component",

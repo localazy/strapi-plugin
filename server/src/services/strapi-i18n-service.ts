@@ -51,7 +51,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     };
   },
   async getEntryInLocale(modelUid, baseEntryId, isoStrapi, populate = "*") {
-    const StrapiService = strapi.plugin("localazy").service("strapiService");
+    const StrapiService = strapi.plugin("strapi-plugin-v5").service("strapiService");
     const entry = await strapi.entityService.findOne(modelUid, baseEntryId, {
       populate,
     });
@@ -116,7 +116,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async updateLocalizationForAnExistingEntry(uid, updateEntryId, data) {
     try {
 
-      const StrapiService = strapi.plugin("localazy").service("strapiService");
+      const StrapiService = strapi.plugin("strapi-plugin-v5").service("strapiService");
       const strapiContentTypesModels = await StrapiService.getModels();
       const populate = await StrapiService.getPopulateObject(uid);
 

@@ -1,9 +1,13 @@
-"use strict";
+import { Core } from "@strapi/strapi";
 
 class PluginSettingsServiceHelper {
-  constructor(strapi) {
+  private strapi: Core.Strapi;
+  private pluginSettingsService: any;
+  private pluginSettings: any;
+
+  constructor(strapi: Core.Strapi) {
     this.strapi = strapi;
-    this.pluginSettingsService = strapi.plugin("localazy").service("pluginSettingsService");
+    this.pluginSettingsService = strapi.plugin("strapi-plugin-v5").service("pluginSettingsService");
   }
 
   async setup() {
@@ -49,4 +53,4 @@ class PluginSettingsServiceHelper {
   }
 }
 
-module.exports = PluginSettingsServiceHelper;
+export default PluginSettingsServiceHelper;
