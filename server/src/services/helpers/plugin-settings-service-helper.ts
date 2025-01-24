@@ -2,16 +2,16 @@ import { Core } from '@strapi/strapi';
 
 class PluginSettingsServiceHelper {
   private strapi: Core.Strapi;
-  private pluginSettingsService: any;
+  private PluginSettingsService: any;
   private pluginSettings: any;
 
   constructor(strapi: Core.Strapi) {
     this.strapi = strapi;
-    this.pluginSettingsService = strapi.plugin('strapi-plugin-v5').service('pluginSettingsService');
+    this.PluginSettingsService = strapi.plugin('strapi-plugin-v5').service('PluginSettingsService');
   }
 
   async setup() {
-    this.pluginSettings = await this.pluginSettingsService.getPluginSettings();
+    this.pluginSettings = await this.PluginSettingsService.getPluginSettings();
   }
 
   shouldAllowAutomatedUpload() {

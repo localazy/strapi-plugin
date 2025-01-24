@@ -12,7 +12,7 @@ export type NavItem = {
 };
 
 const BASE_PATH = `${process.env.ADMIN_PATH}/plugins/${PLUGIN_ID}`;
-const getNav: () => NavItem[] = () => {
+const useNav: () => NavItem[] = () => {
   const { t } = useTranslation();
   return [
     {
@@ -42,4 +42,4 @@ const getNav: () => NavItem[] = () => {
   ];
 };
 
-export default getNav;
+export default useNav;

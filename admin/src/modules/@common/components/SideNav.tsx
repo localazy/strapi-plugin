@@ -1,11 +1,11 @@
 import { SubNav, SubNavHeader, SubNavSection, SubNavSections, SubNavLink } from '@strapi/design-system';
 import { useTranslation } from 'react-i18next';
-import getNav, { NavItem } from '../utils/get-nav';
+import useNav, { NavItem } from '../utils/use-nav';
 
 const SideNav = () => {
   const { t } = useTranslation();
 
-  const navigation = getNav();
+  const navigation = useNav();
 
   const isActive = (navItem: NavItem) => {
     // url contains to

@@ -25,7 +25,8 @@ const FetchIdentity: React.FC = () => {
     };
 
     fetchIdentity();
-  }, [setIdentity, navigateToPluginRoute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setIdentity]);
 
   return null; // This component doesn't render anything
 };

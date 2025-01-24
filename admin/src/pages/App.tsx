@@ -5,8 +5,8 @@ import { useLocalazyIdentity } from '../state/localazy-identity';
 import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
 import isPluginRoute from '../modules/@common/utils/is-plugin-route';
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
-import { useHeaderTitle } from '../modules/@common/utils/get-header-title';
-import { useHeaderSubtitle } from '../modules/@common/utils/get-header-subtitle';
+import { useHeaderTitle } from '../modules/@common/utils/use-header-title';
+import { useHeaderSubtitle } from '../modules/@common/utils/use-header-subtitle';
 import Login from './Login';
 import { Layouts } from '@strapi/strapi/admin';
 import SideNav from '../modules/@common/components/SideNav';
@@ -15,6 +15,7 @@ import Overview from './Overview';
 // import and load resources
 import '../i18n';
 import { Upload } from './Upload';
+import Download from './Download';
 
 const App = () => {
   const location = useLocation();
@@ -49,6 +50,7 @@ const App = () => {
               element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
             />
             <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
+            <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
             {/* <Route path="*" element={<Page.Error />} /> */}
           </Routes>
         </Layouts.Root>

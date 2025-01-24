@@ -1,23 +1,20 @@
 import { useLocation } from 'react-router-dom';
-import getNav from './get-nav';
+import useNav from './use-nav';
 import { PLUGIN_ID } from '../../../pluginId';
-import { useTranslation } from 'react-i18next';
 
-const useHeaderTitle = () => {
-  const { t } = useTranslation();
-
+const useHeaderSubtitle = () => {
   const location = useLocation();
+  const navigation = useNav();
 
   // segment after pluginId
   const pluginSegment = location?.pathname.split(`/${PLUGIN_ID}/`)[1];
 
   if (!pluginSegment) {
-    return t('common.localazy_plugin_hand');
+    return '';
   }
-  const navigation = getNav();
   const currentNavItem = navigation.find((navItem) => pluginSegment.includes(navItem.id));
 
-  return currentNavItem?.label || t('common.localazy_plugin_hand');
+  return currentNavItem?.description || '';
 };
 
-export { useHeaderTitle };
+export { useHeaderSubtitle };
