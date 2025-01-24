@@ -296,9 +296,9 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             /**
              * Get original source language entry
              */
-            const baseEntry = await strapi.documents(uid as any).findOne({
-              documentId: id,
+            const baseEntry = await strapi.entityService.findOne(uid as any, id, {
               // TODO: Resolve pLevel parameter type
+              // @ts-expect-error Improve types
               pLevel: 6,
             });
 
@@ -312,6 +312,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
              */
             const baseEntryLocalizations = baseEntry.localizations;
 
+            // TODO: Not true in v5 - can be null and still support localizations
             if (!Array.isArray(baseEntryLocalizations)) {
               throw new Error(`Content type ${uid} does not support localizations, skipping...`);
             }

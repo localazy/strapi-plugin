@@ -6,7 +6,7 @@ const flattenObject = (object: any, prefix = '') => {
   }
 
   for (const objectKey in object) {
-    if (objectKey === 'id') {
+    if (objectKey === 'documentId') {
       continue;
     }
 
@@ -22,11 +22,11 @@ const flattenObject = (object: any, prefix = '') => {
       if (Array.isArray(object[objectKey])) {
         // Reduce each item into the right key
         const flattenedArray = object[objectKey].reduce((accumulator, item, index) => {
-          // No id should use the index of the array item
-          let key = `${objectKey}[${item?.id || index}]`;
+          // No documentId should use the index of the array item
+          let key = `${objectKey}[${item?.documentId || index}]`;
           // is Dynamic Zone
-          if (item?.id && item?.__component) {
-            key = `${objectKey}[${item.id};${item.__component}]`;
+          if (item?.documentId && item?.__component) {
+            key = `${objectKey}[${item.documentId};${item.__component}]`;
           }
 
           accumulator[key] = flattenObject(item);
@@ -38,7 +38,7 @@ const flattenObject = (object: any, prefix = '') => {
       } else {
         // Otherwise it is a complex object so you want to flatten that
         // but with the prefix of this current object key
-        const suffix = object[objectKey]?.id ? `${objectKey}[${object[objectKey].id}]` : objectKey;
+        const suffix = object[objectKey]?.documentId ? `${objectKey}[${object[objectKey].documentId}]` : objectKey;
         flatObject = flattenObject(object[objectKey], suffix);
       }
 

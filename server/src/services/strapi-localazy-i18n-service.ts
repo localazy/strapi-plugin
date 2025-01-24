@@ -13,7 +13,7 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     // * It's one extra database call, but the amount of recursive code's complexity is reduced
 
     // Strapi i18n Service
-    const StrapiI18nService = strapi.plugin('localazy').service('strapiI18nService');
+    const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
 
     const { createEntry } = parsedLocalazyEntryToCreateEntry(
       strapiContentTypesModels,
@@ -66,14 +66,13 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
 
     const populate = await StrapiService.getPopulateObject(uid);
-    const localizedEntry = await strapi.documents(uid as any).findOne({
-      documentId: localizedEntryId,
+    const localizedEntry = await strapi.entityService.findOne(uid as any, localizedEntryId, {
       populate,
     });
 
-    const fullyPopulatedLocalizedEntry = await strapi.documents(uid as any).findOne({
-      documentId: localizedEntryId,
+    const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(uid as any, localizedEntryId, {
       // TODO: Resolve pLevel parameter type
+      // @ts-expect-error Improve types
       pLevel: 6,
     });
 

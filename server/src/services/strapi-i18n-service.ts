@@ -51,7 +51,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     };
   },
   async getEntryInLocale(modelUid, baseEntryId, isoStrapi, populate = '*') {
-    const StrapiService = strapi.plugin('strapi-plugin-v5').service('strapiService');
+    const StrapiService = strapi.plugin('strapi-plugin-v5').service('StrapiService');
     const entry = await strapi.entityService.findOne(modelUid, baseEntryId, {
       populate,
     });
@@ -87,8 +87,19 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
 
       newLocalizationCtx.request.body = filteredNewEntry;
 
+      // strapi.entityService.create(uid, {
+      //   data: {
+      //     ...filteredNewEntry,
+      //     localizations: [baseEntry.id],
+      //   },
+      // });
+      delete filteredNewEntry.id;
+      await strapi.documents(uid).create({
+        locale: newEntryLocale,
+        data: filteredNewEntry,
+      });
       // @ts-expect-error Improve types
-      await contentTypeController.createLocalization(newLocalizationCtx);
+      // await contentTypeController.createLocalization(newLocalizationCtx);
 
       const insertedEntry = await this.getEntryInLocale(uid, baseEntry.id, newEntryLocale);
 
@@ -100,7 +111,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
   async updateLocalizationForAnExistingEntry(uid, updateEntryId, data) {
     try {
-      const StrapiService = strapi.plugin('strapi-plugin-v5').service('strapiService');
+      const StrapiService = strapi.plugin('strapi-plugin-v5').service('StrapiService');
       const strapiContentTypesModels = await StrapiService.getModels();
       const populate = await StrapiService.getPopulateObject(uid);
 

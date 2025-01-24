@@ -117,10 +117,21 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         });
         // get only enabled fields; "__component" will be filtered out inside of the function
         const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
+        // const pickedFlattenMeta = Object.keys(pickedFlatten).reduce((acc, key) => {
+        //   acc[`@meta:${key}`] = {
+        //     add: {
+        //       strapi: {
+        //         documentId: entry.documentId,
+        //       },
+        //     },
+        //   };
+        //   return acc;
+        // }, {});
 
         flattenContent = {
           ...flattenContent,
           ...pickedFlatten,
+          // ...pickedFlattenMeta,
         };
       });
     }

@@ -38,8 +38,8 @@ const getPickPaths = (transferSetupModelProps) => {
     (key) => flattenedObject[key] === true && key.indexOf('__model__') === -1
   );
 
-  // id needs to be always included
-  pickPaths.push('id');
+  // `documentId` needs to be always included
+  pickPaths.push('documentId');
 
   return pickPaths;
 };
@@ -61,8 +61,8 @@ const getPickPathsWithComponents = (transferSetupModelProps) => {
     (key) => flattenedObject[key] === true && key.indexOf('__model__') === -1
   );
 
-  // id needs to be always included
-  pickPaths.push('id');
+  // `documentId` needs to be always included
+  pickPaths.push('documentId');
 
   let pickPathsWithComponents = [];
   Object.entries(pickPaths).forEach(([, value]) => {
