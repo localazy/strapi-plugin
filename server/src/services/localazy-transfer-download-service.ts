@@ -296,9 +296,9 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             /**
              * Get original source language entry
              */
-            const baseEntry = await strapi.entityService.findOne(uid as any, id, {
+            const baseEntry = await strapi.documents(uid as any).findOne({
+              documentId: id,
               // TODO: Resolve pLevel parameter type
-              // @ts-expect-error Improve types
               pLevel: 6,
             });
 
