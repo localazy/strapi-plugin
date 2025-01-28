@@ -307,6 +307,77 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               throw new Error(message);
             }
 
+            // TODO: try the new way of creating/updating a localization for an existing entry
+            // this is a working example
+            await strapi.documents(uid as any).update({
+              documentId: id,
+              locale: 'pl',
+              data: {
+                description: 'test PL description 2',
+                name: 'test PL name 2',
+                // repeatable component
+                testcomprep: [
+                  {
+                    field: 'test PL repeatable component field',
+                  },
+                  {
+                    field: 'test PL repeatable component field 2',
+                  },
+                ],
+                testcompsingle: {
+                  desc: 'test PL single component desc',
+                  // json field
+                  json: {
+                    field: 'test PL single component json field',
+                    field2: 'test PL single component json field 2',
+                    fieldnested: {
+                      field: 'test PL single component json field nested',
+                      evenmorenested: {
+                        field: 'test PL single component json field nested 2',
+                      },
+                    },
+                  },
+                  // repeatable component
+                  innercomponent: [
+                    {
+                      field: 'test PL inner component field',
+                    },
+                    {
+                      field: 'test PL inner component field 2',
+                    },
+                  ],
+                },
+                // dynamic zone
+                dz: [
+                  {
+                    __component: 'test-category.test-component-1',
+                    desc: 'test PL dynamic zone field 1 desc',
+                  },
+                  {
+                    __component: 'test-category.test-component-2',
+                    field: 'test PL dynamic zone field 2 field',
+                  },
+                ],
+              },
+            });
+
+            /**
+             * TODO: Convert `id` in a key to the correct position in created/updated localization entry
+             * e.g.:
+             * api::test.test[jy7djs8ejurs3ndd4b0v0h5y].dz[12;test-category.test-component-1].desc
+             * api::test.test[jy7djs8ejurs3ndd4b0v0h5y].testcompsingle[11].innercomponent[39].field
+             *
+             * This must be read from the base (source) language entry.
+             * Then, the order of the final structure must be adjusted to match the order of the base entry.
+             *
+             * 1. Read the base (source) entry with ids
+             * 2. Read the existing (target) entry with ids (if exists)
+             * 3. Create a structure that matches the base entry ids positioning
+             * 4. Deep merge 1. (could be optional in the future; in case user will take care of the required fields himself) -> 2. (could be optional in the future) -> 3.
+             */
+
+            return;
+
             /**
              * Get current language entry
              */
