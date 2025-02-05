@@ -1,18 +1,19 @@
 import type { Core } from '@strapi/strapi';
+import { getStrapiService } from '../core';
 
 const StrapiController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getModels(ctx) {
-    ctx.body = await strapi.plugin('strapi-plugin-v5').service('StrapiService').getModels();
+    ctx.body = await getStrapiService().getModels();
   },
   async getLocalizableModels(ctx) {
-    ctx.body = await strapi.plugin('strapi-plugin-v5').service('StrapiService').getLocalizableModels();
+    ctx.body = await getStrapiService().getLocalizableModels();
   },
-  async postLifecycleLocalazyWebhooks(ctx) {
+  async postLifecycleLocalazyWebhooks() {
     strapi.log.info('done');
   },
   async getPluginVersion(ctx) {
     ctx.body = {
-      version: await strapi.plugin('strapi-plugin-v5').service('StrapiService').getPluginVersion(),
+      version: await getStrapiService().getPluginVersion(),
     };
   },
 });

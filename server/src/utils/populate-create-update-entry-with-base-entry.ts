@@ -167,6 +167,7 @@ export const populateCreateUpdateEntryWithBaseEntry = async (
           );
           // }
         } else if (isRelation(attribute)) {
+          // TODO: based on the plugin settings, assign/not assign the relation (documentId)
           const newPrefix = getNewPrefix(objectKey, prefix);
 
           const isArray = Array.isArray(value);
@@ -174,23 +175,23 @@ export const populateCreateUpdateEntryWithBaseEntry = async (
           if (!isArray) {
             arraiedValue = [value];
           }
-          for (const [index, item] of Object.entries(arraiedValue)) {
+          const localizedDocumentIds = [];
+          for (const item of Object.values(arraiedValue)) {
             if (!isEmpty(item)) {
-              const entityId = item.id;
-              if (!!entityId) {
-                const entryWithLocalizations = await strapi.entityService.findOne(attribute.target, entityId, {
-                  populate: ['localizations'],
+              const documentId = item.documentId;
+              if (!!documentId) {
+                const localizedEntry = await strapi.documents(attribute.target).findOne({
+                  documentId,
+                  locale,
                 });
-
-                const localizedEntry = entryWithLocalizations.localizations?.find((item) => item.locale === locale);
-                const idToAssign = localizedEntry?.id || entityId;
-                if (!isArray) {
-                  set(populatedEntry, newPrefix, { id: idToAssign });
-                } else {
-                  set(populatedEntry, `${newPrefix}.${index}`, { id: idToAssign });
+                if (localizedEntry) {
+                  localizedDocumentIds.push(localizedEntry.documentId);
                 }
               }
             }
+          }
+          if (localizedDocumentIds.length > 0) {
+            set(populatedEntry, newPrefix, localizedDocumentIds);
           }
         } else {
           const newPrefix = getNewPrefix(objectKey, prefix);

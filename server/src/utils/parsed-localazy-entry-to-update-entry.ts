@@ -30,7 +30,7 @@ export const parsedLocalazyEntryToUpdateEntry = async (
   let updateEntry = {};
   merge(updateEntry, currentEntry, createEntry);
   updateEntry = omitDeep(updateEntry, [
-    '__component',
+    // '__component',
     'locale',
     'localizations',
     'createdAt',
@@ -39,7 +39,7 @@ export const parsedLocalazyEntryToUpdateEntry = async (
     'updatedBy',
     'publishedAt',
   ]);
-  // set dynamic zone compoonent keys again
+  // set dynamic zone component keys again
   dynamicZoneComponentKeys.forEach((v) => {
     set(updateEntry, v.key, v.component);
   });

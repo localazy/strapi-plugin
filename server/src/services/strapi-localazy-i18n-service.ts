@@ -2,18 +2,19 @@ import { parsedLocalazyEntryToCreateEntry } from '../utils/parsed-localazy-entry
 import { parsedLocalazyEntryToUpdateEntry } from '../utils/parsed-localazy-entry-to-update-entry';
 import { omitDeep } from '../utils/omit-deep';
 import { merge } from 'lodash-es';
-import { Core } from '@strapi/strapi';
-
+import { Core, UID } from '@strapi/strapi';
+import { dropPropertyDeep } from '../utils/drop-property-deep';
+import { getStrapiI18nService, getStrapiService } from '../core';
 // TODO: ADD TYPES
 // TODO: refactor to use the new APIs
 
 const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async createEntry(ctx, uid, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
+  async createEntry(uid: UID.ContentType, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
     // * The entry will be created and then updated as the structures differ
     // * It's one extra database call, but the amount of recursive code's complexity is reduced
 
     // Strapi i18n Service
-    const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
+    const StrapiI18nService = getStrapiI18nService();
 
     const { createEntry } = parsedLocalazyEntryToCreateEntry(
       strapiContentTypesModels,
@@ -23,56 +24,47 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
       isoStrapi
     );
 
-    const filteredBaseEntry = omitDeep(baseEntry, [
-      'locale',
-      'localizations',
-      'createdAt',
-      'createdBy',
-      'updatedAt',
-      'updatedBy',
-      'publishedAt',
-    ]);
+    const omitKeys = ['locale', 'localizations', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'publishedAt'];
 
+    let filteredBaseEntry = omitDeep(baseEntry, omitKeys);
+    // TODO: Deal with relations - must be omitted
+    filteredBaseEntry = dropPropertyDeep(filteredBaseEntry, 'documentId');
+
+    /**
+     * Items positioning is done by the `toCreateEntry` function
+     * that's why can entry can be merged now
+     */
     let mergedCreateEntry: Record<string, any> = {};
     merge(mergedCreateEntry, filteredBaseEntry, createEntry);
-    mergedCreateEntry = omitDeep(mergedCreateEntry, [
-      'locale',
-      'localizations',
-      'createdAt',
-      'createdBy',
-      'updatedAt',
-      'updatedBy',
-      'publishedAt',
-    ]);
+    mergedCreateEntry = omitDeep(mergedCreateEntry, omitKeys);
 
     mergedCreateEntry.locale = isoStrapi;
     const createdEntry = await StrapiI18nService.createLocalizationForAnExistingEntry(
-      ctx,
       uid,
       baseEntry,
       mergedCreateEntry
     );
 
-    await this.updateEntry(uid, createdEntry.id, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi);
+    // await this.updateEntry(uid, createdEntry.id, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi);
 
     return createdEntry;
   },
 
-  async updateEntry(uid, localizedEntryId, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
-    // Strapi Service
-    const StrapiService = strapi.plugin('strapi-plugin-v5').service('StrapiService');
+  async updateEntry(uid, localizedDocumentId: string, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
+    const StrapiService = getStrapiService();
+    const StrapiI18nService = getStrapiI18nService();
 
-    // Strapi i18n Service
-    const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
-
-    const populate = await StrapiService.getPopulateObject(uid);
-    const localizedEntry = await strapi.entityService.findOne(uid as any, localizedEntryId, {
-      populate,
+    // const populate = await StrapiService.getPopulateObject(uid);
+    // TODO: Correct populate
+    const localizedEntry = await strapi.documents(uid as any).findOne({
+      documentId: localizedDocumentId,
+      locale: isoStrapi,
+      pLevel: 6,
     });
 
-    const fullyPopulatedLocalizedEntry = await strapi.entityService.findOne(uid as any, localizedEntryId, {
-      // TODO: Resolve pLevel parameter type
-      // @ts-expect-error Improve types
+    const fullyPopulatedLocalizedEntry = await strapi.documents(uid as any).findOne({
+      documentId: localizedDocumentId,
+      locale: isoStrapi,
       pLevel: 6,
     });
 
@@ -86,14 +78,19 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
       isoStrapi
     );
 
+    const filteredUpdateEntry = dropPropertyDeep(updateEntry, 'documentId');
+
     const updatedEntry = await StrapiI18nService.updateLocalizationForAnExistingEntry(
       uid,
-      localizedEntryId,
-      updateEntry
+      localizedDocumentId,
+      filteredUpdateEntry,
+      isoStrapi
     );
 
     return updatedEntry;
   },
 });
+
+export type StrapiLocalazyI18nServiceReturnType = ReturnType<typeof StrapiLocalazyI18nService>;
 
 export default StrapiLocalazyI18nService;

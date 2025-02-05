@@ -8,6 +8,15 @@ import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-ser
 import { EventType } from '../constants/events';
 import localazyApiClientFactory from '../utils/localazy-api-client-factory';
 import { Core } from '@strapi/strapi';
+import { PluginSettingsServiceReturnType } from './plugin-settings-service';
+import {
+  getStrapiService,
+  getStrapiI18nService,
+  getLocalazyUserService,
+  getLocalazyPubAPIService,
+  getStrapiLocalazyI18nService,
+  getPluginSettingsService,
+} from '../core';
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -42,16 +51,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
 
     let success = true;
 
-    const StrapiService = strapi.plugin('strapi-plugin-v5').service('StrapiService');
-    const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
-    const LocalazyUserService = strapi.plugin('strapi-plugin-v5').service('LocalazyUserService');
-    const LocalazyPubAPIService = strapi.plugin('strapi-plugin-v5').service('LocalazyPubAPIService');
-    const StrapiLocalazyI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiLocalazyI18nService');
+    const StrapiService = getStrapiService();
+    const StrapiI18nService = getStrapiI18nService();
+    const LocalazyUserService = getLocalazyUserService();
+    const LocalazyPubAPIService = getLocalazyPubAPIService();
+    const StrapiLocalazyI18nService = getStrapiLocalazyI18nService();
 
-    const contentTransferSetup = await strapi
-      .plugin('strapi-plugin-v5')
-      .service('PluginSettingsService')
-      .getContentTransferSetup();
+    const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
     const user = await LocalazyUserService.getUser();
 
@@ -291,78 +297,29 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
           continue;
         }
 
-        for (const [id, translatedModel] of Object.entries(models)) {
+        if (!strapiContentTypeModel.pluginOptions?.i18n?.localized) {
+          strapi.log.info(`Content type ${uid} does not support localizations, skipping...`);
+          continue;
+        }
+
+        for (const [documentId, translatedModel] of Object.entries(models)) {
           try {
             /**
              * Get original source language entry
              */
             const baseEntry = await strapi.documents(uid as any).findOne({
-              documentId: id,
+              documentId,
               // TODO: Resolve pLevel parameter type
               pLevel: 6,
             });
 
             if (isEmpty(baseEntry)) {
-              const message = `Source language entry ${uid}[${id}] does not exist anymore, skipping...`;
+              const message = `Source language entry ${uid}[${documentId}] does not exist anymore, skipping...`;
               throw new Error(message);
             }
 
-            // TODO: try the new way of creating/updating a localization for an existing entry
-            // this is a working example
-            await strapi.documents(uid as any).update({
-              documentId: id,
-              locale: 'pl',
-              data: {
-                description: 'test PL description 2',
-                name: 'test PL name 2',
-                // repeatable component
-                testcomprep: [
-                  {
-                    field: 'test PL repeatable component field',
-                  },
-                  {
-                    field: 'test PL repeatable component field 2',
-                  },
-                ],
-                testcompsingle: {
-                  desc: 'test PL single component desc',
-                  // json field
-                  json: {
-                    field: 'test PL single component json field',
-                    field2: 'test PL single component json field 2',
-                    fieldnested: {
-                      field: 'test PL single component json field nested',
-                      evenmorenested: {
-                        field: 'test PL single component json field nested 2',
-                      },
-                    },
-                  },
-                  // repeatable component
-                  innercomponent: [
-                    {
-                      field: 'test PL inner component field',
-                    },
-                    {
-                      field: 'test PL inner component field 2',
-                    },
-                  ],
-                },
-                // dynamic zone
-                dz: [
-                  {
-                    __component: 'test-category.test-component-1',
-                    desc: 'test PL dynamic zone field 1 desc',
-                  },
-                  {
-                    __component: 'test-category.test-component-2',
-                    field: 'test PL dynamic zone field 2 field',
-                  },
-                ],
-              },
-            });
-
             /**
-             * TODO: Convert `id` in a key to the correct position in created/updated localization entry
+             * TODO: Convert `documentId` in a key to the correct position in created/updated localization entry
              * e.g.:
              * api::test.test[jy7djs8ejurs3ndd4b0v0h5y].dz[12;test-category.test-component-1].desc
              * api::test.test[jy7djs8ejurs3ndd4b0v0h5y].testcompsingle[11].innercomponent[39].field
@@ -376,28 +333,19 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
              * 4. Deep merge 1. (could be optional in the future; in case user will take care of the required fields himself) -> 2. (could be optional in the future) -> 3.
              */
 
-            return;
-
             /**
              * Get current language entry
              */
-            const baseEntryLocalizations = baseEntry.localizations;
+            const currentLanguageLocalizedEntry = await strapi.documents(uid as any).findOne({
+              documentId,
+              locale: isoStrapi,
+            });
 
-            // TODO: Not true in v5 - can be null and still support localizations
-            if (!Array.isArray(baseEntryLocalizations)) {
-              throw new Error(`Content type ${uid} does not support localizations, skipping...`);
-            }
-
-            const baseEntryCurrentLanguageLocalizationInfo = baseEntryLocalizations.find(
-              (localization) => localization.locale === isoStrapi
-            );
-
-            if (!baseEntryCurrentLanguageLocalizationInfo) {
+            if (isEmpty(currentLanguageLocalizedEntry)) {
               // create new entry
               try {
                 const createdEntry = await StrapiLocalazyI18nService.createEntry(
-                  ctx,
-                  uid,
+                  uid as any,
                   strapiContentTypesModels,
                   translatedModel,
                   baseEntry,
@@ -420,11 +368,11 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             } else {
               // update existing entry
               try {
-                const localizedEntryId = baseEntryCurrentLanguageLocalizationInfo.id;
+                const localizedDocumentId = currentLanguageLocalizedEntry.documentId;
 
                 const updatedEntry = await StrapiLocalazyI18nService.updateEntry(
-                  uid,
-                  localizedEntryId,
+                  uid as any,
+                  localizedDocumentId,
                   strapiContentTypesModels,
                   translatedModel,
                   baseEntry,
@@ -441,7 +389,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 await JobNotificationService.emit(EventType.DOWNLOAD, {
-                  message: `Cannot update an ${uid}[${baseEntryCurrentLanguageLocalizationInfo.id}] (${isoStrapi}): ${e.message}`,
+                  message: `Cannot update an ${uid}[${currentLanguageLocalizedEntry.id}] (${isoStrapi}): ${e.message}`,
                 });
               }
             }
@@ -465,5 +413,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     console.timeEnd('download');
   },
 });
+
+export type LocalazyTransferDownloadServiceReturnType = ReturnType<typeof LocalazyTransferDownloadService>;
 
 export default LocalazyTransferDownloadService;

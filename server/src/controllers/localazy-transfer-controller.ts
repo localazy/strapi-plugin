@@ -1,12 +1,12 @@
 import { Core } from '@strapi/strapi';
 import { EventType } from '../constants/events';
 import jobNotificationServiceFactory from '../services/helpers/job-notification-service';
-
+import { getLocalazyTransferUploadService, getLocalazyTransferDownloadService } from '../core';
 const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async upload(ctx) {
     const JobNotificationService = new jobNotificationServiceFactory(strapi.StrapIO);
     try {
-      const LocalazyTransferUploadService = strapi.plugin('strapi-plugin-v5').service('LocalazyTransferUploadService');
+      const LocalazyTransferUploadService = getLocalazyTransferUploadService();
 
       /**
        * start executing the function after a delay
@@ -31,9 +31,7 @@ const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async download(ctx) {
     const JobNotificationService = new jobNotificationServiceFactory(strapi.StrapIO);
     try {
-      const LocalazyTransferDownloadService = strapi
-        .plugin('strapi-plugin-v5')
-        .service('LocalazyTransferDownloadService');
+      const LocalazyTransferDownloadService = getLocalazyTransferDownloadService();
 
       /**
        * start executing the function after a delay

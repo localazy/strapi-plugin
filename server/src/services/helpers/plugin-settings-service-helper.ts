@@ -1,4 +1,5 @@
 import { Core } from '@strapi/strapi';
+import { getPluginSettingsService } from '../../core';
 
 class PluginSettingsServiceHelper {
   private strapi: Core.Strapi;
@@ -7,7 +8,7 @@ class PluginSettingsServiceHelper {
 
   constructor(strapi: Core.Strapi) {
     this.strapi = strapi;
-    this.PluginSettingsService = strapi.plugin('strapi-plugin-v5').service('PluginSettingsService');
+    this.PluginSettingsService = getPluginSettingsService();
   }
 
   async setup() {

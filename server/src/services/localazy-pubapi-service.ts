@@ -40,7 +40,7 @@ const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
       return [];
     }
   },
-  async getProject(projectId, addOrganization = true, addLanguages = true) {
+  async getProject(projectId: string, addOrganization = true, addLanguages = true) {
     const projects = await this.listProjects(addOrganization, addLanguages);
 
     return projects.find((project) => project.id === projectId);
@@ -52,5 +52,7 @@ const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
     return result;
   },
 });
+
+export type LocalazyPubAPIServiceReturnType = ReturnType<typeof LocalazyPubAPIService>;
 
 export default LocalazyPubAPIService;

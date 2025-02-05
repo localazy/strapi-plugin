@@ -2,6 +2,9 @@ import { set, get } from 'lodash-es';
 import { resetArrayKeysDeep } from './reset-array-keys-deep';
 import { getAttribute, isComponent, isDynamicZone, isRepeatable, findModel } from './model-utils';
 
+/**
+ * Items positioning is done by the `toCreateEntry` function
+ */
 export const parsedLocalazyEntryToCreateEntry = (
   models: any,
   parsedLocalazyEntry: any,

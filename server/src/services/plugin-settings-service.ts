@@ -5,7 +5,7 @@ import { KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings } from 
 import getStrapiStore from '../db/model/utils/get-strapi-store';
 
 const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async getContentTransferSetup() {
+  async getContentTransferSetup(): Promise<Record<string, any>> {
     const pluginStore = getStrapiStore(strapi);
     const setup = await pluginStore.get({ key: CONTENT_TRANSFER_SETUP_KEY });
 
@@ -50,5 +50,7 @@ const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
     return newSettings;
   },
 });
+
+export type PluginSettingsServiceReturnType = ReturnType<typeof PluginSettingsService>;
 
 export default PluginSettingsService;

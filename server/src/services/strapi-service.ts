@@ -25,4 +25,6 @@ const StrapiService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 });
 
+export type StrapiServiceReturnType = ReturnType<typeof StrapiService>;
+
 export default StrapiService;

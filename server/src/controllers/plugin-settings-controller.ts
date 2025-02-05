@@ -1,26 +1,21 @@
 import { Core } from '@strapi/strapi';
+import { getPluginSettingsService } from '../core';
 
 const PluginSettingsController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getContentTransferSetup(ctx) {
-    ctx.body = await strapi.plugin('strapi-plugin-v5').service('PluginSettingsService').getContentTransferSetup();
+    ctx.body = await getPluginSettingsService().getContentTransferSetup();
   },
 
   async updateContentTransferSetup(ctx) {
-    ctx.body = await strapi
-      .plugin('strapi-plugin-v5')
-      .service('PluginSettingsService')
-      .updateContentTransferSetup(ctx.request.body);
+    ctx.body = await getPluginSettingsService().updateContentTransferSetup(ctx.request.body);
   },
 
   async getPluginSettings(ctx) {
-    ctx.body = await strapi.plugin('strapi-plugin-v5').service('PluginSettingsService').getPluginSettings();
+    ctx.body = await getPluginSettingsService().getPluginSettings();
   },
 
   async updatePluginSettings(ctx) {
-    ctx.body = await strapi
-      .plugin('strapi-plugin-v5')
-      .service('PluginSettingsService')
-      .updatePluginSettings(ctx.request.body);
+    ctx.body = await getPluginSettingsService().updatePluginSettings(ctx.request.body);
   },
 });
 

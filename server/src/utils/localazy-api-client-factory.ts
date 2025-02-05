@@ -1,8 +1,9 @@
 import { ApiClient } from '@localazy/api-client';
 import config from '../config';
+import { getLocalazyUserService } from '../core';
 
 const LocalazyApiClientFactory = async () => {
-  const user = await strapi.plugin('strapi-plugin-v5').service('LocalazyUserService').getUser();
+  const user = await getLocalazyUserService().getUser();
 
   const { accessToken } = user;
   if (!accessToken) {

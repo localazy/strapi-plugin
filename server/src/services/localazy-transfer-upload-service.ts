@@ -11,6 +11,7 @@ import config from '../config';
 import { isoStrapiToLocalazy } from '../utils/iso-locales-utils';
 import { omitDeep } from '../utils/omit-deep';
 import { EventType } from '../constants/events';
+import { getStrapiService, getStrapiI18nService, getLocalazyUploadService, getPluginSettingsService } from '../core';
 
 const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async upload(JobNotificationService, ctx) {
@@ -21,20 +22,10 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
 
     let success = true;
 
-    // Strapi Service
-    const StrapiService = strapi.plugin('strapi-plugin-v5').service('StrapiService');
-
-    // Strapi i18n Service
-    const StrapiI18nService = strapi.plugin('strapi-plugin-v5').service('StrapiI18nService');
-
-    // Localazy Upload Service
-    const LocalazyUploadService = strapi.plugin('strapi-plugin-v5').service('LocalazyUploadService');
-
-    // get content transfer setup
-    const contentTransferSetup = await strapi
-      .plugin('strapi-plugin-v5')
-      .service('PluginSettingsService')
-      .getContentTransferSetup();
+    const StrapiService = getStrapiService();
+    const StrapiI18nService = getStrapiI18nService();
+    const LocalazyUploadService = getLocalazyUploadService();
+    const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
     if (!contentTransferSetup.has_setup) {
       const message = 'Content transfer setup is not set up.';
@@ -166,5 +157,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     console.timeEnd('upload');
   },
 });
+
+export type LocalazyTransferUploadServiceReturnType = ReturnType<typeof LocalazyTransferUploadService>;
 
 export default LocalazyTransferUploadService;
