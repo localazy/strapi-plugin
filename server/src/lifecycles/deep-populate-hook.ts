@@ -1,31 +1,58 @@
+import { getFullPopulateLocalazyUploadObject } from '../utils/get-full-populate-localazy-upload-object';
 import {
   getFullPopulateObject,
   DEFAULT_POPULATE_DEPTH,
   DEFAULT_MAX_POPULATE_DEPTH,
+  FullPopulateObject,
 } from '../utils/get-full-populate-object';
+import type { UID } from '@strapi/strapi';
 
-const deepPopulateHook = (event: any) => {
-  const pLevel = event.params?.pLevel;
+export type ChosenPopulateParam = 'localazyPLevel' | 'pLevel';
 
-  // if pLevel is not defined, do nothing
-  if (typeof pLevel === 'undefined') {
+export type DeepPopulateHookEvent = {
+  model: {
+    uid: UID.ContentType;
+  };
+  params: {
+    localazyPLevel?: number;
+    pLevel?: number;
+    populate?: FullPopulateObject;
+  };
+};
+
+const deepPopulateHook = (event: DeepPopulateHookEvent) => {
+  const localazyPLevel = event.params?.localazyPLevel;
+  const chosen: ChosenPopulateParam = localazyPLevel ? 'localazyPLevel' : 'pLevel';
+  const eventDepth = event.params[chosen];
+
+  // skip deep populate if `eventDepth` is undefined
+  if (typeof eventDepth === 'undefined') {
     return;
   }
 
-  const populateDefaultDepth =
-    strapi.plugin('strapi-plugin-v5')?.config('populateDefaultDepth') ?? DEFAULT_POPULATE_DEPTH;
-  // 0 is not a valid depth
-  let depth = pLevel ?? populateDefaultDepth ?? 1;
-  const maxDepth = strapi.plugin('strapi-plugin-v5')?.config('populateMaxDepth') ?? DEFAULT_MAX_POPULATE_DEPTH;
+  const populateDefaultDepth = (strapi.plugin('strapi-plugin-v5')?.config('populateDefaultDepth') ??
+    DEFAULT_POPULATE_DEPTH) as number;
+  // adjust invalid (0) is not a valid depth
+  let depth = Math.max(eventDepth, populateDefaultDepth, 1);
+  const maxDepth = (strapi.plugin('strapi-plugin-v5')?.config('populateMaxDepth') ??
+    DEFAULT_MAX_POPULATE_DEPTH) as number;
   if (depth > maxDepth) {
     depth = maxDepth;
   }
 
-  if (typeof depth === 'number') {
-    const modelObject = getFullPopulateObject(event.model.uid, depth);
-    if (typeof modelObject !== 'boolean' && modelObject !== undefined) {
-      event.params.populate = modelObject.populate;
+  let modelObject: FullPopulateObject;
+  switch (chosen) {
+    case 'localazyPLevel': {
+      modelObject = getFullPopulateLocalazyUploadObject(event.model.uid, depth);
+      break;
     }
+    case 'pLevel': {
+      modelObject = getFullPopulateObject(event.model.uid, depth);
+      break;
+    }
+  }
+  if (typeof modelObject !== 'boolean' && modelObject !== undefined) {
+    event.params.populate = modelObject.populate;
   }
 };
 

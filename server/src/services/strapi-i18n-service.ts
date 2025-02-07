@@ -3,13 +3,15 @@ import { intlDisplayName } from '../utils/intl-display-name';
 import { isoLocalazyToStrapi } from '../utils/iso-locales-utils.js';
 import { omitDeep } from '../utils/omit-deep.js';
 import { getStrapiService } from '../core';
+import type { Locale } from '../models/strapi/locale';
 // TODO: ADD TYPES
 
 const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async getLocales(ctx: any) {
-    // @ts-expect-error Improve types
-    await strapi.controller('plugin::i18n.locales').listLocales(ctx);
-    return ctx.body;
+  async getLocales(): Promise<Locale[]> {
+    return strapi.plugin('i18n').service('locales').find();
+  },
+  async getDefaultLocaleCode(): Promise<string> {
+    return strapi.plugin('i18n').service('locales').getDefaultLocale();
   },
   async createStrapiLocale(ctx: any, isoLocalazy: any) {
     try {

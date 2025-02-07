@@ -2,8 +2,9 @@ import { Core } from '@strapi/strapi';
 import { EventType } from '../constants/events';
 import jobNotificationServiceFactory from '../services/helpers/job-notification-service';
 import { getLocalazyTransferUploadService, getLocalazyTransferDownloadService } from '../core';
+
 const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async upload(ctx) {
+  async upload(ctx: any) {
     const JobNotificationService = new jobNotificationServiceFactory(strapi.StrapIO);
     try {
       const LocalazyTransferUploadService = getLocalazyTransferUploadService();
@@ -13,12 +14,12 @@ const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
        * (to let the client receive and subscribe to the messages stream)
        */
       // TODO: let the client send a message to the server to start the upload (that it's subscribed to the stream)
-      setTimeout(() => LocalazyTransferUploadService.upload(JobNotificationService, ctx), 1000);
+      setTimeout(() => LocalazyTransferUploadService.upload(JobNotificationService), 1000);
 
       ctx.body = {
         streamIdentifier: JobNotificationService.getStreamIdentifier(),
       };
-    } catch (e) {
+    } catch (e: any) {
       strapi.log.error(e.message);
       await JobNotificationService.emit(EventType.UPLOAD_FINISHED, {
         success: false,
@@ -28,7 +29,7 @@ const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
     }
   },
 
-  async download(ctx) {
+  async download(ctx: any) {
     const JobNotificationService = new jobNotificationServiceFactory(strapi.StrapIO);
     try {
       const LocalazyTransferDownloadService = getLocalazyTransferDownloadService();

@@ -6,7 +6,6 @@ import { Core, UID } from '@strapi/strapi';
 import { dropPropertyDeep } from '../utils/drop-property-deep';
 import { getStrapiI18nService, getStrapiService } from '../core';
 // TODO: ADD TYPES
-// TODO: refactor to use the new APIs
 
 const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async createEntry(uid: UID.ContentType, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {

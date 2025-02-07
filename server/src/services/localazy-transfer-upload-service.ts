@@ -14,7 +14,7 @@ import { EventType } from '../constants/events';
 import { getStrapiService, getStrapiI18nService, getLocalazyUploadService, getPluginSettingsService } from '../core';
 
 const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async upload(JobNotificationService, ctx) {
+  async upload(JobNotificationService) {
     console.time('upload');
     await JobNotificationService.emit(EventType.UPLOAD, {
       message: 'Upload started',
@@ -27,6 +27,10 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const LocalazyUploadService = getLocalazyUploadService();
     const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
+    /**
+     * If the content transfer setup is not set up,
+     * finish (skip) the upload process.
+     */
     if (!contentTransferSetup.has_setup) {
       const message = 'Content transfer setup is not set up.';
       success = false;
@@ -41,9 +45,8 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const { setup } = contentTransferSetup;
     const collectionsNames = getCollectionsNames(setup);
     const models = await StrapiService.getModels();
-    // flatten Strapi content
-    let flattenContent = {};
 
+    let pickedFlattenStrapiContent: Record<string, string> = {};
     for (const collectionName of collectionsNames) {
       const currentModel = models.find((model) => model.collectionName === collectionName);
       const modelUid = currentModel.uid;
@@ -74,33 +77,31 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         strapi.log.warn(message);
         continue;
       }
+
+      /**
+       * Contains the paths to the fields with the model uid.
+       * These paths will be used (selected) from the content and then uploaded to Localazy.
+       */
       const pickPathsWithUid = pickPaths.map((pickPath) => `${modelUid}.${pickPath}`);
 
       // https://docs.strapi.io/dev-docs/api/document-service#examples-1;
       let entries = await strapi.documents(modelUid).findMany({
         // TODO: Resolve pLevel parameter type
         // @ts-expect-error Improve types
-        pLevel: 6,
+        // pLevel: 6,
+        localazyPLevel: 6,
       });
-      entries = omitDeep(entries, [
-        // "__component",
-        'locale',
-        'localizations',
-        'createdAt',
-        'createdBy',
-        'updatedAt',
-        'updatedBy',
-        'publishedAt',
-      ]);
 
-      if (!entries) {
+      if (!entries.length) {
         strapi.log.info(`No entries found for model ${modelUid}`);
         continue;
       }
 
-      if (!Array.isArray(entries)) {
-        entries = [entries];
-      }
+      /*
+       * These fields are not omitted during the document service call,
+       * even though they are specified in the `getFullPopulateLocalazyUploadObject` function.
+       */
+      entries = omitDeep(entries, ['locale', 'createdAt', 'updatedAt', 'publishedAt']);
 
       entries.forEach((entry) => {
         const flatten = flattenObject({
@@ -108,33 +109,26 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         });
         // get only enabled fields; "__component" will be filtered out inside of the function
         const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
-        // const pickedFlattenMeta = Object.keys(pickedFlatten).reduce((acc, key) => {
-        //   acc[`@meta:${key}`] = {
-        //     add: {
-        //       strapi: {
-        //         documentId: entry.documentId,
-        //       },
-        //     },
-        //   };
-        //   return acc;
-        // }, {});
-
-        flattenContent = {
-          ...flattenContent,
+        // TODO: upload some meta data with the content?
+        pickedFlattenStrapiContent = {
+          ...pickedFlattenStrapiContent,
           ...pickedFlatten,
-          // ...pickedFlattenMeta,
         };
       });
     }
 
-    // get Strapi default language and convert it to Localazy language code
-    const strapiLocales = await StrapiI18nService.getLocales(ctx);
-    const defaultLocale = strapiLocales.find((locale) => locale.isDefault);
+    const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
+    const localazyLocaleCode = strapiDefaultLocaleCode
+      ? isoStrapiToLocalazy(strapiDefaultLocaleCode)
+      : config.default.LOCALAZY_DEFAULT_LOCALE;
 
-    const locale = defaultLocale ? isoStrapiToLocalazy(defaultLocale.code) : config.default.LOCALAZY_DEFAULT_LOCALE;
-
-    const importFile = LocalazyUploadService.createImportFileRepresentation(locale, flattenContent);
-    // Use `deprecate: "file"` if there is one chunk of transferred data only (99900 keys)!
+    const importFile = LocalazyUploadService.createImportFileRepresentation(
+      localazyLocaleCode,
+      pickedFlattenStrapiContent
+    );
+    /**
+     * Use :`deprecate: "file"` if there is one chunk of transferred data only (99900 keys)!
+     */
     const uploadConfig = {
       contentOptions: {
         type: config.default.LOCALAZY_DEFAULT_FILE_EXTENSION,
@@ -145,11 +139,15 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         path: config.default.LOCALAZY_DEFAULT_FILE_PATH,
       },
     };
+
     await JobNotificationService.emit(EventType.UPLOAD, {
       message: 'Uploading collections to Localazy...',
     });
+
     await LocalazyUploadService.upload(importFile, uploadConfig);
+
     strapi.log.info('Upload finished in');
+
     await JobNotificationService.emit(EventType.UPLOAD_FINISHED, {
       success,
       message: 'Upload finished',

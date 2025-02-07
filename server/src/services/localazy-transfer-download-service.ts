@@ -7,8 +7,8 @@ import RequestInitiatorHelper from '../utils/request-initiator-helper';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
 import { EventType } from '../constants/events';
 import localazyApiClientFactory from '../utils/localazy-api-client-factory';
-import { Core } from '@strapi/strapi';
-import { PluginSettingsServiceReturnType } from './plugin-settings-service';
+import { Core, UID } from '@strapi/strapi';
+
 import {
   getStrapiService,
   getStrapiI18nService,
@@ -17,6 +17,7 @@ import {
   getStrapiLocalazyI18nService,
   getPluginSettingsService,
 } from '../core';
+import { Language } from '@localazy/api-client';
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -135,7 +136,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
      * Iterate over languages and create the ones that are not present in Strapi
      */
     const strapiUnsupportedLanguages = []; // do not iterate over these languages later
-    const strapiLocales = await StrapiI18nService.getLocales(ctx);
+    const strapiLocales = await StrapiI18nService.getLocales();
     for (const isoLocalazy of languagesCodes) {
       try {
         const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
@@ -192,7 +193,9 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     /**
      * Parse Localazy content
      */
-    const parsedLocalazyContent = {};
+    type ParsedLocalazyContent = Record<Language['code'], Record<UID.ContentType, Record<string, any>>>;
+
+    const parsedLocalazyContent: ParsedLocalazyContent = {};
     const strapiContentTypesModels = await StrapiService.getModels();
     const jsonFields = [];
     for (const [isoLocalazy, keys] of Object.entries<any>(localazyContent)) {
@@ -287,7 +290,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
      * Iterate over parsed Localazy content and insert/update content in Strapi
      */
     for (const [isoStrapi, contentTypes] of Object.entries(parsedLocalazyContent)) {
-      for (const [uid, models] of Object.entries(contentTypes)) {
+      for (const [uid, models] of Object.entries(contentTypes) as [UID.ContentType, Record<string, any>][]) {
         /**
          * Model could not exist anymore in Strapi
          */
@@ -345,7 +348,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               // create new entry
               try {
                 const createdEntry = await StrapiLocalazyI18nService.createEntry(
-                  uid as any,
+                  uid,
                   strapiContentTypesModels,
                   translatedModel,
                   baseEntry,
