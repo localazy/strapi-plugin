@@ -9,13 +9,14 @@ enum PLUGIN_ROUTES {
   OVERVIEW = 'overview',
   // settings routes
   CONTENT_TRANSFER_SETUP = 'content-transfer-setup',
+  GLOBAL_SETTINGS = 'global-settings',
 }
 
 const useRedirectToPluginRoute = () => {
   const navigate = useNavigate();
 
   const navigateToPluginRoute = (route: PLUGIN_ROUTES) => {
-    if (route === PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP) {
+    if ([PLUGIN_ROUTES.CONTENT_TRANSFER_SETUP, PLUGIN_ROUTES.GLOBAL_SETTINGS].includes(route)) {
       navigate(`/settings/${PLUGIN_ID}/${route}`);
       return;
     }

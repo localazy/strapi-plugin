@@ -8,6 +8,7 @@ import { useRedirectToPluginRoute, PLUGIN_ROUTES } from '../modules/@common/util
 import ProductAnalyticsService from '../modules/@common/services/product-analytics-service';
 import { LocalazyIdentity } from '../modules/user/model/localazy-identity';
 import { Layouts } from '@strapi/strapi/admin';
+import { useEffect } from 'react';
 
 type LoginProps = {
   title: string;
@@ -32,14 +33,15 @@ const Login: React.FC<LoginProps> = ({ title, subtitle, isLoading = false }) => 
   const onLoginResultFetched = async (result: LocalazyIdentity) => {
     await LocalazyUserService.updateIdentity(result);
     setIdentity(result);
+  };
 
-    if (isLoggedIn) {
-      // track user login
+  useEffect(() => {
+    if (isLoggedIn && identity.user && identity.project) {
       ProductAnalyticsService.trackAppConnected(identity.user.id, identity.project);
 
       navigateToPluginRoute(PLUGIN_ROUTES.DOWNLOAD);
     }
-  };
+  }, [isLoggedIn, identity, navigateToPluginRoute]);
 
   return (
     <>
