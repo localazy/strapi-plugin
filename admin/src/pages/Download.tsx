@@ -22,7 +22,6 @@ import { useLocalazyIdentity } from '../state/localazy-identity';
 // TODO: ADD TYPES
 
 const downloadAlertsService = new DownloadAlertsService();
-downloadAlertsService.subscribe();
 
 export type DownloadProps = {
   title: string;
@@ -112,6 +111,8 @@ const Download: React.FC<DownloadProps> = (props) => {
   useEffect(() => {
     async function initComponent() {
       setIsLoading(true);
+
+      downloadAlertsService.subscribe();
 
       /**
        * Handle alerts onload apperance

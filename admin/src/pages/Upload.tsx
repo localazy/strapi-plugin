@@ -22,7 +22,6 @@ import { useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-p
 // TODO: ADD TYPES
 
 const uploadAlertsService = new UploadAlertsService();
-uploadAlertsService.subscribe();
 
 interface UploadProps {
   title: string;
@@ -66,16 +65,20 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
     const { streamIdentifier } = result;
     uploadAlertsService.setStreamIdentifier(streamIdentifier);
     uploadAlertsService.onUpload((data: any) => {
-      setUploadResult((old: any) => ({
-        success: data.success,
-        report: [...(old.report || []), data.message],
-      }));
+      setUploadResult((old: any) => {
+        return {
+          success: data.success,
+          report: [...(old.report || []), data.message],
+        };
+      });
     });
     uploadAlertsService.onUploadFinished((data: any) => {
-      setUploadResult((old: any) => ({
-        success: data.success,
-        report: [...(old.report || []), data.message],
-      }));
+      setUploadResult((old: any) => {
+        return {
+          success: data.success,
+          report: [...(old.report || []), data.message],
+        };
+      });
       setIsUploading(false);
       setShowUploadFinishedModal(true);
     });
@@ -89,6 +92,8 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
   useEffect(() => {
     async function initComponent() {
       setIsLoading(true);
+
+      uploadAlertsService.subscribe();
 
       setStrapiDefaultLocale(await getStrapiDefaultLocale());
       setLocalazySourceLanguage(await getLocalazySourceLanguage());

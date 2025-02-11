@@ -1,16 +1,17 @@
 import type { Core } from '@strapi/strapi';
-import RequestInitiatorHelper from './utils/request-initiator-helper';
-import deepPopulateHook from './lifecycles/deep-populate-hook';
-
+// import RequestInitiatorHelper from './utils/request-initiator-helper';
+import deepPopulateHook, { DeepPopulateHookEvent } from './lifecycles/deep-populate-hook';
+import { Server } from 'socket.io';
+import { WebSocketServer } from 'ws';
 const bootstrap = ({ strapi }: { strapi: Core.Strapi }) => {
   // bootstrap phase
   strapi.db.lifecycles.subscribe(async (event) => {
-    const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
+    // const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
     const action = event.action;
     switch (action) {
       case 'beforeFindMany':
       case 'beforeFindOne': {
-        deepPopulateHook(event);
+        deepPopulateHook(event as DeepPopulateHookEvent);
         break;
       }
       // TODO: add hooks
@@ -56,10 +57,31 @@ const bootstrap = ({ strapi }: { strapi: Core.Strapi }) => {
   });
 
   process.nextTick(async () => {
-    // TODO: implement sockets
-    // const StrapiIOInstance = await strapio(strapi);
-    // console.log('StrapiIOInstance', StrapiIOInstance);
-    // strapi.StrapIO = StrapiIOInstance;
+    const io = new Server(strapi.server.httpServer, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+      },
+      // this must be a constructor
+      wsEngine: WebSocketServer,
+    });
+
+    strapi.StrapIO = io;
+
+    io.on('connection', (socket) => {
+      console.log('New WebSocket connection:', socket.id);
+
+      socket.on('message', (data) => {
+        console.log('Received message from client:', data);
+        socket.emit('server_response', { message: 'Hello from Strapi!' });
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+      });
+    });
+
+    console.log('✅ WebSocket server started');
   });
 };
 
