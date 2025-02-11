@@ -89,14 +89,16 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
             <Box borderColor='neutral200' hasRadius key={`key`}>
               <Accordion.Root size='S'>
                 <Accordion.Item value={key}>
-                  <Switch
-                    label={`switch_tree_${key}`}
-                    onCheckedChange={() => onTreeItemClick([`${key}.__model__`], value.__model__)}
-                    checked={!!value.__model__}
-                  />
-                  <Accordion.Header>
-                    <Accordion.Trigger description={key}>{key}</Accordion.Trigger>
-                  </Accordion.Header>
+                  <Flex alignItems='center' justifyContent='space-between'>
+                    <Accordion.Header style={{ flex: 1 }}>
+                      <Accordion.Trigger description={key}>{key}</Accordion.Trigger>
+                    </Accordion.Header>
+                    <Switch
+                      label={`switch_tree_${key}`}
+                      onCheckedChange={() => onTreeItemClick([`${key}.__model__`], value.__model__)}
+                      checked={!!value.__model__}
+                    />
+                  </Flex>
 
                   <Accordion.Content>{createTree(key, value, key)}</Accordion.Content>
                 </Accordion.Item>
