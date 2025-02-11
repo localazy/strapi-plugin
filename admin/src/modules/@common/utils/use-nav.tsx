@@ -11,7 +11,6 @@ export type NavItem = {
   active: boolean;
 };
 
-const BASE_PATH = `${process.env.ADMIN_PATH}/plugins/${PLUGIN_ID}`;
 const useNav: () => NavItem[] = () => {
   const { t } = useTranslation();
   return [
@@ -20,7 +19,7 @@ const useNav: () => NavItem[] = () => {
       label: t('common.overview'),
       description: t('overview.description'),
       icon: <House />,
-      to: `${BASE_PATH}/overview`,
+      to: `/plugins/${PLUGIN_ID}/overview`,
       active: false,
     },
     {
@@ -28,7 +27,7 @@ const useNav: () => NavItem[] = () => {
       label: t('common.upload_to_localazy'),
       description: t('upload.description'),
       icon: <Upload />,
-      to: `${BASE_PATH}/upload`,
+      to: `/plugins/${PLUGIN_ID}/upload`,
       active: false,
     },
     {
@@ -36,7 +35,7 @@ const useNav: () => NavItem[] = () => {
       label: t('common.download_to_strapi'),
       description: t('download.description'),
       icon: <Download />,
-      to: `${BASE_PATH}/download`,
+      to: `/plugins/${PLUGIN_ID}/download`,
       active: false,
     },
   ];

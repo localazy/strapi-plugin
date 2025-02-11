@@ -1,6 +1,7 @@
 import { SubNav, SubNavHeader, SubNavSection, SubNavSections, SubNavLink } from '@strapi/design-system';
 import { useTranslation } from 'react-i18next';
 import useNav, { NavItem } from '../utils/use-nav';
+import { NavLink } from 'react-router-dom';
 
 const SideNav = () => {
   const { t } = useTranslation();
@@ -18,13 +19,7 @@ const SideNav = () => {
       <SubNavSections>
         <SubNavSection label={t('common.navigation')}>
           {navigation.map((navItem) => (
-            <SubNavLink
-              // TODO: replace href with to (possible?)
-              href={navItem.to}
-              active={isActive(navItem)}
-              icon={navItem.icon}
-              key={navItem.id}
-            >
+            <SubNavLink tag={NavLink} to={navItem.to} active={isActive(navItem)} icon={navItem.icon} key={navItem.id}>
               {navItem.label}
             </SubNavLink>
           ))}
