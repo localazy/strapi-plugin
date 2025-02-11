@@ -93,8 +93,6 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
     async function initComponent() {
       setIsLoading(true);
 
-      uploadAlertsService.subscribe();
-
       setStrapiDefaultLocale(await getStrapiDefaultLocale());
       setLocalazySourceLanguage(await getLocalazySourceLanguage());
 

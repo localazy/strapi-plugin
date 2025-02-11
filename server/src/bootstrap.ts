@@ -67,21 +67,6 @@ const bootstrap = ({ strapi }: { strapi: Core.Strapi }) => {
     });
 
     strapi.StrapIO = io;
-
-    io.on('connection', (socket) => {
-      console.log('New WebSocket connection:', socket.id);
-
-      socket.on('message', (data) => {
-        console.log('Received message from client:', data);
-        socket.emit('server_response', { message: 'Hello from Strapi!' });
-      });
-
-      socket.on('disconnect', () => {
-        console.log('Client disconnected:', socket.id);
-      });
-    });
-
-    console.log('✅ WebSocket server started');
   });
 };
 

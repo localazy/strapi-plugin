@@ -112,8 +112,6 @@ const Download: React.FC<DownloadProps> = (props) => {
     async function initComponent() {
       setIsLoading(true);
 
-      downloadAlertsService.subscribe();
-
       /**
        * Handle alerts onload apperance
        */
@@ -132,6 +130,7 @@ const Download: React.FC<DownloadProps> = (props) => {
 
       setIsLoading(false);
     }
+
     initComponent();
   }, []);
 
