@@ -32,7 +32,7 @@ const LocalazyUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
     }
   },
 
-  createImportFileRepresentation(sourceLang, strings) {
+  createImportFileRepresentation(sourceLang: string, strings: Record<string, any>) {
     const file = {
       [sourceLang]: {
         ...strings,

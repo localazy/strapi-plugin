@@ -65,12 +65,16 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     try {
       const newEntryLocale = newEntry.locale;
       const filteredNewEntry = omitDeep(newEntry, ['createdAt', 'updatedAt']);
-      // * sets as draft (no timestamp)
-      // do not completely omit as it won't process the required fields
-      // TODO: add correct publish/draft status and createdBy/updatedBy fields
+      delete filteredNewEntry.id;
+
+      /**
+       * TODO: add correct publish/draft status and createdBy/updatedBy fields
+       *
+       * Set as draft
+       * Do not completely omit as it won't process the required fields
+       */
       filteredNewEntry.publishedAt = null;
 
-      delete filteredNewEntry.id;
       await strapi.documents(uid).create({
         locale: newEntryLocale,
         data: filteredNewEntry,

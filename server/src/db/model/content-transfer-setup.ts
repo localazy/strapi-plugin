@@ -1,6 +1,8 @@
+import { ContentTransferSetup } from '../../models/plugin/content-transfer-setup';
+
 const KEY = 'content-transfer-setup';
 
-const emptyContentTransferSetup = {
+const emptyContentTransferSetup: ContentTransferSetup = {
   has_setup: false,
   setup: [],
 };

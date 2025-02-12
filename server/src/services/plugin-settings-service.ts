@@ -3,11 +3,11 @@ import { Core } from '@strapi/strapi';
 import { KEY as CONTENT_TRANSFER_SETUP_KEY, emptyContentTransferSetup } from '../db/model/content-transfer-setup';
 import { KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings } from '../db/model/plugin-settings';
 import getStrapiStore from '../db/model/utils/get-strapi-store';
-
+import { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
 const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async getContentTransferSetup(): Promise<Record<string, any>> {
+  async getContentTransferSetup(): Promise<ContentTransferSetup> {
     const pluginStore = getStrapiStore(strapi);
-    const setup = await pluginStore.get({ key: CONTENT_TRANSFER_SETUP_KEY });
+    const setup = (await pluginStore.get({ key: CONTENT_TRANSFER_SETUP_KEY })) as ContentTransferSetup;
 
     return setup || emptyContentTransferSetup;
   },
