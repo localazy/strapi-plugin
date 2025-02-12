@@ -1,4 +1,4 @@
-const isoStrapiToLocalazy = (isoStrapi) => {
+const isoStrapiToLocalazy = (isoStrapi: string): string | null => {
   if (!isoStrapi) {
     return null;
   }
@@ -27,7 +27,7 @@ const isoStrapiToLocalazy = (isoStrapi) => {
   return isoStrapi.replace('-', '_');
 };
 
-const isoLocalazyToStrapi = (isoLocalazy) => {
+const isoLocalazyToStrapi = (isoLocalazy: string): string | null => {
   if (!isoLocalazy) {
     return null;
   }

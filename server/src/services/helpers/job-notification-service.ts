@@ -4,6 +4,8 @@ import { generateRandomId } from '../../utils/generate-random-id';
 import { Server as SocketIOServer } from 'socket.io';
 // TODO: ADD TYPES
 
+export type JobNotificationServiceType = InstanceType<typeof JobNotificationService>;
+
 class JobNotificationService {
   private _strapio: SocketIOServer;
   private _channel: ChannelType;

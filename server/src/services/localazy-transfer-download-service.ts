@@ -17,7 +17,8 @@ import {
   getStrapiLocalazyI18nService,
   getPluginSettingsService,
 } from '../core';
-import { Language } from '@localazy/api-client';
+import { Language, Locales } from '@localazy/api-client';
+import { JobNotificationServiceType } from './helpers/job-notification-service';
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
@@ -43,10 +44,10 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
 };
 
 const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async download(JobNotificationService, ctx) {
+  async download({ notificationService }: { notificationService: JobNotificationServiceType }) {
     console.time('download');
     strapi.log.info('Download started');
-    await JobNotificationService.emit(EventType.DOWNLOAD, {
+    await notificationService.emit(EventType.DOWNLOAD, {
       message: 'Download started',
     });
 
@@ -70,7 +71,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       success = false;
       const message = `File ${config.default.LOCALAZY_DEFAULT_FILE_NAME} not found`;
       strapi.log.error(message);
-      await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+      await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
         success,
         message,
       });
@@ -85,7 +86,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       success = false;
       const message = `Project ${user.project.id} not found`;
       strapi.log.error(message);
-      await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+      await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
         success,
         message,
       });
@@ -103,7 +104,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       success = false;
       const message = 'Source language not found';
       strapi.log.error(message);
-      await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+      await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
         success,
         message,
       });
@@ -118,7 +119,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     if (!projectLanguagesWithoutSourceLanguage.length) {
       const message = 'Your Localazy project is not translated to other languages.';
       strapi.log.info(message);
-      await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+      await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
         success,
         message,
       });
@@ -147,20 +148,20 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
           continue;
         }
 
-        const newLocaleCode = await StrapiI18nService.createStrapiLocale(ctx, isoLocalazy);
-        await JobNotificationService.emit(EventType.DOWNLOAD, {
-          message: `Created locale ${newLocaleCode}`,
+        const newLocale = await StrapiI18nService.createStrapiLocale(isoLocalazy);
+        await notificationService.emit(EventType.DOWNLOAD, {
+          message: `Created locale ${newLocale.code}`,
         });
       } catch (e) {
         strapi.log.error(e.message);
         if (e.name === 'ValidationError') {
           // store unsupported language code
           strapiUnsupportedLanguages.push(isoLocalazy);
-          await JobNotificationService.emit(EventType.DOWNLOAD, {
+          await notificationService.emit(EventType.DOWNLOAD, {
             message: `Language ${isoLocalazy} is not supported by Strapi`,
           });
         } else {
-          await JobNotificationService.emit(EventType.DOWNLOAD, {
+          await notificationService.emit(EventType.DOWNLOAD, {
             message: e.message,
           });
         }
@@ -180,10 +181,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       const langKeys = await LocalazyApi.files.listKeys({
         project: user.project.id,
         file: strapiFile.id,
-        lang: isoStrapi,
+        lang: isoStrapi as Locales,
       });
       if (!langKeys) {
-        await JobNotificationService.emit(EventType.DOWNLOAD, {
+        await notificationService.emit(EventType.DOWNLOAD, {
           message: `No keys found for language ${isoLocalazy}`,
         });
       }
@@ -201,7 +202,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     for (const [isoLocalazy, keys] of Object.entries<any>(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
-        await JobNotificationService.emit(EventType.DOWNLOAD, {
+        await notificationService.emit(EventType.DOWNLOAD, {
           message: `Language ${isoLocalazy} is not supported by Strapi`,
         });
         continue;
@@ -357,14 +358,14 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
 
                 const message = `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`;
                 strapi.log.info(message);
-                await JobNotificationService.emit(EventType.DOWNLOAD, {
+                await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
-                await JobNotificationService.emit(EventType.DOWNLOAD, {
+                await notificationService.emit(EventType.DOWNLOAD, {
                   message: `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`,
                 });
               }
@@ -384,14 +385,14 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
 
                 const message = `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`;
                 strapi.log.info(message);
-                await JobNotificationService.emit(EventType.DOWNLOAD, {
+                await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
-                await JobNotificationService.emit(EventType.DOWNLOAD, {
+                await notificationService.emit(EventType.DOWNLOAD, {
                   message: `Cannot update an ${uid}[${currentLanguageLocalizedEntry.id}] (${isoStrapi}): ${e.message}`,
                 });
               }
@@ -399,7 +400,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
           } catch (e) {
             success = false;
             strapi.log.error(e.message);
-            await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+            await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
               success,
               message: `An error occured while processing download: ${e.message}`,
             });
@@ -409,7 +410,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     }
 
     strapi.log.info('Download finished in');
-    await JobNotificationService.emit(EventType.DOWNLOAD_FINISHED, {
+    await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
       success,
       message: 'Download finished',
     });

@@ -1,4 +1,4 @@
-import type { Core, UID } from '@strapi/strapi';
+import type { Core, UID, Modules } from '@strapi/strapi';
 import { intlDisplayName } from '../utils/intl-display-name';
 import { isoLocalazyToStrapi } from '../utils/iso-locales-utils.js';
 import { omitDeep } from '../utils/omit-deep.js';
@@ -13,35 +13,29 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getDefaultLocaleCode(): Promise<string> {
     return strapi.plugin('i18n').service('locales').getDefaultLocale();
   },
-  async createStrapiLocale(ctx: any, isoLocalazy: any) {
+  async createStrapiLocale(isoLocalazy: string): Promise<Locale> {
     try {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       let localeName = intlDisplayName(isoStrapi);
 
-      if (!localeName || !isoStrapi) {
+      if (typeof localeName !== 'string' || typeof isoStrapi !== 'string') {
         throw new Error('Invalid locale');
       }
       localeName = `${localeName} (${isoStrapi})`;
+      const strippedLocaleName = localeName.substring(0, 50); // limit name to 50 characters (given by Strapi)
 
-      const newLocaleCtx = { ...ctx };
-      newLocaleCtx.request.body = {
-        isDefault: false,
+      const newLocale = await strapi.plugin('i18n').service('locales').create({
+        name: strippedLocaleName,
         code: isoStrapi,
-        name: localeName.substring(0, 50), // limit name to 50 characters (given by Strapi)
-      };
+      });
 
-      await strapi
-        .controller('plugin::i18n.locales')
-        // @ts-expect-error Improve types
-        .createLocale(newLocaleCtx);
-
-      return isoStrapi;
+      return newLocale;
     } catch (e) {
       strapi.log.error(e);
       throw e;
     }
   },
-  parseLocalazyKey(key) {
+  parseLocalazyKey(key: string) {
     const split = key.split(/\.(?![^[]*])|\[|\]/);
     const filteredSplit = split.filter((item) => item !== '');
 
@@ -51,13 +45,19 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
       rest: filteredSplit.slice(3),
     };
   },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getEntryInLocale(modelUid, baseEntryId, isoStrapi, populate = '*') {
+
+  async getEntryInLocale(
+    modelUid: UID.ContentType,
+    documentId: Modules.Documents.AnyDocument['documentId'],
+    isoStrapi: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    populate = '*'
+  ): Promise<Modules.Documents.AnyDocument | null> {
     const StrapiService = getStrapiService();
     const localPopulate = await StrapiService.getPopulateObject(modelUid);
     const entry = await strapi.documents(modelUid).findOne({
-      documentId: baseEntryId,
-      // TODO: resolve populate object build
+      documentId,
+      // TODO: resolve populate object build!
       // https://docs.strapi.io/dev-docs/api/document-service/populate
       // populate: localPopulate,
       pLevel: 6,

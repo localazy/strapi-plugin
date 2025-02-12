@@ -12,11 +12,12 @@ import { isoStrapiToLocalazy } from '../utils/iso-locales-utils';
 import { omitDeep } from '../utils/omit-deep';
 import { EventType } from '../constants/events';
 import { getStrapiService, getStrapiI18nService, getLocalazyUploadService, getPluginSettingsService } from '../core';
+import { JobNotificationServiceType } from './helpers/job-notification-service';
 
 const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async upload(JobNotificationService) {
+  async upload({ notificationService }: { notificationService: JobNotificationServiceType }) {
     console.time('upload');
-    await JobNotificationService.emit(EventType.UPLOAD, {
+    await notificationService.emit(EventType.UPLOAD, {
       message: 'Upload started',
     });
 
@@ -34,7 +35,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     if (!contentTransferSetup.has_setup) {
       const message = 'Content transfer setup is not set up.';
       success = false;
-      await JobNotificationService.emit(EventType.UPLOAD_FINISHED, {
+      await notificationService.emit(EventType.UPLOAD_FINISHED, {
         success,
         message,
       });
@@ -59,7 +60,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
 
       if (!isCollectionTransferEnabled(setup, collectionName)) {
         const message = `Collection ${collectionName} transfer is disabled.`;
-        await JobNotificationService.emit(EventType.UPLOAD, {
+        await notificationService.emit(EventType.UPLOAD, {
           message,
         });
         strapi.log.info(message);
@@ -71,7 +72,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       const pickPaths = getPickPathsWithComponents(currentTransferSetupModel);
       if (!pickPaths.length) {
         const message = `No fields for collection ${collectionName} transfer are enabled.`;
-        await JobNotificationService.emit(EventType.UPLOAD, {
+        await notificationService.emit(EventType.UPLOAD, {
           message,
         });
         strapi.log.warn(message);
@@ -128,6 +129,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     );
     /**
      * Use :`deprecate: "file"` if there is one chunk of transferred data only (99900 keys)!
+     * TODO: parameterize this
      */
     const uploadConfig = {
       contentOptions: {
@@ -140,7 +142,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       },
     };
 
-    await JobNotificationService.emit(EventType.UPLOAD, {
+    await notificationService.emit(EventType.UPLOAD, {
       message: 'Uploading collections to Localazy...',
     });
 
@@ -148,7 +150,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
 
     strapi.log.info('Upload finished in');
 
-    await JobNotificationService.emit(EventType.UPLOAD_FINISHED, {
+    await notificationService.emit(EventType.UPLOAD_FINISHED, {
       success,
       message: 'Upload finished',
     });
