@@ -97,6 +97,7 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
                       label={`switch_tree_${key}`}
                       onCheckedChange={() => onTreeItemClick([`${key}.__model__`], value.__model__)}
                       checked={!!value.__model__}
+                      style={{ marginRight: '1rem' }}
                     />
                   </Flex>
 
