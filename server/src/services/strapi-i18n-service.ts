@@ -2,7 +2,7 @@ import type { Core, UID, Modules } from '@strapi/strapi';
 import { intlDisplayName } from '../utils/intl-display-name';
 import { isoLocalazyToStrapi } from '../utils/iso-locales-utils.js';
 import { omitDeep } from '../utils/omit-deep.js';
-import { getStrapiService } from '../core';
+// import { getStrapiService } from '../core';
 import type { Locale } from '../models/strapi/locale';
 // TODO: ADD TYPES
 
@@ -53,14 +53,14 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     populate = '*'
   ): Promise<Modules.Documents.AnyDocument | null> {
-    const StrapiService = getStrapiService();
-    const localPopulate = await StrapiService.getPopulateObject(modelUid);
+    // const StrapiService = getStrapiService();
+    // const localPopulate = await StrapiService.getPopulateObject(modelUid);
     const entry = await strapi.documents(modelUid).findOne({
       documentId,
       // TODO: resolve populate object build!
       // https://docs.strapi.io/dev-docs/api/document-service/populate
       // populate: localPopulate,
-      pLevel: 6,
+      locDownloadPLevel: 6,
       locale: isoStrapi,
     });
 

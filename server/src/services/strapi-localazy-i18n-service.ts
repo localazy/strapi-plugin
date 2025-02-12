@@ -4,7 +4,7 @@ import { omitDeep } from '../utils/omit-deep';
 import { merge } from 'lodash-es';
 import { Core, UID } from '@strapi/strapi';
 import { dropPropertyDeep } from '../utils/drop-property-deep';
-import { getStrapiI18nService, getStrapiService } from '../core';
+import { getStrapiI18nService /*, getStrapiService*/ } from '../core';
 // TODO: ADD TYPES
 
 const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -50,7 +50,7 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   async updateEntry(uid, localizedDocumentId: string, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
-    const StrapiService = getStrapiService();
+    // const StrapiService = getStrapiService();
     const StrapiI18nService = getStrapiI18nService();
 
     // const populate = await StrapiService.getPopulateObject(uid);
@@ -58,13 +58,13 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     const localizedEntry = await strapi.documents(uid as any).findOne({
       documentId: localizedDocumentId,
       locale: isoStrapi,
-      pLevel: 6,
+      locUploadPLevel: 6,
     });
 
     const fullyPopulatedLocalizedEntry = await strapi.documents(uid as any).findOne({
       documentId: localizedDocumentId,
       locale: isoStrapi,
-      pLevel: 6,
+      locDownloadPLevel: 6,
     });
 
     const updateEntry = await parsedLocalazyEntryToUpdateEntry(

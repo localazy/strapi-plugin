@@ -30,7 +30,7 @@ export const parsedLocalazyEntryToUpdateEntry = async (
   let updateEntry = {};
   merge(updateEntry, currentEntry, createEntry);
   updateEntry = omitDeep(updateEntry, [
-    // '__component',
+    // '__component', // do not omit the __component
     'locale',
     'localizations',
     'createdAt',

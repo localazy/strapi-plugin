@@ -36,17 +36,15 @@ export type FullPopulateObject =
 const getFullPopulateLocalazyDownloadObject = (
   modelUid: string,
   maxDepth: number = DEFAULT_POPULATE_DEPTH,
-  ignore: string[] = ['localizations', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'publishedAt']
+  ignore: string[] = ['localizations', 'createdAt', 'updatedAt', 'publishedAt']
 ): FullPopulateObject => {
-  const skipCreatorFields = strapi.plugin('strapi-plugin-v5')?.config('skipCreatorFields');
-
   let localDepth = maxDepth;
 
   if (localDepth <= 1) {
     return true;
   }
-  if (modelUid === 'admin::user' && skipCreatorFields) {
-    return undefined;
+  if (modelUid === 'admin::user') {
+    return true;
   }
 
   const populate = {};
@@ -67,11 +65,8 @@ const getFullPopulateLocalazyDownloadObject = (
         }, {});
         populate[key] = isEmpty(dynamicPopulate) ? true : { on: dynamicPopulate };
       } else if (value.type === 'relation') {
-        const relationPopulate = getFullPopulateLocalazyDownloadObject(
-          value.target,
-          key === 'localizations' && maxDepth > 2 ? 1 : maxDepth - 1,
-          ignore
-        );
+        // do not fill relation with more than 1 level for download purposes
+        const relationPopulate = getFullPopulateLocalazyDownloadObject(value.target, 1, ignore);
         if (relationPopulate) {
           populate[key] = relationPopulate;
         }

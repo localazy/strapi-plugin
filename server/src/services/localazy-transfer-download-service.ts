@@ -317,7 +317,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             const baseEntry = await strapi.documents(uid as any).findOne({
               documentId,
               // TODO: Resolve pLevel parameter type
-              pLevel: 6,
+              locDownloadPLevel: 6,
             });
 
             if (isEmpty(baseEntry)) {
