@@ -1,13 +1,10 @@
-import { Core } from '@strapi/strapi';
 import { getPluginSettingsService } from '../../core';
-
+import type { PluginSettingsServiceReturnType } from '../plugin-settings-service';
 class PluginSettingsServiceHelper {
-  private strapi: Core.Strapi;
-  private PluginSettingsService: any;
+  private PluginSettingsService: PluginSettingsServiceReturnType;
   private pluginSettings: any;
 
-  constructor(strapi: Core.Strapi) {
-    this.strapi = strapi;
+  constructor() {
     this.PluginSettingsService = getPluginSettingsService();
   }
 
@@ -15,47 +12,47 @@ class PluginSettingsServiceHelper {
     this.pluginSettings = await this.PluginSettingsService.getPluginSettings();
   }
 
-  shouldAllowAutomatedUpload() {
+  shouldAllowAutomatedUpload(): boolean {
     return typeof this.pluginSettings?.upload?.allowAutomated === 'boolean'
       ? this.pluginSettings.upload.allowAutomated
       : false;
   }
 
-  shouldAllowAutomatedCreatedTrigger() {
+  shouldAllowAutomatedCreatedTrigger(): boolean {
     const automatedTriggers = this.getAutomatedUploadTriggers();
     return this.shouldAllowAutomatedUpload() && automatedTriggers.includes('created');
   }
 
-  shouldAllowAutomatedUpdatedTrigger() {
+  shouldAllowAutomatedUpdatedTrigger(): boolean {
     const automatedTriggers = this.getAutomatedUploadTriggers();
     return this.shouldAllowAutomatedUpload() && automatedTriggers.includes('updated');
   }
 
-  getAutomatedUploadTriggers() {
+  getAutomatedUploadTriggers(): string[] {
     return this.pluginSettings?.upload?.automatedTriggers || [];
   }
 
-  shouldAllowDeprecateOnDeletion() {
+  shouldAllowDeprecateOnDeletion(): boolean {
     return typeof this.pluginSettings?.upload?.allowDeprecate === 'boolean'
       ? this.pluginSettings.upload.allowDeprecate
       : false;
   }
 
-  shouldAllowWebhookDownloadProcess() {
+  shouldAllowWebhookDownloadProcess(): boolean {
     return typeof this.pluginSettings?.download?.processDownloadWebhook === 'boolean'
       ? this.pluginSettings.download.processDownloadWebhook
       : true;
   }
 
-  getWebhookAuthorId() {
+  getWebhookAuthorId(): string | null {
     return this.pluginSettings?.download?.webhookAuthorId || null;
   }
 
-  getWebhookLanguagesCodes() {
+  getWebhookLanguagesCodes(): string[] {
     return this.pluginSettings?.download?.webhookLanguages || [];
   }
 
-  getUiLanguagesCodes() {
+  getUiLanguagesCodes(): string[] {
     return this.pluginSettings?.download?.uiLanguages || [];
   }
 }

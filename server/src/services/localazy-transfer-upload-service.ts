@@ -90,7 +90,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         // TODO: Resolve pLevel parameter type
         // @ts-expect-error Improve types
         // pLevel: 6,
-        localazyPLevel: 6,
+        locUploadPLevel: 6,
       });
 
       if (!entries.length) {

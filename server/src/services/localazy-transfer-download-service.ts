@@ -1,7 +1,10 @@
 import { findSetupModelByCollectionUid } from '../utils/transfer-setup-utils';
 import config from '../config';
 import { isoLocalazyToStrapi } from '../utils/iso-locales-utils';
-import { shouldSetDownloadedProperty } from '../functions/should-set-downloaded-property';
+import {
+  shouldSetDownloadedProperty,
+  ShouldSetDownloadedPropertyReturnType,
+} from '../functions/should-set-downloaded-property';
 import { set, get, isEmpty } from 'lodash-es';
 import RequestInitiatorHelper from '../utils/request-initiator-helper';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
@@ -20,11 +23,11 @@ import {
 import { Language, Locales } from '@localazy/api-client';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
-const getFilteredLanguagesCodesForDownload = async (languagesCodes) => {
-  const pluginSettingsServiceHelper = new PluginSettingsServiceHelper(strapi);
+const getFilteredLanguagesCodesForDownload = async (languagesCodes: string[]): Promise<string[]> => {
+  const pluginSettingsServiceHelper = new PluginSettingsServiceHelper();
   const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
   await pluginSettingsServiceHelper.setup();
-  let localLanguagesCodes;
+  let localLanguagesCodes: string[];
   if (requestInitiatorHelper.isInitiatedByLocalazyWebhook()) {
     // called by a webhook
     localLanguagesCodes = pluginSettingsServiceHelper.getWebhookLanguagesCodes();
@@ -225,12 +228,12 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             modelContentTransferSetup,
             parsedKey.rest
           );
-          if (shouldSetDownloadedPropertyResult === 'no') {
+          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.NO) {
             continue;
           }
 
           let parsedKeyRestWithoutComponents = parsedKey.rest;
-          if (shouldSetDownloadedPropertyResult === 'json') {
+          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.JSON) {
             const setKey = [isoStrapi, parsedKey.uid, parsedKey.id];
 
             // handle dynamic zones and components here
@@ -272,7 +275,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             jsonFields[foundJsonFieldIndex] = foundJsonField;
           }
 
-          if (shouldSetDownloadedPropertyResult === 'yes') {
+          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.YES) {
             const setKey = [isoStrapi, parsedKey.uid, parsedKey.id, ...parsedKeyRestWithoutComponents];
             set(parsedLocalazyContent, setKey, value);
           }
