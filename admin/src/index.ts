@@ -1,7 +1,7 @@
 import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
-import Localazy from './modules/@common/components/Icons/Localazy';
+import { Localazy } from './modules/@common/components/Icons/Localazy';
 import FetchIdentity from './modules/login/components/FetchIdentity';
 import React from 'react';
 
@@ -29,7 +29,7 @@ export default {
 
 const addMenuLink = (app: any) => {
   app.addMenuLink({
-    to: `plugins/${PLUGIN_ID}`,
+    to: `plugins/${PLUGIN_ID}/`,
     icon: Localazy,
     intlLabel: {
       id: `${PLUGIN_ID}.name`,
