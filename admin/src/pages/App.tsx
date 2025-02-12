@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { DesignSystemProvider, lightTheme, Box } from '@strapi/design-system';
+import { DesignSystemProvider, Box } from '@strapi/design-system';
 import { useEffect } from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
 import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
@@ -11,12 +11,12 @@ import Login from './Login';
 import { Layouts } from '@strapi/strapi/admin';
 import SideNav from '../modules/@common/components/SideNav';
 import Overview from './Overview';
+import { getDefaultTheme } from '../modules/strapi/utils/get-default-theme';
 
 // import and load resources
 import '../i18n';
 import { Upload } from './Upload';
 import Download from './Download';
-
 const App = () => {
   const location = useLocation();
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
@@ -40,7 +40,7 @@ const App = () => {
   }, [setIdentity]);
 
   return (
-    <DesignSystemProvider theme={lightTheme}>
+    <DesignSystemProvider theme={getDefaultTheme()}>
       <Box background='neutral100'>
         <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
           <Routes>
