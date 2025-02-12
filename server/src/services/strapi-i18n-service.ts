@@ -49,17 +49,12 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getEntryInLocale(
     modelUid: UID.ContentType,
     documentId: Modules.Documents.AnyDocument['documentId'],
-    isoStrapi: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    populate = '*'
+    isoStrapi: string
   ): Promise<Modules.Documents.AnyDocument | null> {
-    // const StrapiService = getStrapiService();
-    // const localPopulate = await StrapiService.getPopulateObject(modelUid);
     const entry = await strapi.documents(modelUid).findOne({
       documentId,
       // TODO: resolve populate object build!
       // https://docs.strapi.io/dev-docs/api/document-service/populate
-      // populate: localPopulate,
       locDownloadPLevel: 6,
       locale: isoStrapi,
     });
@@ -91,29 +86,6 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
   async updateLocalizationForAnExistingEntry(uid, localizedDocumentId, data, locale: string) {
     try {
-      // const StrapiService = getStrapiService();
-      // const strapiContentTypesModels = await StrapiService.getModels();
-      // const populate = await StrapiService.getPopulateObject(uid);
-
-      // // Bugfix by <emanuele.c@dacoco.io>:
-      // // Prevents IDs to be appended when updating a localized entry. When IDs are present
-      // // Strapi attempts to update a not yet existent ID into the DB
-      // if (strapiContentTypesModels) {
-      //   const filtered = find(strapiContentTypesModels, (model) => model.uid === uid);
-      //   if (filtered?.attributes) {
-      //     for (let attribute in filtered.attributes) {
-      //       if (filtered.attributes[attribute]?.type === 'dynamiczone') {
-      //         if (!populate[attribute] || populate[attribute] !== 'deep') {
-      //           populate[attribute] = 'deep';
-      //         }
-      //         forEach(data[attribute], (prop) => {
-      //           if (prop?.id) delete prop.id;
-      //         });
-      //       }
-      //     }
-      //   }
-      // }
-
       const updatedEntry = await strapi.documents(uid as any).update({
         documentId: localizedDocumentId,
         locale,

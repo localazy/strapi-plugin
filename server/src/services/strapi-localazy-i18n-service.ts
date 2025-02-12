@@ -50,11 +50,7 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   async updateEntry(uid, localizedDocumentId: string, strapiContentTypesModels, translatedModel, baseEntry, isoStrapi) {
-    // const StrapiService = getStrapiService();
     const StrapiI18nService = getStrapiI18nService();
-
-    // const populate = await StrapiService.getPopulateObject(uid);
-    // TODO: Correct populate
     const localizedEntry = await strapi.documents(uid as any).findOne({
       documentId: localizedDocumentId,
       locale: isoStrapi,
