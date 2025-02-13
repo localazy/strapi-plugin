@@ -12,6 +12,7 @@ export default [
   // TypeScript files configuration
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['install/webpack.config.example.ts', 'install/vite.config.example.ts'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
