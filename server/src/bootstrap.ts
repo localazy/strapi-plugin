@@ -38,7 +38,10 @@ const bootstrap = ({ strapi }: { strapi: Core.Strapi }) => {
           break;
         }
       }
-      case 'beforeDeleteMany':
+      /**
+       * 'beforeDeleteMany' won't ever be called in Strapi 5
+       * See https://docs.strapi.io/dev-docs/migration/v4-to-v5/breaking-changes/lifecycle-hooks-document-service#breaking-change-description
+       */
       case 'beforeDelete': {
         try {
           if (

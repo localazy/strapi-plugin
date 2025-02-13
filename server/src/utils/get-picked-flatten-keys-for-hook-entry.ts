@@ -44,23 +44,37 @@ const getEventEntries = async (event: any) => {
       return entry;
     }
     case 'beforeDelete': {
+      /**
+       * Strapi `beforeDelete` licecycle event is limited and does not provide the `documentId`
+       * Fetch from deprecated `entityService` instead to get the `documentId`
+       */
+      const whereId = event.params.where.id;
+      const entryById = await strapi.entityService.findOne(event.model.uid, whereId);
+
+      if (!entryById) {
+        return [];
+      }
+
+      /**
+       * Even though `id` of localized entry is provided in `event.params.where`,
+       * default locale entry is returned instead
+       *
+       * This check is to ensure that only if base locale entry is deleted,
+       * the deprecation process proceeds
+       */
+      if (entryById.id !== whereId) {
+        return [];
+      }
+
+      const documentId = entryById.documentId;
       const entry = [
         await strapi.documents(event.model.uid).findOne({
-          /**
-           * TODO: CONTINUE HERE
-           * TODO: test this
-           * How to get the documentId from the event.params.where? (id only exists event)
-           */
-          documentId: event.params.where.documentId,
+          documentId,
           locUploadPLevel: 6,
         }),
       ];
       return entry;
     }
-    /**
-     * 'beforeDeleteMany' won't ever be called in Strapi 5
-     * See https://docs.strapi.io/dev-docs/migration/v4-to-v5/breaking-changes/lifecycle-hooks-document-service#breaking-change-description
-     */
     default: {
       throw new Error('Unhandled event action');
     }
@@ -88,8 +102,7 @@ const shouldSkipAction = async (event: any) => {
       }
       return false;
     }
-    case 'beforeDelete':
-    case 'beforeDeleteMany': {
+    case 'beforeDelete': {
       if (!PluginSettingsServiceHelperInstance.shouldAllowDeprecateOnDeletion()) {
         strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because deprecate on deletion is disabled.`);
         return true;
