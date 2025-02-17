@@ -1,11 +1,11 @@
-const isDynamicZoneKey = (key) => {
+const isDynamicZoneKey = (key: string) => {
   const matches = key.match(/\[\d+;[\w-]+\./g);
   return matches !== null;
 };
 
-const pickEntries = (flatten, pickPaths) => {
+const pickEntries = (flatten: Record<string, any>, pickPaths: string[]) => {
   // * Dynamic zones properties must! always be in 1st level (not in component; Strapi restrictions)
-  const pickedEntries = {};
+  const pickedEntries: Record<string, any> = {};
   const mappedPickPaths = pickPaths.map((pickPath) => pickPath.replace(/\[\d+\]/g, ''));
 
   // filter out "__component"
