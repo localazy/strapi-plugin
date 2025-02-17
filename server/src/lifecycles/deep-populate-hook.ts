@@ -6,6 +6,7 @@ import {
 } from '../utils/get-full-populate-object';
 import { getFullPopulateLocalazyUploadObject } from '../utils/get-full-populate-localazy-upload-object';
 import { getFullPopulateLocalazyDownloadObject } from '../utils/get-full-populate-localazy-download-object';
+import { PLUGIN_NAME } from '../config/core/config';
 import type { UID } from '@strapi/strapi';
 
 export enum ChosenPopulateParam {
@@ -46,12 +47,11 @@ const deepPopulateHook = (event: DeepPopulateHookEvent) => {
     return;
   }
 
-  const populateDefaultDepth = (strapi.plugin('strapi-plugin-v5')?.config('populateDefaultDepth') ??
+  const populateDefaultDepth = (strapi.plugin(PLUGIN_NAME)?.config('populateDefaultDepth') ??
     DEFAULT_POPULATE_DEPTH) as number;
   // adjust invalid (0) is not a valid depth
   let depth = Math.max(eventDepth, populateDefaultDepth, 1);
-  const maxDepth = (strapi.plugin('strapi-plugin-v5')?.config('populateMaxDepth') ??
-    DEFAULT_MAX_POPULATE_DEPTH) as number;
+  const maxDepth = (strapi.plugin(PLUGIN_NAME)?.config('populateMaxDepth') ?? DEFAULT_MAX_POPULATE_DEPTH) as number;
   if (depth > maxDepth) {
     depth = maxDepth;
   }

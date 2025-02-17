@@ -13,6 +13,8 @@
 
 import isEmpty from 'lodash-es/isEmpty';
 import merge from 'lodash-es/merge';
+import { PLUGIN_NAME } from '../config/core/config';
+
 const DEFAULT_MAX_POPULATE_DEPTH = 10;
 const DEFAULT_POPULATE_DEPTH = 5;
 
@@ -38,7 +40,7 @@ const getFullPopulateObject = (
   maxDepth: number = DEFAULT_POPULATE_DEPTH,
   ignore: string[] = []
 ): FullPopulateObject => {
-  const skipCreatorFields = strapi.plugin('strapi-plugin-v5')?.config('skipCreatorFields');
+  const skipCreatorFields = strapi.plugin(PLUGIN_NAME)?.config('skipCreatorFields');
 
   let localDepth = maxDepth;
 
