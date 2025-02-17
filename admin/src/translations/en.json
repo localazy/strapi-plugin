@@ -1,4 +1,5 @@
 {
-  "localazy_settings": "Localazy Settings",
-  "content_transfer_setup": "Content Transfer Setup"
+  "strapi-plugin-v5.name": "Localazy",
+  "strapi-plugin-v5.localazy_settings": "Localazy Settings",
+  "strapi-plugin-v5.content_transfer_setup": "Content Transfer Setup"
 }
