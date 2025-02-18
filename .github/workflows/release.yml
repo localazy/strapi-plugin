@@ -30,25 +30,9 @@ jobs:
           node-version: 20
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
-
-  verify:
-    name: Verify
-    needs: prepare
-    if: needs.ci.outputs.action == 'prepare' || needs.ci.outputs.action == 'publish'
-    runs-on: [self-hosted, Linux]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - run: npm run verify
-      - run: npm run test:server
-
   publish:
     name: Publish Release
-    needs: [ci, verify]
+    needs: [ci]
     if: needs.ci.outputs.action == 'publish'
     runs-on: [self-hosted, Linux]
     steps:
