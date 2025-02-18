@@ -203,5 +203,3 @@ export const parsedLocalazyEntryToCreateEntry = (
   resetArrayKeysDeep(createEntry, repeatableComponentsKeystoFilter);
   return { createEntry, dynamicZoneComponentKeys };
 };
-
-module.exports = parsedLocalazyEntryToCreateEntry;
