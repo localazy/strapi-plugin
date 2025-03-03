@@ -66,4 +66,3 @@
 * LOC-1096 -  Fix Analytics User Identification Within Integrations (#51) ([6000259](https://github.com/localazy/strapi-plugin/commit/6000259)), closes [#51](https://github.com/localazy/strapi-plugin/issues/51)
 
 
-
