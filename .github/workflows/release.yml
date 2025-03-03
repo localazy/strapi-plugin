@@ -30,9 +30,10 @@ jobs:
           node-version: 20
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
+
   publish:
     name: Publish Release
-    needs: [ci]
+    needs: ci
     if: needs.ci.outputs.action == 'publish'
     runs-on: [self-hosted, Linux]
     steps:
