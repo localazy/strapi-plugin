@@ -1,3 +1,12 @@
+## 0.2.13 (2025-03-03)
+### 🔀 Pull Requests
+
+- [Fix webhook secret fetch 2 #76](https://github.com/localazy/strapi-plugin/pull/76)
+
+### 🐛 Bug Fixes
+
+- **webhook:** simplify secret retrieval from Localazy API ([97f1fe6](https://github.com/localazy/strapi-plugin/commit/97f1fe6)) ([#76](https://github.com/localazy/strapi-plugin/pull/76))
+
 ## 0.2.12 (2024-11-14)
 ### 🔀 Pull Requests
 
