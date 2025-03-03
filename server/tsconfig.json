@@ -1,9 +1,0 @@
-{
-  "extends": "@strapi/typescript-utils/tsconfigs/server",
-  "include": ["./src"],
-  "compilerOptions": {
-    "rootDir": "../",
-    "baseUrl": "."
-  },
-  "types": ["@david-vaclavek/deep-keys", "strapio", "strapi"]
-}
