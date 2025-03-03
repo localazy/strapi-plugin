@@ -24,9 +24,8 @@ module.exports = (config, { strapi }) => {
         .service("localazyUserService");
       const user = await LocalazyUserService.getUser();
 
-      const result = await LocalazyPubApiService.getWebhooksSecret(user.project.id);
+      const secret = await LocalazyPubApiService.getWebhooksSecret(user.project.id);
 
-      const { secret } = result;
       const xLocalazyHmac = ctx.request.header["x-localazy-hmac"];
       const xLocalazyTimestamp = ctx.request.header["x-localazy-timestamp"];
 
