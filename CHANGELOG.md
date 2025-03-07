@@ -1,3 +1,12 @@
+# 1.0.0-beta.1 (2025-03-07)
+### 🔀 Pull Requests
+
+- [FIX - Plugin name import  #79](https://github.com/localazy/strapi-plugin/pull/79)
+
+### 🧰 Other Commits
+
+- **config:** update package name import in config ([badb55c](https://github.com/localazy/strapi-plugin/commit/badb55c)) ([#79](https://github.com/localazy/strapi-plugin/pull/79))
+
 ## 1.0.0-beta.0 (2025-03-07)
 ### 🔀 Pull Requests
 
