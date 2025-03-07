@@ -1,3 +1,3 @@
-import { name } from '../../../../package.json';
+import { strapi } from '../../../../package.json';
 
-export const PLUGIN_NAME = name;
+export const PLUGIN_NAME = strapi.name;
