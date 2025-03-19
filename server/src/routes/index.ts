@@ -4,11 +4,10 @@ import PluginSettingsRoutes from './plugin-settings-routes';
 import StrapiRoutes from './strapi-routes';
 import LocalazyTransferRoutes from './localazy-transfer-routes';
 import LocalazyProjectRoutes from './localazy-project-routes';
-// import localazyPublicTransferRoutes from "./localazy-public-transfer";
+import LocalazyPublicTransferRoutes from './localazy-public-transfer-routes';
 
 export default {
   'content-api': {
-    type: 'content-api',
     routes: [...StrapiRoutes],
   },
   admin: {
@@ -22,5 +21,7 @@ export default {
       ...LocalazyProjectRoutes,
     ],
   },
-  // localazyPublicTransferRoutes,
+  LocalazyPublicTransferRoutes: {
+    routes: [...LocalazyPublicTransferRoutes],
+  },
 };
