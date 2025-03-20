@@ -80,8 +80,6 @@ const ContentTransferSetup: React.FC = () => {
   };
 
   const onTreeItemClick = (keys: any, currentValue: any) => {
-    console.log('keys', keys);
-    console.log('currentValue', currentValue);
     setFormModel((prevState: any) => {
       // model of a subtree is the same for each of the keys
       const modelName = keys[0].split('.')[0];
@@ -164,9 +162,6 @@ const ContentTransferSetup: React.FC = () => {
 
       setFormModel(computedFormModel as any);
       setOriginalFormModel(cloneDeep(computedFormModel as any));
-
-      console.log('computedFormModel');
-      console.log(computedFormModel);
 
       /**
        * Handle alerts onload apperance

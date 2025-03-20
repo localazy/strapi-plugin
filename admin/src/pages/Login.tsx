@@ -4,7 +4,6 @@ import Loader from '../modules/@common/components/PluginPageLoader';
 import { useLocalazyIdentity } from '../state/localazy-identity';
 import LocalazyUserService from '../modules/user/services/localazy-user-service';
 import LoginButton from '../modules/login/components/LoginButton';
-import { useRedirectToPluginRoute, PLUGIN_ROUTES } from '../modules/@common/utils/redirect-to-plugin-route';
 import ProductAnalyticsService from '../modules/@common/services/product-analytics-service';
 import { LocalazyIdentity } from '../modules/user/model/localazy-identity';
 import { Layouts } from '@strapi/strapi/admin';
@@ -18,7 +17,6 @@ type LoginProps = {
 
 const Login: React.FC<LoginProps> = ({ title, subtitle, isLoading = false }) => {
   const { t } = useTranslation();
-  const { navigateToPluginRoute } = useRedirectToPluginRoute();
   /**
    * Localazy Strapi documentation link
    */
@@ -38,10 +36,8 @@ const Login: React.FC<LoginProps> = ({ title, subtitle, isLoading = false }) => 
   useEffect(() => {
     if (isLoggedIn && identity.user && identity.project) {
       ProductAnalyticsService.trackAppConnected(identity.user.id, identity.project);
-
-      navigateToPluginRoute(PLUGIN_ROUTES.DOWNLOAD);
     }
-  }, [isLoggedIn, identity, navigateToPluginRoute]);
+  }, [isLoggedIn, identity]);
 
   return (
     <>

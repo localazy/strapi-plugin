@@ -9,7 +9,7 @@ import { set, get, isEmpty } from 'lodash-es';
 import RequestInitiatorHelper from '../utils/request-initiator-helper';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
 import { EventType } from '../constants/events';
-import localazyApiClientFactory from '../utils/localazy-api-client-factory';
+import LocalazyApiClientFactory from '../utils/localazy-api-client-factory';
 import { Core, UID } from '@strapi/strapi';
 
 import {
@@ -178,7 +178,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       (languageCode) => !strapiUnsupportedLanguages.includes(languageCode)
     );
     const localazyContent = {};
-    const LocalazyApi = await localazyApiClientFactory();
+    const LocalazyApi = await LocalazyApiClientFactory();
     for (const isoLocalazy of supportedLanguages) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       const langKeys = await LocalazyApi.files.listKeys({

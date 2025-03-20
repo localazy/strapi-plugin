@@ -1,24 +1,19 @@
-import { Locales } from '@localazy/api-client';
-
-export const isoStrapiToLocalazy = (isoStrapi: string): Locales | '' => {
+const isoStrapiToLocalazy = (isoStrapi: string): string | null => {
   if (!isoStrapi) {
-    return '';
+    return null;
   }
 
   const split = isoStrapi.split('-');
   const language = split[0];
 
   const hasRegionAndScript = split.length === 3;
-
   if (hasRegionAndScript) {
     const script = split[1];
     const region = split[2];
-
-    return `${language}_${region}#${script}` as Locales;
+    return `${language}_${region}#${script}`;
   }
 
   const hasPossiblyRegion = split.length === 2;
-
   if (hasPossiblyRegion) {
     const regionOrScript = split[1];
 
@@ -26,20 +21,19 @@ export const isoStrapiToLocalazy = (isoStrapi: string): Locales | '' => {
     const isItRegion = regionOrScript.toUpperCase() === regionOrScript;
 
     // it is region; otherwise it is script
-    return isItRegion ? (`${language}_${regionOrScript}` as Locales) : (`${language}#${regionOrScript}` as Locales);
+    return isItRegion ? `${language}_${regionOrScript}` : `${language}#${regionOrScript}`;
   }
 
-  return isoStrapi.replace('-', '_') as Locales;
+  return isoStrapi.replace('-', '_');
 };
 
-export const isoLocalazyToStrapi = (isoLocalazy: Locales): string => {
+const isoLocalazyToStrapi = (isoLocalazy: string): string | null => {
   if (!isoLocalazy) {
-    return '';
+    return null;
   }
 
   const scriptIndex = isoLocalazy.indexOf('#');
   const hasScript = scriptIndex > -1;
-
   if (hasScript) {
     const script = isoLocalazy.substring(scriptIndex + 1);
     const isoLocalazyWithoutScript = isoLocalazy.substring(0, scriptIndex);
@@ -52,9 +46,10 @@ export const isoLocalazyToStrapi = (isoLocalazy: Locales): string => {
     }
 
     const isoStrapi = `${language}-${script}-${region.toUpperCase()}`;
-
     return isoStrapi;
   }
 
   return isoLocalazy.replace('_', '-');
 };
+
+export { isoStrapiToLocalazy, isoLocalazyToStrapi };
