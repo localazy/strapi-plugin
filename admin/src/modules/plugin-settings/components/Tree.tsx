@@ -3,6 +3,12 @@ import { Box, Flex, Switch, Checkbox, Accordion } from '@strapi/design-system';
 import { DynamicZoneField } from '@strapi/icons/symbols';
 import { TreeItem } from './TreeItem';
 import { flattenObject } from '../../@common/functions/flatten-deep';
+import { useTranslation } from 'react-i18next';
+
+interface RecursiveObjectRecord {
+  [key: string]: RecursiveObject;
+}
+type RecursiveObject = RecursiveObjectRecord | boolean | string | number | null;
 
 interface TreeProps {
   objects: any[];
@@ -11,6 +17,8 @@ interface TreeProps {
 }
 
 const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded = false }) => {
+  const { t } = useTranslation();
+
   const [, setIsExpanded] = useState(initiallyExpanded);
 
   useEffect(() => {
@@ -25,6 +33,26 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
       return 'indeterminate';
     }
     return false;
+  };
+
+  const getCheckedStateCount = (value: RecursiveObject): number => {
+    if (typeof value === 'undefined' || value === null) {
+      return 0;
+    }
+    if (typeof value === 'boolean') {
+      return value ? 1 : 0;
+    }
+    if (Array.isArray(value)) {
+      return value.reduce((acc: number, v: RecursiveObject) => acc + getCheckedStateCount(v), 0);
+    }
+    if (typeof value === 'object') {
+      // filter out __model__ and __component__
+      const filteredValue = Object.fromEntries(
+        Object.entries(value).filter(([key]) => !['__model__', '__component__'].includes(key))
+      );
+      return Object.values(filteredValue).reduce((acc: number, v: RecursiveObject) => acc + getCheckedStateCount(v), 0);
+    }
+    return 0;
   };
 
   const createTree = (name: string, branch: any[], path = '') => {
@@ -91,7 +119,9 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
                 <Accordion.Item value={key}>
                   <Flex alignItems='center' justifyContent='space-between'>
                     <Accordion.Header style={{ flex: 1 }}>
-                      <Accordion.Trigger description={key}>{key}</Accordion.Trigger>
+                      <Accordion.Trigger description={key}>
+                        {key} {t('plugin_settings.tree_item_count', { count: getCheckedStateCount(value) })}
+                      </Accordion.Trigger>
                     </Accordion.Header>
                     <Switch
                       label={`switch_tree_${key}`}
