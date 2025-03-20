@@ -29,7 +29,7 @@ const LoginButton = (props: LoginButtonProps) => {
         clientId: config.LOCALAZY_OAUTH_APP_CLIENT_ID,
         customId: keys.writeKey,
         allowCreate: true,
-        createLocale: localazyFormatLocaleCode ? localazyFormatLocaleCode : ('en' as Locales),
+        createLocale: localazyFormatLocaleCode ? (localazyFormatLocaleCode as Locales) : ('en' as Locales),
       },
       config.LOCALAZY_OAUTH_URL
     );

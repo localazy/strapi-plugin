@@ -1,6 +1,6 @@
 import getPickedFlattenKeysForHookEntry from '../utils/get-picked-flatten-keys-for-hook-entry';
 import config from '../config';
-import localazyApiClientFactory from '../utils/localazy-api-client-factory';
+import LocalazyApiClientFactory from '../utils/localazy-api-client-factory';
 import { delay } from '../utils/delay';
 import { getLocalazyUserService, getLocalazyPubAPIService } from '../core';
 
@@ -27,7 +27,7 @@ export default async (event: any) => {
     return;
   }
 
-  const LocalazyApi = await localazyApiClientFactory();
+  const LocalazyApi = await LocalazyApiClientFactory();
   const projectKeys = await LocalazyApi.files.listKeys({
     project: user.project.id,
     file: strapiFile.id,
