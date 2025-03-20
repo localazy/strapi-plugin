@@ -23,10 +23,9 @@ import { LanguagesSelector } from '../modules/@common/components/LanguagesSelect
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import StrapiUsersService from '../modules/plugin-settings/services/strapi-users-service';
 import ProjectService from '../modules/@common/services/project-service';
-
+import { AdminPanelUser } from '../modules/plugin-settings/models/admin-panel-user';
 // TODO: ADD TYPES
 
-// TODO: Rewrite as provider component
 // import and load resources
 import '../i18n';
 
@@ -54,7 +53,7 @@ const GlobalSettings: React.FC = () => {
   /**
    * Admin Panel Users
    */
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<AdminPanelUser[]>([]);
 
   /**
    * Global Settings form model
@@ -90,6 +89,10 @@ const GlobalSettings: React.FC = () => {
     set(newFormModel, key, value);
     setFormModel(newFormModel);
     setHasUnsavedChanges(!isEqual(originalFormModel, newFormModel));
+  };
+
+  const getUserLabel = (user: AdminPanelUser) => {
+    return `${user.firstname} ${user.lastname || ''}${user.lastname ? ' ' : ''}(${user.email})`;
   };
 
   useEffect(() => {
@@ -258,7 +261,7 @@ const GlobalSettings: React.FC = () => {
                 >
                   {users.map((user) => (
                     <SingleSelectOption key={user.id} value={user.id}>
-                      {`${user.firstname} ${user.lastname} (${user.email})`}
+                      {getUserLabel(user)}
                     </SingleSelectOption>
                   ))}
                 </SingleSelect>
