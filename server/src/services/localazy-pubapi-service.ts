@@ -1,6 +1,7 @@
 import { Core } from '@strapi/strapi';
 import LocalazyApiClientFactory from '../utils/localazy-api-client-factory';
 import config from '../config';
+import { Project } from '@localazy/api-client';
 
 const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async listFiles(projectId: string) {
@@ -38,16 +39,25 @@ const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
       return [];
     }
   },
-  async getProject(projectId: string, addOrganization = true, addLanguages = true) {
-    const projects = await this.listProjects(addOrganization, addLanguages);
-
-    return projects.find((project) => project.id === projectId);
+  async getProject(projectId: string, addOrganization = true, addLanguages = true): Promise<Project | null> {
+    try {
+      const projects = await this.listProjects(addOrganization, addLanguages);
+      return projects.find((project) => project.id === projectId) || null;
+    } catch (e) {
+      strapi.log.error(e);
+      return null;
+    }
   },
   async getWebhooksSecret(projectId: string) {
-    const LocalazyApi = await LocalazyApiClientFactory();
-    const result = await LocalazyApi.webhooks.getSecret({ project: projectId });
+    try {
+      const LocalazyApi = await LocalazyApiClientFactory();
+      const result = await LocalazyApi.webhooks.getSecret({ project: projectId });
 
-    return result;
+      return result;
+    } catch (e) {
+      strapi.log.error(e);
+      return null;
+    }
   },
 });
 
