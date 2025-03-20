@@ -73,12 +73,10 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
       isoStrapi
     );
 
-    const filteredUpdateEntry = dropPropertyDeep(updateEntry, 'documentId');
-
     const updatedEntry = await StrapiI18nService.updateLocalizationForAnExistingEntry(
       uid,
       localizedDocumentId,
-      filteredUpdateEntry,
+      updateEntry,
       isoStrapi
     );
 
