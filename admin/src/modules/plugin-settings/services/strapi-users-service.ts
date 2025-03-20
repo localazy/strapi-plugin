@@ -1,7 +1,7 @@
 import { createStrapiApiAxiosInstance } from '../../@common/api/strapi-api-base';
-
+import { AdminPanelUser } from '../models/admin-panel-user';
 export default class PluginSettingsService {
-  static async getAdminPanelUsers() {
+  static async getAdminPanelUsers(): Promise<AdminPanelUser[]> {
     try {
       const axiosInstance = createStrapiApiAxiosInstance('/admin/users');
 
