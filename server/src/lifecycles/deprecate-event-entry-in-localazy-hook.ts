@@ -3,15 +3,17 @@ import config from '../config';
 import LocalazyApiClientFactory from '../utils/localazy-api-client-factory';
 import { delay } from '../utils/delay';
 import { getLocalazyUserService, getLocalazyPubAPIService } from '../core';
+import { Locales } from '@localazy/api-client';
+import type { HookParams } from '../models/plugin/hook-params';
 
-export default async (event: any) => {
-  const pickedFlattedResult = await getPickedFlattenKeysForHookEntry(event);
+export default async (params: HookParams) => {
+  const pickedFlattedResult = await getPickedFlattenKeysForHookEntry(params);
 
   if (typeof pickedFlattedResult === 'undefined') {
     return;
   }
 
-  const { pickedFlatten, eventEntryLocale } = pickedFlattedResult;
+  const { pickedFlatten, projectSourceLanguageCode } = pickedFlattedResult;
 
   const LocalazyUserService = getLocalazyUserService();
   const LocalazyPubApiService = getLocalazyPubAPIService();
@@ -31,7 +33,7 @@ export default async (event: any) => {
   const projectKeys = await LocalazyApi.files.listKeys({
     project: user.project.id,
     file: strapiFile.id,
-    lang: eventEntryLocale,
+    lang: projectSourceLanguageCode as Locales,
   });
 
   if (!projectKeys) {
