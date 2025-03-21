@@ -1,9 +1,10 @@
 import getPickedFlattenKeysForHookEntry from '../utils/get-picked-flatten-keys-for-hook-entry';
 import config from '../config';
 import { getLocalazyUploadService } from '../core';
+import type { HookParams } from '../models/plugin/hook-params';
 
-export default async (event: any) => {
-  const pickedFlattedResult = await getPickedFlattenKeysForHookEntry(event);
+export default async (params: HookParams) => {
+  const pickedFlattedResult = await getPickedFlattenKeysForHookEntry(params);
   if (typeof pickedFlattedResult === 'undefined') {
     return;
   }

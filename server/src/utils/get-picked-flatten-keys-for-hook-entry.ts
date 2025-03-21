@@ -13,15 +13,17 @@ import {
   getLocalazyUserService,
   getLocalazyPubAPIService,
 } from '../core';
+import type { Context } from '@strapi/types/dist/modules/documents/middleware';
+import type { HookParams } from '../models/plugin/hook-params';
 
 const shouldProcessEntry = (
   contentTransferSetup: ContentTransferSetup,
-  eventModel: UID.ContentType
+  contextModel: UID.ContentType
 ): boolean | undefined => {
   let key: string;
   const modelContentTransferSetup = contentTransferSetup.setup.find((model) => {
     key = Object.keys(model)[0];
-    return key === eventModel;
+    return key === contextModel;
   });
 
   // might be undefined as it's called on any Content-Type
@@ -31,44 +33,19 @@ const shouldProcessEntry = (
   return !!modelContentTransferSetup[key].__model__;
 };
 
-const getEventEntries = async (event: any) => {
-  switch (event.action) {
-    case 'afterCreate':
-    case 'afterUpdate': {
+const getEventEntries = async (params: HookParams) => {
+  const { context, documentId } = params;
+
+  switch (context.action) {
+    // must be called AFTER the document is created
+    case 'create':
+    // must be called AFTER the document is updated
+    case 'update':
+    // must be called BEFORE the document is deleted
+    case 'delete': {
+      // must be called BEFORE the document is deleted
       const entry = [
-        await strapi.documents(event.model.uid).findOne({
-          documentId: event.result.documentId,
-          locUploadPLevel: 6,
-        }),
-      ];
-      return entry;
-    }
-    case 'beforeDelete': {
-      /**
-       * Strapi `beforeDelete` licecycle event is limited and does not provide the `documentId`
-       * Fetch from deprecated `entityService` instead to get the `documentId`
-       */
-      const whereId = event.params.where.id;
-      const entryById = await strapi.entityService.findOne(event.model.uid, whereId);
-
-      if (!entryById) {
-        return [];
-      }
-
-      /**
-       * Even though `id` of localized entry is provided in `event.params.where`,
-       * default locale entry is returned instead
-       *
-       * This check is to ensure that only if base locale entry is deleted,
-       * the deprecation process proceeds
-       */
-      if (entryById.id !== whereId) {
-        return [];
-      }
-
-      const documentId = entryById.documentId;
-      const entry = [
-        await strapi.documents(event.model.uid).findOne({
+        await strapi.documents(context.contentType.uid).findOne({
           documentId,
           locUploadPLevel: 6,
         }),
@@ -81,30 +58,32 @@ const getEventEntries = async (event: any) => {
   }
 };
 
-const shouldSkipAction = async (event: any) => {
+const shouldSkipAction = async (context: Context) => {
   const PluginSettingsServiceHelperInstance = new PluginSettingsServiceHelper();
   await PluginSettingsServiceHelperInstance.setup();
 
-  switch (event.action) {
-    case 'afterCreate': {
+  switch (context.action) {
+    case 'create': {
       if (!PluginSettingsServiceHelperInstance.shouldAllowAutomatedCreatedTrigger()) {
         strapi.log.info(
-          `Localazy Plugin: Skipping ${event.action} hook because automated created trigger is disabled.`
+          `Localazy Plugin: Skipping ${context.action} hook because automated created trigger is disabled.`
         );
         return true;
       }
       return false;
     }
-    case 'afterUpdate': {
+    case 'update': {
       if (!PluginSettingsServiceHelperInstance.shouldAllowAutomatedUpdatedTrigger()) {
-        strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because automated update trigger is disabled.`);
+        strapi.log.info(
+          `Localazy Plugin: Skipping ${context.action} hook because automated update trigger is disabled.`
+        );
         return true;
       }
       return false;
     }
-    case 'beforeDelete': {
+    case 'delete': {
       if (!PluginSettingsServiceHelperInstance.shouldAllowDeprecateOnDeletion()) {
-        strapi.log.info(`Localazy Plugin: Skipping ${event.action} hook because deprecate on deletion is disabled.`);
+        strapi.log.info(`Localazy Plugin: Skipping ${context.action} hook because deprecate on deletion is disabled.`);
         return true;
       }
       return false;
@@ -115,17 +94,17 @@ const shouldSkipAction = async (event: any) => {
   }
 };
 
-export default async (event: any) => {
-  // Docs: https://docs.strapi.io/developer-docs/latest/development/backend-customization/models.html#hook-event-object
-  // this should respect the content transfer setup
-  // there read it and compare with the model property
+export default async (params: HookParams) => {
+  const { context, locale } = params;
+  const eventEntryLocale = locale;
+
   const LocalazyUserService = getLocalazyUserService();
   const LocalazyPubAPIService = getLocalazyPubAPIService();
   const StrapiI18nService = getStrapiI18nService();
   const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
-  const eventAction = event.action;
-  strapi.log.info(`${eventAction} triggered`);
+  const contextAction = context.action;
+  strapi.log.info(`${contextAction} triggered`);
 
   // Content Transfer Setup not available yet; break execution
   if (!contentTransferSetup.has_setup) {
@@ -134,8 +113,8 @@ export default async (event: any) => {
   }
 
   // entry model not supposed to be processed; break execution
-  const eventModel = event.model.tableName;
-  const shouldProcess = shouldProcessEntry(contentTransferSetup, eventModel);
+  const contextModel = context.contentType.collectionName as UID.ContentType;
+  const shouldProcess = shouldProcessEntry(contentTransferSetup, contextModel);
   if (typeof shouldProcess === 'undefined') {
     return;
   }
@@ -152,7 +131,7 @@ export default async (event: any) => {
     return;
   }
 
-  if (await shouldSkipAction(event)) {
+  if (await shouldSkipAction(context)) {
     strapi.log.info('Localazy Plugin: Automated action skipped');
     return;
   }
@@ -175,22 +154,21 @@ export default async (event: any) => {
     return;
   }
 
-  /**
-   * Prepare the data structure and upload it to Localazy
-   */
-  const modelUid = event.model.uid;
-  const entries = await getEventEntries(event);
-
-  if (entries.length === 0) {
+  // event entry not in source language; break execution
+  if (eventEntryLocale !== '*' && isoStrapiToLocalazy(eventEntryLocale) !== projectSourceLanguageCode) {
+    strapi.log.info(
+      "Localazy Plugin: Triggered locale is not in Localazy source language; the operation won't proceed"
+    );
     return;
   }
 
-  // ? TODO: will always be valid?
-  const eventEntryLocale = entries[0].locale;
+  /**
+   * Prepare the data structure and upload it to Localazy
+   */
+  const modelUid = context.contentType.uid;
+  const entries = await getEventEntries(params);
 
-  // event entry not in source language; break execution
-  if (isoStrapiToLocalazy(eventEntryLocale) !== projectSourceLanguageCode) {
-    strapi.log.info("Localazy Plugin: Entry language is not in Localazy source language; the operation won't proceed");
+  if (entries.length === 0) {
     return;
   }
 
@@ -200,11 +178,11 @@ export default async (event: any) => {
    */
   const reducedEntries = omitDeep(entries, ['locale', 'createdAt', 'updatedAt', 'publishedAt']);
 
-  const transferSetupModel = findSetupModelByCollectionName(contentTransferSetup.setup, eventModel);
-  const currentTransferSetupModel = transferSetupModel[eventModel];
+  const transferSetupModel = findSetupModelByCollectionName(contentTransferSetup.setup, contextModel);
+  const currentTransferSetupModel = transferSetupModel[contextModel];
   const pickPaths = getPickPaths(currentTransferSetupModel);
   if (!pickPaths.length) {
-    strapi.log.warn(`No fields for collection ${eventModel} transfer are enabled.`);
+    strapi.log.warn(`No fields for collection ${contextModel} transfer are enabled.`);
     return;
   }
   const pickPathsWithUid = pickPaths.map((pickPath) => `${modelUid}.${pickPath}`);
@@ -225,5 +203,6 @@ export default async (event: any) => {
   return {
     pickedFlatten,
     eventEntryLocale,
+    projectSourceLanguageCode,
   };
 };
