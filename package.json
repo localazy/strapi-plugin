@@ -37,7 +37,9 @@
       "default": "./dist/server/index.js"
     }
   },
-  "bin": "./install/index.mjs",
+  "bin": {
+    "strapi-plugin": "install/index.mjs"
+  },
   "files": [
     "dist",
     "install"
