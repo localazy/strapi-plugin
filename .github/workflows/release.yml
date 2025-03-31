@@ -12,7 +12,7 @@ permissions:
 jobs:
   ci:
     name: CI Init
-    runs-on: [self-hosted, Linux]
+    runs-on: [ self-hosted, Linux ]
     outputs:
       action: ${{ steps.init.outputs.action }}
     steps:
@@ -23,22 +23,23 @@ jobs:
     name: Prepare Release PR
     needs: ci
     if: needs.ci.outputs.action == 'prepare'
-    runs-on: [self-hosted, Linux]
+    runs-on: [ self-hosted, Linux ]
     steps:
       - uses: localazy/release/prepare@v2
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
+
   publish:
     name: Publish Release
-    needs: [ci]
+    needs: [ ci ]
     if: needs.ci.outputs.action == 'publish'
-    runs-on: [self-hosted, Linux]
+    runs-on: [ self-hosted, Linux ]
     steps:
       - uses: localazy/release/publish@v2
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
           npm-publish: public
