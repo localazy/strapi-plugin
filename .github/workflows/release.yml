@@ -30,6 +30,7 @@ jobs:
           node-version-file: .nvmrc
           app-id: ${{ secrets.AUTH_APP_ID }}
           app-key: ${{ secrets.AUTH_APP_KEY }}
+          badges: true
 
   publish:
     name: Publish Release
