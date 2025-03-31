@@ -32,7 +32,6 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
         'Content-Type': 'application/json',
         // Add this header to identify the request as initiated by the plugin
         'X-Localazy-Initiated-By': 'strapi-plugin-localazy',
-        'x-hovno-do-riti': 'x-hovno-do-riti',
       });
       if (token) {
         config.headers.set('Authorization', `Bearer ${token}`);
