@@ -40,6 +40,10 @@ const exampleFileName =
   type === 'vite'
     ? `vite.config.localazy-strapi-plugin.example.${extension}`
     : `webpack.config.localazy-strapi-plugin.example.${extension}`;
+const existingFile =
+  type === 'vite'
+    ? path.join(process.cwd(), `vite.config.${extension}`)
+    : path.join(process.cwd(), `webpack.config.${extension}`);
 const template =
   type === 'vite'
     ? await fs.readFile(path.join(__dirname, `vite.config.example.${extension}`))
@@ -124,6 +128,6 @@ installSpinner.start(
 await updateEnvConfig();
 installSpinner.succeed();
 installSpinner.succeed(
-  `To run the plugin, you need to update your webpack config in ${chalk.bold.green('src/admin/webpack.config.js')} file`
+  `To run the plugin, you need to update your webpack config in ${chalk.bold.green(`src/admin/${existingFile}`)} file`
 );
 installSpinner.succeed(`Don't forget to build the admin panel with ${chalk.bold.green('npm run build')} command`);

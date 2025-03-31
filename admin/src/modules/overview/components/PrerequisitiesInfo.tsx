@@ -7,11 +7,6 @@ const PrerequisitiesInfo: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant='omega' fontWeight='semiBold'>
-        {t('overview.internationalization_plugin')}
-      </Typography>
-      <Typography variant='omega'>{t('overview.has_to_be_installed')}</Typography>
-      <br />
       <Typography variant='omega'>{t('overview.transfer_setup_message_a')}</Typography>
       <Typography variant='omega' fontWeight='semiBold'>
         {t('overview.transfer_setup_message_b')}
