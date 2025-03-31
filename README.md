@@ -1,10 +1,25 @@
-## Quick Installation
+<div align="center">
+
+[<img src="https://localazy.com/directus9/assets/9fc36b9c-81b7-4dbf-bd82-b64cd984090f" width="285" height="50" alt="Localazy" >](https://localazy.com)
+
+### 📦 `@localazy/strapi-plugin`
+
+[**Documentation**](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation) &nbsp;|&nbsp;
+[**Blog Articles**](https://localazy.com/tags/strapi)
+
+_The official Strapi Plugin by Localazy_
+
+[![npm](.github/badges/npm.svg)](https://www.npmjs.com/package/@localazy/strapi-plugin)
+
+</div>
+
+## 🚀 Quick Start
 
 ```
 npm install @localazy/strapi-plugin@latest && npx @localazy/strapi-plugin
 ```
 
-## The Official Strapi Localization Plugin by Localazy
+## ✨ The Official Strapi Localization Plugin by Localazy
 
 Strapi localization doesn't have to be a headache! Install the Strapi localization plugin and seamlessly translate your content into multiple languages with [Localazy](https://localazy.com).
 
@@ -16,7 +31,7 @@ Strapi localization doesn't have to be a headache! Install the Strapi localizati
 
 📰 Learn more in the [Strapi + Localazy tutorial](https://localazy.com/blog/how-to-strapi-localization-with-localazy#getting-started-with-strapi-localization).
 
-## Installation & Setup
+## 🔧 Installation & Setup
 
 The plugin is available on [NPM](https://www.npmjs.com/package/@localazy/strapi-plugin).
 You can also follow the installation commands located in your Strapi project Marketplace or [Strapi Marketplace > Localazy](https://market.strapi.io/plugins/@localazy-strapi-plugin) itself. This is the recommended approach.
@@ -35,7 +50,7 @@ Due to the changes in Strapi core code it's also necessary to add an environment
 STRAPI_ADMIN_LOCALAZY_ENV=
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 Additional configuration object may be provided in the `plugins.js` file. The following options are available:
 
@@ -52,12 +67,17 @@ localazy: {
   },
 ```
 
-## Additional Resources
+## 🛟 Support
 
-- Localazy Docs: [Introduction to Strapi](https://localazy.com/docs/strapi/strapi-plugin-introduction-installation)
-- Localazy Blog: [Articles about the Strapi plugin](https://localazy.com/tags/strapi)
+If you encounter any issues or have questions, feel free to contact us through whichever channel suits you best:
 
-## Support
+- [Intercom chat](https://localazy.com)
+- [GitHub issues](https://github.com/localazy/strapi-plugin/issues)
+- [Discussion forum](https://discuss.localazy.com/)
+- [team@localazy.com](mailto:team@localazy.com)
 
-- If you encounter any issues or have questions, please contact us at [team@localazy.com](mailto:team@localazy.com).
-- Join the [Localazy Discussion Forum](https://discuss.localazy.com/) to discuss all things localization.
+## 📜 License
+
+This project is licensed under the MIT License.
+
+See [LICENSE](LICENSE) for details.
