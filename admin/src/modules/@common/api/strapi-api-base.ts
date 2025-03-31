@@ -6,22 +6,16 @@ import axios from 'axios';
 import { PLUGIN_ID } from '../../../pluginId';
 
 const BASE_PLUGIN_PATH = `/${PLUGIN_ID}`;
+const JWT_TOKEN_NAME = 'jwtToken';
 
 const getToken = (): string => {
-  const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken') || '';
-  if (!token) {
-    return '';
-  }
-
-  const parsedToken = JSON.parse(token);
-  return parsedToken;
+  const jwtTokenCookie = document.cookie.split('; ').find((row) => row.startsWith(`${JWT_TOKEN_NAME}=`));
+  const jwtToken = jwtTokenCookie ? jwtTokenCookie.split('=')[1] : '';
+  return jwtToken || localStorage.getItem(JWT_TOKEN_NAME) || sessionStorage.getItem(JWT_TOKEN_NAME) || '';
 };
 
 const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   const token = getToken();
-  if (!token) {
-    // throw new Error("No token found");
-  }
 
   if (baseUrl === null) {
     baseUrl = `${BASE_PLUGIN_PATH}`;
