@@ -9,7 +9,7 @@
 
 _The official Strapi Plugin by Localazy_
 
-[![npm](.github/badges/npm.svg)](https://www.npmjs.com/package/@localazy/strapi-plugin)
+[![version](.github/badges/version.svg)](https://www.npmjs.com/package/@localazy/strapi-plugin)
 
 </div>
 

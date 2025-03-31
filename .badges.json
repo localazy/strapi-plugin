@@ -2,9 +2,9 @@
   "dir": ".github/badges",
   "files": [
     {
-      "fileName": "npm.svg",
+      "fileName": "version.svg",
       "label": "npm",
-      "status": "1.0.0",
+      "status": "1.0.1",
       "icon": "npm"
     }
   ]
