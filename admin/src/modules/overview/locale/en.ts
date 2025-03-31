@@ -6,8 +6,6 @@ export default {
   connected_organization: 'Connected Organization',
   remaining_organization_keys: 'Remaining Organization Keys',
   open_project_in_localazy: 'Open project in Localazy',
-  internationalization_plugin: 'Internationalization Plugin ',
-  has_to_be_installed: 'has to be installed.',
   transfer_setup_message_a: 'Select which parts of your project you want to upload in ',
   transfer_setup_message_b: 'Settings > Localazy Settings > Content Transfer Setup.',
 };
