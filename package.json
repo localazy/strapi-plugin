@@ -13,6 +13,14 @@
     "cms",
     "l10n"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/localazy/strapi-plugin"
+  },
+  "bugs": {
+    "url": "https://github.com/localazy/strapi-plugin/issues"
+  },
+  "homepage": "https://github.com/localazy/strapi-plugin#readme",
   "license": "MIT",
   "author": {
     "name": "Localazy",
