@@ -1,5 +1,7 @@
 ## Quick Installation
 
+This is a README for Strapi v5. For Strapi v4, please refer to the [Strapi v4 README](https://github.com/localazy/strapi-plugin/tree/strapi-v4#readme) file.
+
 ```
 npm install @localazy/strapi-plugin@latest && npx @localazy/strapi-plugin
 ```
