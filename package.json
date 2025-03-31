@@ -120,7 +120,7 @@
   },
   "strapi": {
     "kind": "plugin",
-    "name": "strapi-plugin-v5",
+    "name": "localazy",
     "displayName": "Localazy Strapi Plugin",
     "description": "The official Strapi Plugin by Localazy"
   }
