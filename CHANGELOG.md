@@ -1,3 +1,12 @@
+## 1.0.1 (2025-03-31)
+### 🔀 Pull Requests
+
+- [Update package.json #87](https://github.com/localazy/strapi-plugin/pull/87)
+
+### 🧰 Other Commits
+
+- Add repository reference to package.json ([4dda07c](https://github.com/localazy/strapi-plugin/commit/4dda07c)) ([#87](https://github.com/localazy/strapi-plugin/pull/87))
+
 ## 1.0.0 (2025-03-31)
 ### 🔀 Pull Requests
 
