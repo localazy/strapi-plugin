@@ -1,3 +1,12 @@
+## 1.0.3 (2025-07-28)
+### 🔀 Pull Requests
+
+- [LOC-2904 - Fix Failing Strapi Transfer Command With Plugin Installed #91](https://github.com/localazy/strapi-plugin/pull/91)
+
+### ✨ Features
+
+- Enhance README and bootstrap logic ([f70c539](https://github.com/localazy/strapi-plugin/commit/f70c539)) ([#91](https://github.com/localazy/strapi-plugin/pull/91))
+
 ## 1.0.2 (2025-07-28)
 ### 🔀 Pull Requests
 
