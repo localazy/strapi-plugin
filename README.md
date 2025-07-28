@@ -65,6 +65,8 @@ localazy: {
        */
       populateDefaultDepth?: number, // default is 5
       populateMaxDepth?: number, // default is 10
+      skipCreatorFields?: boolean, // default is false
+      enableSocketIO?: boolean, // default is true
     },
   },
 ```
