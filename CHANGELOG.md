@@ -1,3 +1,16 @@
+## 1.0.4 (2025-08-19)
+### 🔀 Pull Requests
+
+- [FIX - Missing media handling in created entries #94](https://github.com/localazy/strapi-plugin/pull/94)
+
+### ✨ Features
+
+- Introduce dropDocumentIdExceptMedia function to selectively omit documentId ([eb90350](https://github.com/localazy/strapi-plugin/commit/eb90350)) ([#94](https://github.com/localazy/strapi-plugin/pull/94))
+
+### 🧪 Tests
+
+- Add tests for dropPropertyDeepWithSkip and dropDocumentIdExceptMedia functions ([eb90350](https://github.com/localazy/strapi-plugin/commit/eb90350)) ([#94](https://github.com/localazy/strapi-plugin/pull/94))
+
 ## 1.0.3 (2025-07-28)
 ### 🔀 Pull Requests
 
