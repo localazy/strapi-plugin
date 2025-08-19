@@ -1,6 +1,6 @@
 {
   "name": "@localazy/strapi-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "The official Strapi Plugin by Localazy.",
   "keywords": [
     "strapi",
