@@ -1,4 +1,4 @@
-import { dropPropertyDeep } from '../drop-property-deep';
+import { dropPropertyDeep, dropPropertyDeepWithSkip, dropDocumentIdExceptMedia } from '../drop-property-deep';
 
 describe('dropPropertyDeep', () => {
   describe('with primitive values', () => {
@@ -104,5 +104,115 @@ describe('dropPropertyDeep', () => {
       const result = dropPropertyDeep(input, 'nonexistent');
       expect(result).toEqual(input);
     });
+  });
+
+  describe('with skipPredicates', () => {
+    it('should skip objects that match predicates', () => {
+      const isSpecialObject = (obj: any) => obj?.special === true;
+
+      const input = {
+        regular: { id: 1, toRemove: 'value' },
+        special: { id: 2, toRemove: 'keep', special: true },
+        nested: {
+          regularNested: { id: 3, toRemove: 'value' },
+          specialNested: { id: 4, toRemove: 'keep', special: true },
+        },
+      };
+
+      const expected = {
+        regular: { id: 1 },
+        special: { id: 2, toRemove: 'keep', special: true },
+        nested: {
+          regularNested: { id: 3 },
+          specialNested: { id: 4, toRemove: 'keep', special: true },
+        },
+      };
+
+      expect(dropPropertyDeepWithSkip(input, 'toRemove', true, [isSpecialObject])).toEqual(expected);
+    });
+  });
+});
+
+describe('dropDocumentIdExceptMedia', () => {
+  it('should drop documentId from regular objects but keep it in media objects', () => {
+    const input = {
+      regularObject: {
+        id: 1,
+        documentId: 'doc1',
+        name: 'Regular Object',
+      },
+      mediaObject: {
+        id: 2,
+        documentId: 'doc2',
+        name: 'image.jpg',
+        url: '/uploads/image.jpg',
+        mime: 'image/jpeg',
+        ext: '.mp4',
+      },
+      nested: {
+        regularNested: {
+          id: 3,
+          documentId: 'doc3',
+          title: 'Nested Object',
+        },
+        mediaNested: {
+          id: 4,
+          documentId: 'doc4',
+          name: 'photo.png',
+          url: '/uploads/photo.png',
+          mimeType: 'image/png',
+          ext: '.png',
+        },
+      },
+    };
+
+    const expected = {
+      regularObject: {
+        id: 1,
+        name: 'Regular Object',
+      },
+      mediaObject: {
+        id: 2,
+        documentId: 'doc2',
+        name: 'image.jpg',
+        url: '/uploads/image.jpg',
+        mime: 'image/jpeg',
+        ext: '.mp4',
+      },
+      nested: {
+        regularNested: {
+          id: 3,
+          title: 'Nested Object',
+        },
+        mediaNested: {
+          id: 4,
+          documentId: 'doc4',
+          name: 'photo.png',
+          url: '/uploads/photo.png',
+          mimeType: 'image/png',
+          ext: '.png',
+        },
+      },
+    };
+
+    expect(dropDocumentIdExceptMedia(input)).toEqual(expected);
+  });
+
+  it('should handle arrays with media objects', () => {
+    const input = {
+      items: [
+        { id: 1, documentId: 'doc1', title: 'Regular' },
+        { id: 2, documentId: 'doc2', name: 'file.pdf', url: '/uploads/file.pdf', mime: 'application/pdf', ext: '.pdf' },
+      ],
+    };
+
+    const expected = {
+      items: [
+        { id: 1, title: 'Regular' },
+        { id: 2, documentId: 'doc2', name: 'file.pdf', url: '/uploads/file.pdf', mime: 'application/pdf', ext: '.pdf' },
+      ],
+    };
+
+    expect(dropDocumentIdExceptMedia(input)).toEqual(expected);
   });
 });
