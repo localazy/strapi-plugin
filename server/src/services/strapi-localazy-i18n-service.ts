@@ -3,7 +3,7 @@ import { parsedLocalazyEntryToUpdateEntry } from '../utils/parsed-localazy-entry
 import { omitDeep } from '../utils/omit-deep';
 import { merge } from 'lodash-es';
 import { Core, UID } from '@strapi/strapi';
-import { dropPropertyDeep } from '../utils/drop-property-deep';
+import { dropDocumentIdExceptMedia } from '../utils/drop-property-deep';
 import { getStrapiI18nService /*, getStrapiService*/ } from '../core';
 // TODO: ADD TYPES
 
@@ -27,7 +27,8 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
 
     let filteredBaseEntry = omitDeep(baseEntry, omitKeys);
     // TODO: Deal with relations - must be omitted
-    filteredBaseEntry = dropPropertyDeep(filteredBaseEntry, 'documentId');
+    // Drop documentId from all objects except media objects (images, files, etc.)
+    filteredBaseEntry = dropDocumentIdExceptMedia(filteredBaseEntry);
 
     /**
      * Items positioning is done by the `toCreateEntry` function
