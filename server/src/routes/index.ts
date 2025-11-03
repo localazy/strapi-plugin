@@ -5,6 +5,7 @@ import StrapiRoutes from './strapi-routes';
 import LocalazyTransferRoutes from './localazy-transfer-routes';
 import LocalazyProjectRoutes from './localazy-project-routes';
 import LocalazyPublicTransferRoutes from './localazy-public-transfer-routes';
+import EntryExclusionRoutes from './entry-exclusion-routes';
 
 export default {
   'content-api': {
@@ -19,6 +20,7 @@ export default {
       ...StrapiRoutes,
       ...LocalazyTransferRoutes,
       ...LocalazyProjectRoutes,
+      ...EntryExclusionRoutes,
     ],
   },
   LocalazyPublicTransferRoutes: {

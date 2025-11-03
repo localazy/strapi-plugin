@@ -4,6 +4,7 @@ import StrapiController from './strapi-controller';
 import LocalazyProjectController from './localazy-project-controller';
 import PluginSettingsController from './plugin-settings-controller';
 import LocalazyTransferController from './localazy-transfer-controller';
+import EntryExclusionController from './entry-exclusion-controller';
 
 export default {
   LocalazyUserController,
@@ -12,4 +13,5 @@ export default {
   LocalazyProjectController,
   PluginSettingsController,
   LocalazyTransferController,
+  EntryExclusionController,
 };

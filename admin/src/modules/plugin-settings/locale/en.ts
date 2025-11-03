@@ -64,4 +64,12 @@ export default {
   tree_item_count_other: '({{count}} selected fields)',
 
   general: 'General',
+
+  exclude_from_translation: 'Exclude this entry from translation',
+
+  bulk_action_exclude_from_translation: 'Exclude from translation',
+  bulk_action_updating_entries: 'Updating entries...',
+  bulk_action_failed_message: 'Failed to update entries.',
+  bulk_action_success_message: 'Entries successfully updated.',
+  bulk_action_include_to_translation: 'Include to translation',
 };
