@@ -72,4 +72,6 @@ export default {
   bulk_action_failed_message: 'Failed to update entries.',
   bulk_action_success_message: 'Entries successfully updated.',
   bulk_action_include_to_translation: 'Include to translation',
+  status_excluded: 'Excluded',
+  status_included: 'Included',
 };

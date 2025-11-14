@@ -41,6 +41,47 @@ export default {
         console.warn('Localazy Plugin: Content Manager "addEditViewSidePanel" API not available');
       }
 
+      const { default: LocalazyStatusColumn } = await import('./components/LocalazyStatusColumn');
+
+      // Register hook to add custom column to list view
+      app.registerHook('Admin/CM/pages/ListView/inject-column-in-table', (params: any) => {
+        try {
+          console.log('Localazy: Hook called with params:', params);
+
+          const { displayedHeaders, layout } = params;
+
+          // Verify displayedHeaders is an array
+          if (!Array.isArray(displayedHeaders)) {
+            return params; // Return original params if structure is unexpected
+          }
+
+          // Add Localazy status column
+          const localazyStatusColumn = {
+            name: 'localazy_status',
+            label: 'Localazy Status',
+            searchable: false,
+            sortable: false,
+            attribute: { type: 'custom' },
+            cellFormatter: (data: any, header: any, context: any) => {
+              return React.createElement(LocalazyStatusColumn, {
+                data,
+                model: context?.model || '',
+              });
+            },
+          };
+
+          const updatedHeaders = [...displayedHeaders, localazyStatusColumn];
+
+          return {
+            displayedHeaders: updatedHeaders,
+            layout,
+          };
+        } catch (error) {
+          console.error('Localazy: Error in hook:', error);
+          return params; // Return original params on error
+        }
+      });
+
       if (contentManagerPlugin?.apis?.addBulkAction) {
         const { useNotification } = await import('@strapi/strapi/admin');
         await import('./i18n');
