@@ -1,3 +1,18 @@
+## 1.0.6 (2025-11-24)
+### 🔀 Pull Requests
+
+- [Feat/exclude specific entries #96](https://github.com/localazy/strapi-plugin/pull/96)
+
+### ✨ Features
+
+- adding custom column in ListView to display localazy status ([ec76ebb](https://github.com/localazy/strapi-plugin/commit/ec76ebb)) ([#96](https://github.com/localazy/strapi-plugin/pull/96))
+- exclude specific entries ([ec76ebb](https://github.com/localazy/strapi-plugin/commit/ec76ebb)) ([#96](https://github.com/localazy/strapi-plugin/pull/96))
+- skipping excluded entries from being donwloaded ([ec76ebb](https://github.com/localazy/strapi-plugin/commit/ec76ebb)) ([#96](https://github.com/localazy/strapi-plugin/pull/96))
+
+### 🐛 Bug Fixes
+
+- namespace in en.json tranlation ([ec76ebb](https://github.com/localazy/strapi-plugin/commit/ec76ebb)) ([#96](https://github.com/localazy/strapi-plugin/pull/96))
+
 ## 1.0.5 (2025-11-24)
 ### 🔀 Pull Requests
 
