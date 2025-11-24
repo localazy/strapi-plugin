@@ -8,6 +8,7 @@ import { StrapiServiceReturnType } from '../services/strapi-service';
 import { StrapiI18nServiceReturnType } from '../services/strapi-i18n-service';
 import { StrapiLocalazyI18nServiceReturnType } from '../services/strapi-localazy-i18n-service';
 import { LocalazyUploadServiceReturnType } from 'src/services/localazy-upload-service';
+import { EntryExclusionServiceReturnType } from '../services/entry-exclusion-service';
 
 export const getLocalazyUserService = () => {
   return strapi.plugin(PLUGIN_NAME).service<LocalazyUserServiceReturnType>('LocalazyUserService');
@@ -45,4 +46,8 @@ export const getStrapiLocalazyI18nService = () => {
 
 export const getLocalazyUploadService = () => {
   return strapi.plugin(PLUGIN_NAME).service<LocalazyUploadServiceReturnType>('LocalazyUploadService');
+};
+
+export const getEntryExclusionService = () => {
+  return strapi.plugin(PLUGIN_NAME).service<EntryExclusionServiceReturnType>('EntryExclusionService');
 };

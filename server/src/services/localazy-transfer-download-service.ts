@@ -19,6 +19,7 @@ import {
   getLocalazyPubAPIService,
   getStrapiLocalazyI18nService,
   getPluginSettingsService,
+  getEntryExclusionService,
 } from '../core';
 import { Language, Locales } from '@localazy/api-client';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
@@ -61,6 +62,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     const LocalazyUserService = getLocalazyUserService();
     const LocalazyPubAPIService = getLocalazyPubAPIService();
     const StrapiLocalazyI18nService = getStrapiLocalazyI18nService();
+    const EntryExclusionService = getEntryExclusionService();
 
     const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
@@ -309,7 +311,17 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
           continue;
         }
 
+        const excludedEntries = await EntryExclusionService.getContentTypeExclusions(uid);
+
         for (const [documentId, translatedModel] of Object.entries(models)) {
+          /**
+           * Entry could be excluded from translation after being uploaded to Localazy
+           */
+          if (excludedEntries.includes(documentId)) {
+            strapi.log.info(`Entry ${uid}[${documentId}] is excluded from transfer, skipping...`);
+            continue;
+          }
+
           try {
             /**
              * Get original source language entry

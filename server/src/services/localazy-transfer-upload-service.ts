@@ -11,7 +11,13 @@ import config from '../config';
 import { isoStrapiToLocalazy } from '../utils/iso-locales-utils';
 import { omitDeep } from '../utils/omit-deep';
 import { EventType } from '../constants/events';
-import { getStrapiService, getStrapiI18nService, getLocalazyUploadService, getPluginSettingsService } from '../core';
+import {
+  getStrapiService,
+  getStrapiI18nService,
+  getLocalazyUploadService,
+  getPluginSettingsService,
+  getEntryExclusionService,
+} from '../core';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
 const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -26,6 +32,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const StrapiService = getStrapiService();
     const StrapiI18nService = getStrapiI18nService();
     const LocalazyUploadService = getLocalazyUploadService();
+    const EntryExclusionService = getEntryExclusionService();
     const contentTransferSetup = await getPluginSettingsService().getContentTransferSetup();
 
     /**
@@ -96,6 +103,34 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         strapi.log.info(`No entries found for model ${modelUid}`);
         continue;
       }
+
+      const excludedEntries = await EntryExclusionService.getContentTypeExclusions(modelUid);
+
+      // Filter out excluded entries
+      const filteredEntries = [];
+      for (const entry of entries) {
+        const isExcluded = excludedEntries.includes(entry.documentId);
+        if (!isExcluded) {
+          filteredEntries.push(entry);
+        }
+      }
+
+      entries = filteredEntries;
+
+      if (!entries.length) {
+        const message = `All entries for model ${collectionName} are excluded from translation`;
+        await notificationService.emit(EventType.UPLOAD, {
+          message,
+        });
+        strapi.log.info(message);
+        continue;
+      }
+
+      const message = `Excluding ${excludedEntries.length} entries for model ${collectionName} from upload. Entries to translate: ${entries.length}.`;
+      await notificationService.emit(EventType.UPLOAD, {
+        message,
+      });
+      strapi.log.info(message);
 
       /*
        * These fields are not omitted during the document service call,

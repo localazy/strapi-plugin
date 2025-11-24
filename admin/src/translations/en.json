@@ -1,5 +1,7 @@
 {
-  "strapi-plugin-v5.name": "Localazy",
-  "strapi-plugin-v5.localazy_settings": "Localazy Settings",
-  "strapi-plugin-v5.content_transfer_setup": "Content Transfer Setup"
+  "localazy.name": "Localazy",
+  "localazy.localazy_settings": "Localazy Settings",
+  "localazy.content_transfer_setup": "Content Transfer Setup",
+  "localazy.exclude_from_translation": "Exclude from translation",
+  "localazy.include_to_translation": "Include to translation"
 }
