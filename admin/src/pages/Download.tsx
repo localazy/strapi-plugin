@@ -112,18 +112,20 @@ const Download: React.FC<DownloadProps> = (props) => {
     async function initComponent() {
       setIsLoading(true);
 
-      /**
-       * Handle alerts onload apperance
-       */
-      setModelChanged(await hasModelChanged());
-      setLocalesIncompatible(!(await areLocalesCompatible()));
+      const [modelChangedResult, localesCompatibleResult, project, globalSettings] = await Promise.all([
+        hasModelChanged(),
+        areLocalesCompatible(),
+        ProjectService.getConnectedProject(),
+        PluginSettingsService.getPluginSettings(),
+      ]);
 
-      const project = await ProjectService.getConnectedProject();
+      setModelChanged(modelChangedResult);
+      setLocalesIncompatible(!localesCompatibleResult);
+
       const projectLanguagesWithoutDefaultLanguage =
         project?.languages?.filter((language) => language.id !== project.sourceLanguage) || [];
       setProjectLanguages(projectLanguagesWithoutDefaultLanguage as any);
 
-      const globalSettings = await PluginSettingsService.getPluginSettings();
       setFormModel(globalSettings);
 
       PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });

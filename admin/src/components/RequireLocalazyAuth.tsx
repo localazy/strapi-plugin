@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
-import Loader from '../modules/@common/components/PluginPageLoader';
 import { PLUGIN_ID } from '../pluginId';
 import { Box, Typography } from '@strapi/design-system';
 import { Layouts } from '@strapi/strapi/admin';
@@ -12,18 +11,10 @@ const RequireLocalazyAuth = ({ children }: { children: React.ReactElement }) => 
   const { isLoggedIn, isFetchingIdentity } = useLocalazyIdentity();
   const { t } = useTranslation();
 
-  if (isFetchingIdentity) {
-    return <Loader />;
-  }
-
-  if (!isLoggedIn) {
+  if (!isFetchingIdentity && !isLoggedIn) {
     return (
       <>
-        <Layouts.Header
-          title={t('common.localazy_plugin')}
-          subtitle={t('common.localazy_plugin_description')}
-          as='h2'
-        />
+        <Layouts.Header title={t('common.localazy_plugin')} subtitle={t('common.localazy_plugin_description')} as='h2' />
         <Box marginLeft={10} marginRight={10} background='neutral0' padding={7} hasRadius shadow='tableShadow'>
           <Typography variant='epsilon' textColor='neutral600'>
             {t('login.you_have_to_own_account_for_the_plugin_to_work_properly')}

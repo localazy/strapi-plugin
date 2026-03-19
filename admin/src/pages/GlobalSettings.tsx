@@ -99,17 +99,19 @@ const GlobalSettings: React.FC = () => {
     async function fetchData() {
       setIsLoading(true);
 
-      const project = await ProjectService.getConnectedProject();
+      const [project, globalSettings, users] = await Promise.all([
+        ProjectService.getConnectedProject(),
+        PluginSettingsService.getPluginSettings(),
+        StrapiUsersService.getAdminPanelUsers(),
+      ]);
+
       const projectLanguagesWithoutDefaultLanguage =
         project?.languages?.filter((language) => language.id !== project.sourceLanguage) || [];
       setProjectLanguages(projectLanguagesWithoutDefaultLanguage);
 
-      const globalSettings = await PluginSettingsService.getPluginSettings();
-
       setFormModel(globalSettings);
       setOriginalFormModel(cloneDeep(globalSettings));
 
-      const users = await StrapiUsersService.getAdminPanelUsers();
       setUsers(users);
 
       setIsLoading(false);
