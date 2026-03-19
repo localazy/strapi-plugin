@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { DesignSystemProvider, Box } from '@strapi/design-system';
 import { useEffect } from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
@@ -17,6 +17,21 @@ import Loader from '../modules/@common/components/PluginPageLoader';
 import '../i18n';
 import { Upload } from './Upload';
 import Download from './Download';
+
+const ProtectedRoute = ({ children }: { children: React.ReactElement }) => {
+  const { isLoggedIn, isFetchingIdentity } = useLocalazyIdentity();
+
+  if (isFetchingIdentity) {
+    return <Loader />;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to={`login`} replace />;
+  }
+
+  return children;
+};
+
 const App = () => {
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
 
@@ -50,10 +65,10 @@ const App = () => {
             <Route path={`login`} element={<Login title={headerTitle} subtitle={headerSubtitle} isLoading={false} />} />
             <Route
               path={`overview`}
-              element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
+              element={<ProtectedRoute><Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} /></ProtectedRoute>}
             />
-            <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
+            <Route path={`upload`} element={<ProtectedRoute><Upload title={headerTitle} subtitle={headerSubtitle} /></ProtectedRoute>} />
+            <Route path={`download`} element={<ProtectedRoute><Download title={headerTitle} subtitle={headerSubtitle} /></ProtectedRoute>} />
             <Route path='*' element={<Page.Error />} />
           </Routes>
         </Layouts.Root>

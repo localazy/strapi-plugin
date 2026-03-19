@@ -11,12 +11,12 @@ const JWT_TOKEN_NAME = 'jwtToken';
 const getToken = (): string => {
   const jwtTokenCookie = document.cookie.split('; ').find((row) => row.startsWith(`${JWT_TOKEN_NAME}=`));
   const jwtToken = jwtTokenCookie ? jwtTokenCookie.split('=')[1] : '';
-  return jwtToken || localStorage.getItem(JWT_TOKEN_NAME) || sessionStorage.getItem(JWT_TOKEN_NAME) || '';
+  const raw = jwtToken || localStorage.getItem(JWT_TOKEN_NAME) || sessionStorage.getItem(JWT_TOKEN_NAME) || '';
+  // Strip surrounding quotes if present (e.g. stored as "\"token\"")
+  return raw.replace(/^["']|["']$/g, '');
 };
 
 const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
-  const token = getToken();
-
   if (baseUrl === null) {
     baseUrl = `${BASE_PLUGIN_PATH}`;
   }
@@ -33,6 +33,7 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
         // Add this header to identify the request as initiated by the plugin
         'X-Localazy-Initiated-By': 'strapi-plugin-localazy',
       });
+      const token = getToken();
       if (token) {
         config.headers.set('Authorization', `Bearer ${token}`);
       }
@@ -47,14 +48,6 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      // whatever you want to do with the error
-      if (error.response?.status === 401) {
-        // force-logout from the app
-        // TODO: replace auth.clearAppStorage() with a v5 function
-        // auth.clearAppStorage();
-        // window.location.reload();
-      }
-
       throw error;
     }
   );

@@ -12,8 +12,12 @@ const FetchIdentity: React.FC = () => {
         setIsFetchingIdentity(true);
         const fetchedIdentity = await LocalazyUserService.getIdentity();
         setIdentity(fetchedIdentity || emptyIdentity);
-      } catch (error) {
-        console.error('Error fetching identity:', error);
+      } catch (error: any) {
+        // 401 is expected when the Strapi session is invalid or token is missing
+        if (error?.status !== 401 && error?.response?.status !== 401) {
+          console.error('Error fetching identity:', error);
+        }
+        setIdentity(emptyIdentity);
       } finally {
         setIsFetchingIdentity(false);
       }
