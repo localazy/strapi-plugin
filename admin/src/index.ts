@@ -187,7 +187,7 @@ export default {
 
 const addMenuLink = (app: any) => {
   app.addMenuLink({
-    to: `plugins/${PLUGIN_ID}/`,
+    to: `/plugins/${PLUGIN_ID}`,
     icon: Localazy,
     intlLabel: {
       id: `${PLUGIN_ID}.name`,

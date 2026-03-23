@@ -21,7 +21,7 @@ const RequireLocalazyAuth = ({ children }: { children: React.ReactElement }) => 
           </Typography>
           <Box paddingTop={4}>
             <Typography variant='omega'>
-              <a href={`/admin/plugins/${PLUGIN_ID}/`}>
+              <a href={`/admin/plugins/${PLUGIN_ID}/login`}>
                 {t('login.login_with_localazy')}
               </a>
             </Typography>
