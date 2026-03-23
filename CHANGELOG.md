@@ -1,3 +1,17 @@
+## 1.0.9 (2026-03-23)
+### 🔀 Pull Requests
+
+- [Deprecation warnings and soon breaking changes in Strapi plugin #104](https://github.com/localazy/strapi-plugin/pull/104)
+
+### ⚡️ Performance
+
+- parallelize data fetching and remove render-blocking auth guards ([595c532](https://github.com/localazy/strapi-plugin/commit/595c532)) ([#104](https://github.com/localazy/strapi-plugin/pull/104))
+
+### 🐛 Bug Fixes
+
+- protect routes from unauthenticated access and fix token handling ([595c532](https://github.com/localazy/strapi-plugin/commit/595c532)) ([#104](https://github.com/localazy/strapi-plugin/pull/104))
+- resolve Strapi deprecation warnings and broken menu/settings labels ([595c532](https://github.com/localazy/strapi-plugin/commit/595c532)) ([#104](https://github.com/localazy/strapi-plugin/pull/104))
+
 ## 1.0.8 (2025-11-24)
 ### 🔀 Pull Requests
 
