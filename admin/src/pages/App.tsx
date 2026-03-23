@@ -17,6 +17,7 @@ import Loader from '../modules/@common/components/PluginPageLoader';
 import '../i18n';
 import { Upload } from './Upload';
 import Download from './Download';
+
 const App = () => {
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
 

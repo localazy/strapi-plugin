@@ -127,18 +127,11 @@ const ContentTransferSetup: React.FC = () => {
     async function fetchData() {
       setIsLoading(true);
 
-      /**
-       * Fetch current models schemas
-       */
-      const [models, localizableModels] = await Promise.all([
+      const [models, localizableModels, storedContentTransferSetup] = await Promise.all([
         StrapiModelService.getModels(),
         StrapiModelService.getLocalizableModels(),
+        PluginSettingsService.getContentTransferSetup(),
       ]);
-
-      /**
-       * Fetch stored content transfer setup
-       */
-      const storedContentTransferSetup = await PluginSettingsService.getContentTransferSetup();
 
       /**
        * Build and set accordion expanded state model

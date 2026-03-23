@@ -93,14 +93,17 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
     async function initComponent() {
       setIsLoading(true);
 
-      setStrapiDefaultLocale(await getStrapiDefaultLocale());
-      setLocalazySourceLanguage(await getLocalazySourceLanguage());
+      const [defaultLocale, sourceLanguage, modelChangedResult, localesCompatibleResult] = await Promise.all([
+        getStrapiDefaultLocale(),
+        getLocalazySourceLanguage(),
+        hasModelChanged(),
+        areLocalesCompatible(strapiDefaultLocale, localazySourceLanguage),
+      ]);
 
-      /**
-       * Handle alerts onload apperance
-       */
-      setModelChanged(await hasModelChanged());
-      setLocalesIncompatible(!(await areLocalesCompatible(strapiDefaultLocale, localazySourceLanguage)));
+      setStrapiDefaultLocale(defaultLocale);
+      setLocalazySourceLanguage(sourceLanguage);
+      setModelChanged(modelChangedResult);
+      setLocalesIncompatible(!localesCompatibleResult);
 
       PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
 
