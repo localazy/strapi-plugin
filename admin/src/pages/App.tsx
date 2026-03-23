@@ -1,8 +1,9 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { DesignSystemProvider, Box } from '@strapi/design-system';
 import { useEffect } from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
 import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
+import { PLUGIN_ID } from '../pluginId';
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import { useHeaderTitle } from '../modules/@common/utils/use-header-title';
 import { useHeaderSubtitle } from '../modules/@common/utils/use-header-subtitle';
@@ -20,10 +21,17 @@ import Download from './Download';
 
 const App = () => {
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
+  const location = useLocation();
 
   const { isLoggedIn, isFetchingIdentity } = useLocalazyIdentity();
   const headerTitle = useHeaderTitle();
   const headerSubtitle = useHeaderSubtitle();
+
+  const normalizedPath = location.pathname.replace(/\/+$/, '');
+  const pluginRoot = `/plugins/${PLUGIN_ID}`;
+  const isAtPluginRoot = normalizedPath === pluginRoot;
+  const isAtLoginRoute = normalizedPath === `${pluginRoot}/login`;
+  const shouldRedirect = isAtPluginRoot || isAtLoginRoute;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,15 +40,17 @@ const App = () => {
       }
 
       if (!isLoggedIn) {
-        navigateToPluginRoute(PLUGIN_ROUTES.LOGIN);
-      } else {
+        if (!isAtLoginRoute) {
+          navigateToPluginRoute(PLUGIN_ROUTES.LOGIN);
+        }
+      } else if (shouldRedirect) {
         const lastRoute = (await PluginSettingsService.getPluginSettings()).defaultRoute || PLUGIN_ROUTES.UPLOAD;
         navigateToPluginRoute(lastRoute);
       }
     };
 
     fetchData();
-  }, [isLoggedIn, isFetchingIdentity]);
+  }, [isLoggedIn, isFetchingIdentity, normalizedPath]);
 
   return (
     <DesignSystemProvider theme={getDefaultTheme()}>
