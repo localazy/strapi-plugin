@@ -79,7 +79,7 @@
   },
   "devDependencies": {
     "@david-vaclavek/deep-keys": "^0.5.0",
-    "@localazy/api-client": "^2.1.6",
+    "@localazy/api-client": "^2.1.17",
     "@localazy/generic-connector-client": "^0.3.0",
     "@strapi/design-system": "^2.0.0-rc.14",
     "@strapi/icons": "^2.0.0-rc.14",

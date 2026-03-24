@@ -23,4 +23,10 @@ export default {
     'Download in progress: Please do not close or refresh this page if you wish to see the progress information.',
   to_see_to_progress:
     'The operation will continue running in the background even if you close the page, but you will lose access to the status report.',
+  full_sync: 'Full Sync',
+  full_sync_confirm_title: 'Full Sync Warning',
+  full_sync_confirm_message:
+    'Full sync will download all translations and may take a significant amount of time depending on project size. Continue?',
+  incremental_download: 'Download changes',
+  incremental_disabled_hint: 'Run a Full Sync first to enable incremental downloads.',
 };

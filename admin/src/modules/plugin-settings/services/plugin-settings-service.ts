@@ -45,4 +45,14 @@ export default class PluginSettingsService {
       throw e;
     }
   }
+
+  static async getSyncCursor() {
+    try {
+      const result = await axiosInstance.get(`${BASE_PATH}/sync-cursor`);
+
+      return result.data;
+    } catch (e) {
+      throw e;
+    }
+  }
 }

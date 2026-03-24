@@ -2,6 +2,7 @@ import { Core } from '@strapi/strapi';
 
 import { KEY as CONTENT_TRANSFER_SETUP_KEY, emptyContentTransferSetup } from '../db/model/content-transfer-setup';
 import { KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings } from '../db/model/plugin-settings';
+import { KEY as SYNC_CURSOR_KEY, SyncCursor, emptySyncCursor } from '../db/model/sync-cursor';
 import getStrapiStore from '../db/model/utils/get-strapi-store';
 import { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
 const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -48,6 +49,23 @@ const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
     });
 
     return newSettings;
+  },
+
+  async getSyncCursor(): Promise<SyncCursor> {
+    const pluginStore = getStrapiStore(strapi);
+    const cursor = (await pluginStore.get({ key: SYNC_CURSOR_KEY })) as SyncCursor;
+
+    return cursor || emptySyncCursor;
+  },
+
+  async updateSyncCursor(cursor: SyncCursor): Promise<SyncCursor> {
+    const pluginStore = getStrapiStore(strapi);
+    await pluginStore.set({
+      key: SYNC_CURSOR_KEY,
+      value: cursor,
+    });
+
+    return cursor;
   },
 });
 

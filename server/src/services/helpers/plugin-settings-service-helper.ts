@@ -55,6 +55,12 @@ class PluginSettingsServiceHelper {
   getUiLanguagesCodes(): string[] {
     return this.pluginSettings?.download?.uiLanguages || [];
   }
+
+  shouldWebhookUseIncrementalSync(): boolean {
+    return typeof this.pluginSettings?.download?.webhookIncrementalSync === 'boolean'
+      ? this.pluginSettings.download.webhookIncrementalSync
+      : true;
+  }
 }
 
 export default PluginSettingsServiceHelper;

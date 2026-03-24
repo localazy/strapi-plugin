@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
 import { Layouts } from '@strapi/strapi/admin';
-import { Box, Button, Alert, Flex, Divider, Typography } from '@strapi/design-system';
+import { Box, Button, Alert, Flex, Divider, Typography, Dialog } from '@strapi/design-system';
 import { Download as DownloadIcon } from '@strapi/icons';
 import { useTranslation } from 'react-i18next';
 import Loader from '../modules/@common/components/PluginPageLoader';
@@ -47,6 +47,8 @@ const Download: React.FC<DownloadProps> = (props) => {
     report: [],
   });
   const [isDownloading, setIsDownloading] = useState(false);
+  const [hasSyncCursor, setHasSyncCursor] = useState(false);
+  const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false);
 
   /**
    * Localazy identity / access token
@@ -77,14 +79,14 @@ const Download: React.FC<DownloadProps> = (props) => {
     }
   };
 
-  const onDownloadClick = async () => {
+  const onDownloadClick = async (fullSync = false) => {
     setIsDownloading(true);
     setshowDownloadFinishedModal(false);
     setDownloadResult({
       success: false,
       report: [],
     });
-    const result = await LocalazyDownloadService.download();
+    const result = await LocalazyDownloadService.download({ fullSync });
     const { streamIdentifier } = result;
     downloadAlertsService.setStreamIdentifier(streamIdentifier);
     downloadAlertsService.onDownload((data: any) => {
@@ -93,13 +95,23 @@ const Download: React.FC<DownloadProps> = (props) => {
         report: [...(old.report || []), data.message],
       }));
     });
-    downloadAlertsService.onDownloadFinished((data: any) => {
+    downloadAlertsService.onDownloadFinished(async (data: any) => {
       setDownloadResult((old: any) => ({
         success: data.success,
         report: [...(old.report || []), data.message],
       }));
       setIsDownloading(false);
       setshowDownloadFinishedModal(true);
+
+      // Re-check cursor so incremental button enables after first (partial) sync
+      try {
+        const cursor = await PluginSettingsService.getSyncCursor();
+        setHasSyncCursor(
+          cursor?.processedKeys !== undefined && Object.keys(cursor.processedKeys).length > 0
+        );
+      } catch (_e) {
+        // ignore — button state stays as is
+      }
     });
 
     // track download
@@ -112,15 +124,19 @@ const Download: React.FC<DownloadProps> = (props) => {
     async function initComponent() {
       setIsLoading(true);
 
-      const [modelChangedResult, localesCompatibleResult, project, globalSettings] = await Promise.all([
+      const [modelChangedResult, localesCompatibleResult, project, globalSettings, syncCursor] = await Promise.all([
         hasModelChanged(),
         areLocalesCompatible(),
         ProjectService.getConnectedProject(),
         PluginSettingsService.getPluginSettings(),
+        PluginSettingsService.getSyncCursor(),
       ]);
 
       setModelChanged(modelChangedResult);
       setLocalesIncompatible(!localesCompatibleResult);
+      setHasSyncCursor(
+        syncCursor?.processedKeys !== undefined && Object.keys(syncCursor.processedKeys).length > 0
+      );
 
       const projectLanguagesWithoutDefaultLanguage =
         project?.languages?.filter((language) => language.id !== project.sourceLanguage) || [];
@@ -142,14 +158,24 @@ const Download: React.FC<DownloadProps> = (props) => {
         title={props.title}
         subtitle={props.subtitle}
         primaryAction={
-          <Button
-            startIcon={<DownloadIcon />}
-            disabled={isLoading || modelChanged || localesIncompatible}
-            loading={isDownloading}
-            onClick={onDownloadClick}
-          >
-            {t('download.download_to_strapi')}
-          </Button>
+          <Flex gap={2}>
+            <Button
+              variant='secondary'
+              disabled={isLoading || modelChanged || localesIncompatible}
+              loading={isDownloading}
+              onClick={() => setShowFullSyncConfirm(true)}
+            >
+              {t('download.full_sync')}
+            </Button>
+            <Button
+              startIcon={<DownloadIcon />}
+              disabled={isLoading || modelChanged || localesIncompatible || !hasSyncCursor}
+              loading={isDownloading}
+              onClick={() => onDownloadClick(false)}
+            >
+              {t('download.incremental_download')}
+            </Button>
+          </Flex>
         }
         as='h2'
       />
@@ -241,11 +267,42 @@ const Download: React.FC<DownloadProps> = (props) => {
               </Alert>
             </Box>
           )}
+          {!hasSyncCursor && (
+            <Box marginTop={4} marginBottom={4}>
+              <Alert title={t('download.incremental_disabled_hint')} variant='default'>
+                {t('download.incremental_disabled_hint')}
+              </Alert>
+            </Box>
+          )}
           {downloadResult.report && downloadResult.report.length > 0 && (
             <TransferReport report={downloadResult.report} />
           )}
         </Box>
       )}
+      <Dialog.Root open={showFullSyncConfirm} onOpenChange={setShowFullSyncConfirm}>
+        <Dialog.Content>
+          <Dialog.Header>{t('download.full_sync_confirm_title')}</Dialog.Header>
+          <Dialog.Body>
+            <Typography variant='omega'>{t('download.full_sync_confirm_message')}</Typography>
+          </Dialog.Body>
+          <Dialog.Footer>
+            <Dialog.Cancel>
+              <Button variant='tertiary'>{t('download.close')}</Button>
+            </Dialog.Cancel>
+            <Dialog.Action>
+              <Button
+                variant='danger-light'
+                onClick={() => {
+                  setShowFullSyncConfirm(false);
+                  onDownloadClick(true);
+                }}
+              >
+                {t('download.full_sync')}
+              </Button>
+            </Dialog.Action>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   );
 };
