@@ -94,9 +94,8 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
 
       // https://docs.strapi.io/dev-docs/api/document-service#examples-1;
       let entries = await strapi.documents(modelUid).findMany({
-        // TODO: Resolve pLevel parameter type
-        // @ts-expect-error Improve types
         locUploadPLevel: 6,
+        status: 'draft',
       });
 
       if (!entries.length) {

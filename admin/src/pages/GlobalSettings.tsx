@@ -280,6 +280,23 @@ const GlobalSettings: React.FC = () => {
                 hint={t('plugin_settings.webhook_languages_info')}
                 placeholder={t('plugin_settings.webhook_languages_placeholder')}
               />
+              {/* Webhook incremental sync */}
+              <br />
+              <br />
+              <Field.Root hint={t('plugin_settings.webhook_incremental_sync_info')}>
+                <Field.Label>{t('plugin_settings.webhook_incremental_sync')}</Field.Label>
+                <Toggle
+                  offLabel={t('plugin_settings.off')}
+                  onLabel={t('plugin_settings.on')}
+                  checked={
+                    typeof formModel?.download?.webhookIncrementalSync === 'boolean'
+                      ? formModel.download.webhookIncrementalSync
+                      : true
+                  }
+                  onChange={(e: any) => patchFormModel('download.webhookIncrementalSync', e.target.checked)}
+                />
+                <Field.Hint />
+              </Field.Root>
             </Box>
           </Box>
         )}

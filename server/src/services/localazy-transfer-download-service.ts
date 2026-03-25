@@ -22,6 +22,7 @@ import {
   getEntryExclusionService,
 } from '../core';
 import { Language, Locales } from '@localazy/api-client';
+import { SyncCursor } from '../db/model/sync-cursor';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
 const getFilteredLanguagesCodesForDownload = async (languagesCodes: string[]): Promise<string[]> => {
@@ -48,11 +49,18 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes: string[]): P
 };
 
 const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) => ({
-  async download({ notificationService }: { notificationService: JobNotificationServiceType }) {
+  async download({
+    notificationService,
+    fullSync = false,
+  }: {
+    notificationService: JobNotificationServiceType;
+    fullSync?: boolean;
+  }) {
     console.time('download');
-    strapi.log.info('Download started');
+    const syncMode = fullSync ? 'Full sync' : 'Incremental sync';
+    strapi.log.info(`Download started (${syncMode})`);
     await notificationService.emit(EventType.DOWNLOAD, {
-      message: 'Download started',
+      message: `Download started (${syncMode})`,
     });
 
     let success = true;
@@ -181,20 +189,66 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     );
     const localazyContent = {};
     const LocalazyApi = await LocalazyApiClientFactory();
+    const PluginSettingsService = getPluginSettingsService();
+    const syncCursor: SyncCursor = await PluginSettingsService.getSyncCursor();
+
+    // On full sync, reset the processed keys map
+    const processedKeys: Record<string, Record<string, number>> = fullSync
+      ? {}
+      : JSON.parse(JSON.stringify(syncCursor.processedKeys || {}));
+
     for (const isoLocalazy of supportedLanguages) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
+      const langProcessedKeys = processedKeys[isoStrapi] || {};
+
+      // Fetch all keys with event info; no API-level filtering — we filter locally using the map
       const langKeys = await LocalazyApi.files.listKeys({
         project: user.project.id,
         file: strapiFile.id,
         lang: isoStrapi as Locales,
+        event: true,
       });
-      if (!langKeys) {
+
+      if (!langKeys || langKeys.length === 0) {
         await notificationService.emit(EventType.DOWNLOAD, {
           message: `No keys found for language ${isoLocalazy}`,
         });
+      } else {
+        const newKeys = langKeys.filter((k) => {
+          const storedEvent = langProcessedKeys[k.id];
+          return storedEvent === undefined || k.event === undefined || k.event > storedEvent;
+        });
+        await notificationService.emit(EventType.DOWNLOAD, {
+          message: `${syncMode}: ${newKeys.length} changed / ${langKeys.length} total keys for language ${isoLocalazy}`,
+        });
       }
+
       localazyContent[isoLocalazy] = langKeys;
     }
+
+    /**
+     * Helper: persist updated processedKeys map after each entry write
+     */
+    const persistCursor = async () => {
+      await PluginSettingsService.updateSyncCursor({ processedKeys });
+    };
+
+    /**
+     * Helper: mark Localazy key IDs as processed (per-language) and persist
+     */
+    const markKeysProcessed = async (
+      keyIds: Array<{ lang: string; id: string; event: number | undefined }>
+    ) => {
+      for (const { lang, id, event } of keyIds) {
+        if (event !== undefined) {
+          if (!processedKeys[lang]) {
+            processedKeys[lang] = {};
+          }
+          processedKeys[lang][id] = event;
+        }
+      }
+      await persistCursor();
+    };
 
     /**
      * Parse Localazy content
@@ -204,6 +258,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     const parsedLocalazyContent: ParsedLocalazyContent = {};
     const strapiContentTypesModels = await StrapiService.getModels();
     const jsonFields = [];
+
+    // Track which Localazy keys contribute to each Strapi entry: "isoStrapi:uid:documentId" → [{lang, id, event}]
+    const entryKeySourceMap: Record<
+      string,
+      Array<{ lang: string; id: string; event: number | undefined }>
+    > = {};
+
     for (const [isoLocalazy, keys] of Object.entries<any>(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
@@ -216,8 +277,23 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       for (const localazyEntry of keys) {
         const key = localazyEntry.key[0];
         const value = localazyEntry.value;
+        const localazyKeyId: string = localazyEntry.id;
+        const localazyKeyEvent: number | undefined = localazyEntry.event;
+
+        // Skip keys already processed at the same or newer event for this language
+        const storedEvent = processedKeys[isoStrapi]?.[localazyKeyId];
+        if (storedEvent !== undefined && localazyKeyEvent !== undefined && localazyKeyEvent <= storedEvent) {
+          continue;
+        }
 
         const parsedKey = StrapiI18nService.parseLocalazyKey(key);
+
+        // Track source key for this entry
+        const entryKey = `${isoStrapi}:${parsedKey.uid}:${parsedKey.id}`;
+        if (!entryKeySourceMap[entryKey]) {
+          entryKeySourceMap[entryKey] = [];
+        }
+        entryKeySourceMap[entryKey].push({ lang: isoStrapi, id: localazyKeyId, event: localazyKeyEvent });
 
         const modelContentTransferSetup = findSetupModelByCollectionUid(
           contentTransferSetup,
@@ -294,6 +370,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
 
     /**
      * Iterate over parsed Localazy content and insert/update content in Strapi
+     * Track processed entries and persist cursor every FLUSH_INTERVAL entries
      */
     for (const [isoStrapi, contentTypes] of Object.entries(parsedLocalazyContent)) {
       for (const [uid, models] of Object.entries(contentTypes) as [UID.ContentType, Record<string, any>][]) {
@@ -314,11 +391,15 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         const excludedEntries = await EntryExclusionService.getContentTypeExclusions(uid);
 
         for (const [documentId, translatedModel] of Object.entries(models)) {
+          const entryKey = `${isoStrapi}:${uid}:${documentId}`;
+          const sourceKeys = entryKeySourceMap[entryKey] || [];
+
           /**
            * Entry could be excluded from translation after being uploaded to Localazy
            */
           if (excludedEntries.includes(documentId)) {
             strapi.log.info(`Entry ${uid}[${documentId}] is excluded from transfer, skipping...`);
+            await markKeysProcessed(sourceKeys);
             continue;
           }
 
@@ -333,8 +414,11 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             });
 
             if (isEmpty(baseEntry)) {
-              const message = `Source language entry ${uid}[${documentId}] does not exist anymore, skipping...`;
-              throw new Error(message);
+              strapi.log.info(
+                `Source language entry ${uid}[${documentId}] does not exist anymore, skipping...`
+              );
+              await markKeysProcessed(sourceKeys);
+              continue;
             }
 
             /**
@@ -360,6 +444,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               locale: isoStrapi,
             });
 
+            // Build content type path for Strapi admin link (e.g. api::article.article -> content-manager/collection-types/api::article.article)
+            const strapiAdminEntryUrl = `/admin/content-manager/collection-types/${uid}/${documentId}?plugins[i18n][locale]=${isoStrapi}`;
+            const localazySearchUrl = `${user.project.url}/source-language?search=${uid}[${documentId}]`;
+
             if (isEmpty(currentLanguageLocalizedEntry)) {
               // create new entry
               try {
@@ -371,18 +459,24 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   isoStrapi
                 );
 
-                const message = `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`;
+                const message = `Created entry for ${uid} [${documentId}] in ${isoStrapi}`;
                 strapi.log.info(message);
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
+                await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 await notificationService.emit(EventType.DOWNLOAD, {
-                  message: `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`,
+                  message: `Failed to create ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
+                  links: {
+                    strapi: strapiAdminEntryUrl,
+                    localazy: localazySearchUrl,
+                  },
                 });
+                // NOT marked — will be retried on next sync
               }
             } else {
               // update existing entry
@@ -398,33 +492,39 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   isoStrapi
                 );
 
-                const message = `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`;
+                const message = `Updated ${uid} [${documentId}] in ${isoStrapi}`;
                 strapi.log.info(message);
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
+                await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 await notificationService.emit(EventType.DOWNLOAD, {
-                  message: `Cannot update an ${uid}[${currentLanguageLocalizedEntry.id}] (${isoStrapi}): ${e.message}`,
+                  message: `Failed to update ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
+                  links: {
+                    strapi: strapiAdminEntryUrl,
+                    localazy: localazySearchUrl,
+                  },
                 });
+                // NOT marked — will be retried on next sync
               }
             }
           } catch (e) {
             success = false;
             strapi.log.error(e.message);
-            await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
-              success,
-              message: `An error occured while processing download: ${e.message}`,
+            await notificationService.emit(EventType.DOWNLOAD, {
+              message: `Error processing ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
             });
+            // NOT marked — will be retried on next sync
           }
         }
       }
     }
 
-    strapi.log.info('Download finished in');
+    strapi.log.info(`Download finished. Tracked ${Object.keys(processedKeys).length} processed keys.`);
     await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
       success,
       message: 'Download finished',

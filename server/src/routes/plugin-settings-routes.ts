@@ -33,6 +33,14 @@ const PluginSettingsRoutes = [
       policies: [],
     },
   },
+  {
+    method: 'GET',
+    path: `${ROUTE_PREFIX}/sync-cursor`,
+    handler: 'PluginSettingsController.getSyncCursor',
+    config: {
+      policies: [],
+    },
+  },
 ];
 
 export default PluginSettingsRoutes;

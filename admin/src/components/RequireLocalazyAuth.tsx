@@ -14,16 +14,18 @@ const RequireLocalazyAuth = ({ children }: { children: React.ReactElement }) => 
   if (!isFetchingIdentity && !isLoggedIn) {
     return (
       <>
-        <Layouts.Header title={t('common.localazy_plugin')} subtitle={t('common.localazy_plugin_description')} as='h2' />
+        <Layouts.Header
+          title={t('common.localazy_plugin')}
+          subtitle={t('common.localazy_plugin_description')}
+          as='h2'
+        />
         <Box marginLeft={10} marginRight={10} background='neutral0' padding={7} hasRadius shadow='tableShadow'>
           <Typography variant='epsilon' textColor='neutral600'>
             {t('login.you_have_to_own_account_for_the_plugin_to_work_properly')}
           </Typography>
           <Box paddingTop={4}>
             <Typography variant='omega'>
-              <a href={`/admin/plugins/${PLUGIN_ID}/login`}>
-                {t('login.login_with_localazy')}
-              </a>
+              <a href={`/admin/plugins/${PLUGIN_ID}/login`}>{t('login.login_with_localazy')}</a>
             </Typography>
           </Box>
         </Box>

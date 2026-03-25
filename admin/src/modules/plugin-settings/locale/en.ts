@@ -37,6 +37,10 @@ export default {
     'Select the languages from Localazy. Translations of selected languages would be downloaded. If no language is selected, all translations will be downloaded.',
   webhook_languages_placeholder: 'Download all languages',
 
+  webhook_incremental_sync: 'Use incremental sync for webhooks',
+  webhook_incremental_sync_info:
+    'When enabled, webhook-triggered downloads will only fetch recently changed translations. Disable to always perform a full sync via webhook.',
+
   global_settings_saved_successfully: 'Global Settings were saved',
 
   /* Content Transfer Setup */
