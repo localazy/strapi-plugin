@@ -18,6 +18,9 @@ const StrapiService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getPluginVersion() {
     return await import('../../../package.json').then((module) => module.version);
   },
+  getStrapiVersion() {
+    return strapi.config.get('info.strapi') as string;
+  },
 });
 
 export type StrapiServiceReturnType = ReturnType<typeof StrapiService>;

@@ -71,7 +71,7 @@ export default class ProductAnalyticsService {
   }
 
   static async buildData(event: string, project: any, params: Record<string, any>) {
-    const { version } = await PluginService.getPluginVersion();
+    const { version, versionStrapi } = await PluginService.getPluginVersion();
 
     return {
       event,
@@ -79,6 +79,7 @@ export default class ProductAnalyticsService {
         'Project Id': project.id,
         'Project Name': project.name,
         version,
+        versionStrapi,
         ...params,
       },
     };
