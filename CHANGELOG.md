@@ -1,3 +1,23 @@
+## 1.0.11 (2026-03-25)
+### 🔀 Pull Requests
+
+- [Correct processed keys count in download log #110](https://github.com/localazy/strapi-plugin/pull/110)
+- [Loc 3949 integrations  strapi allow continuous recentlychanged data transfer #108](https://github.com/localazy/strapi-plugin/pull/108)
+
+### ✨ Features
+
+- Allow continuous recently-changed data transfer (LOC-3949) ([ebf9605](https://github.com/localazy/strapi-plugin/commit/ebf9605)) ([#108](https://github.com/localazy/strapi-plugin/pull/108))
+
+### 🐛 Bug Fixes
+
+- Correct processed keys count in download log ([337fb50](https://github.com/localazy/strapi-plugin/commit/337fb50)) ([#110](https://github.com/localazy/strapi-plugin/pull/110))
+- Improve download error handling and reporting ([ebf9605](https://github.com/localazy/strapi-plugin/commit/ebf9605)) ([#108](https://github.com/localazy/strapi-plugin/pull/108))
+- Restore deep populate for dynamic zones and fetch draft entries ([ebf9605](https://github.com/localazy/strapi-plugin/commit/ebf9605)) ([#108](https://github.com/localazy/strapi-plugin/pull/108))
+
+### 🧰 Other Commits
+
+- Add CLAUDE.md for Claude Code guidance ([ebf9605](https://github.com/localazy/strapi-plugin/commit/ebf9605)) ([#108](https://github.com/localazy/strapi-plugin/pull/108))
+
 ## 1.0.10 (2026-03-23)
 ### 🔀 Pull Requests
 
