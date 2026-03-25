@@ -17,7 +17,7 @@ describe('getCharacterLimitsMetadata', () => {
 
   it('should return empty metadata when model is not found', () => {
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
+      'api::article.article[doc1].title': 'Hello',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
@@ -33,13 +33,13 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
-      'api::article.article.doc1.description': 'World',
+      'api::article.article[doc1].title': 'Hello',
+      'api::article.article[doc1].description': 'World',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
     expect(result).toEqual({
-      '@meta:api::article.article.doc1.title': { limit: 100 },
+      '@meta:api::article.article[doc1].title': { limit: 100 },
     });
   });
 
@@ -52,8 +52,8 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
-      'api::article.article.doc1.description': 'World',
+      'api::article.article[doc1].title': 'Hello',
+      'api::article.article[doc1].description': 'World',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
@@ -75,15 +75,15 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
-      'api::article.article.doc1.seo[1].metaTitle': 'SEO Title',
-      'api::article.article.doc1.seo[1].metaDescription': 'SEO Description',
+      'api::article.article[doc1].title': 'Hello',
+      'api::article.article[doc1].seo[1].metaTitle': 'SEO Title',
+      'api::article.article[doc1].seo[1].metaDescription': 'SEO Description',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
     expect(result).toEqual({
-      '@meta:api::article.article.doc1.title': { limit: 50 },
-      '@meta:api::article.article.doc1.seo[1].metaTitle': { limit: 60 },
+      '@meta:api::article.article[doc1].title': { limit: 50 },
+      '@meta:api::article.article[doc1].seo[1].metaTitle': { limit: 60 },
     });
   });
 
@@ -105,14 +105,14 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::page.page.doc1.content[1;basic.text].body': 'Some text',
-      'api::page.page.doc1.content[2;basic.hero].heading': 'Hero Title',
+      'api::page.page[doc1].content[1;basic.text].body': 'Some text',
+      'api::page.page[doc1].content[2;basic.hero].heading': 'Hero Title',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::page.page');
     expect(result).toEqual({
-      '@meta:api::page.page.doc1.content[1;basic.text].body': { limit: 500 },
-      '@meta:api::page.page.doc1.content[2;basic.hero].heading': { limit: 80 },
+      '@meta:api::page.page[doc1].content[1;basic.text].body': { limit: 500 },
+      '@meta:api::page.page[doc1].content[2;basic.hero].heading': { limit: 80 },
     });
   });
 
@@ -124,13 +124,13 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
-      'api::other.other.doc2.name': 'Other',
+      'api::article.article[doc1].title': 'Hello',
+      'api::other.other[doc2].name': 'Other',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
     expect(result).toEqual({
-      '@meta:api::article.article.doc1.title': { limit: 100 },
+      '@meta:api::article.article[doc1].title': { limit: 100 },
     });
   });
 
@@ -142,14 +142,14 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'api::article.article.doc1.title': 'Hello',
-      'api::article.article.doc2.title': 'World',
+      'api::article.article[doc1].title': 'Hello',
+      'api::article.article[doc2].title': 'World',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'api::article.article');
     expect(result).toEqual({
-      '@meta:api::article.article.doc1.title': { limit: 100 },
-      '@meta:api::article.article.doc2.title': { limit: 100 },
+      '@meta:api::article.article[doc1].title': { limit: 100 },
+      '@meta:api::article.article[doc2].title': { limit: 100 },
     });
   });
 
@@ -161,12 +161,12 @@ describe('getCharacterLimitsMetadata', () => {
     };
 
     const flattenedContent = {
-      'shared.seo.1.metaTitle': 'Title',
+      'shared.seo[1].metaTitle': 'Title',
     };
 
     const result = getCharacterLimitsMetadata(flattenedContent, 'shared.seo');
     expect(result).toEqual({
-      '@meta:shared.seo.1.metaTitle': { limit: 60 },
+      '@meta:shared.seo[1].metaTitle': { limit: 60 },
     });
   });
 });
