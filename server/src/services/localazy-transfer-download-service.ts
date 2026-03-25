@@ -524,7 +524,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       }
     }
 
-    strapi.log.info(`Download finished. Tracked ${Object.keys(processedKeys).length} processed keys.`);
+    const totalProcessedKeys = Object.values(processedKeys).reduce((sum, langKeys) => sum + Object.keys(langKeys).length, 0);
+    strapi.log.info(
+      `Download finished. Tracked ${totalProcessedKeys} processed keys across ${Object.keys(processedKeys).length} languages.`
+    );
     await notificationService.emit(EventType.DOWNLOAD_FINISHED, {
       success,
       message: 'Download finished',
