@@ -14,6 +14,7 @@ const StrapiController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getPluginVersion(ctx) {
     ctx.body = {
       version: await getStrapiService().getPluginVersion(),
+      versionStrapi: getStrapiService().getStrapiVersion(),
     };
   },
 });
