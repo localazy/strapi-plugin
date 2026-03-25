@@ -40,18 +40,26 @@ const getCharacterLimitsMetadata = (
  * then walks the schema through components to find the leaf attribute's maxLength.
  */
 const resolveMaxLength = (flatKey: string, modelUid: string, model: any): number | undefined => {
-  if (!flatKey.startsWith(`${modelUid}.`)) {
+  // Flat keys look like: api::article.article[docId].description
+  // or: api::article.article[docId].blocks[1;shared.quote].title
+  if (!flatKey.startsWith(`${modelUid}[`)) {
     return undefined;
   }
 
-  const withoutModelUid = flatKey.substring(modelUid.length + 1);
+  // Remove "modelUid[docId]." prefix
+  const afterUid = flatKey.substring(modelUid.length);
+  const closingBracket = afterUid.indexOf(']');
+  if (closingBracket === -1) {
+    return undefined;
+  }
+  const withoutDocId = afterUid.substring(closingBracket + 2); // skip "]."
 
-  // Split by dots and remove the first segment (documentId)
-  const allParts = withoutModelUid.split('.');
+  if (!withoutDocId) {
+    return undefined;
+  }
 
-  // The first part is the documentId (or contains bracket with it), skip it
-  // Filter out parts that are purely bracket segments (ids) and extract field names
-  const fieldPath = parseFieldPath(allParts.slice(1));
+  const allParts = withoutDocId.split('.');
+  const fieldPath = parseFieldPath(allParts);
 
   if (fieldPath.length === 0) {
     return undefined;
