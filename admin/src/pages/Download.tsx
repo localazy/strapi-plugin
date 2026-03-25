@@ -92,13 +92,13 @@ const Download: React.FC<DownloadProps> = (props) => {
     downloadAlertsService.onDownload((data: any) => {
       setDownloadResult((old: any) => ({
         success: data.success,
-        report: [...(old.report || []), data.message],
+        report: [...(old.report || []), { message: data.message, links: data.links }],
       }));
     });
     downloadAlertsService.onDownloadFinished(async (data: any) => {
       setDownloadResult((old: any) => ({
         success: data.success,
-        report: [...(old.report || []), data.message],
+        report: [...(old.report || []), { message: data.message, links: data.links }],
       }));
       setIsDownloading(false);
       setshowDownloadFinishedModal(true);

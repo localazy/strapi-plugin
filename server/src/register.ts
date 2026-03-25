@@ -20,12 +20,12 @@ const register = ({ strapi }: { strapi: Core.Strapi }) => {
       }
       case 'create':
       case 'update':
-        try {
-          result = await next();
+        result = await next();
 
+        try {
           const hookResult = await uploadEventEntryToLocalazyHook({
             context,
-            documentId: result.documentId,
+            documentId: result?.documentId,
             locale: context.params.locale || context['locale'],
           });
           if (typeof hookResult !== 'undefined') {
@@ -33,9 +33,8 @@ const register = ({ strapi }: { strapi: Core.Strapi }) => {
           }
         } catch (e) {
           strapi.log.error(e);
-        } finally {
-          break;
         }
+        break;
       case 'delete': {
         try {
           const hookResult = await deprecateEventEntryInLocalazyHook({

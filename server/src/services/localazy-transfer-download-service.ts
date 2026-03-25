@@ -444,6 +444,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               locale: isoStrapi,
             });
 
+            // Build content type path for Strapi admin link (e.g. api::article.article -> content-manager/collection-types/api::article.article)
+            const strapiAdminEntryUrl = `/admin/content-manager/collection-types/${uid}/${documentId}?plugins[i18n][locale]=${isoStrapi}`;
+            const localazySearchUrl = `${user.project.url}/source-language?search=${uid}[${documentId}]`;
+
             if (isEmpty(currentLanguageLocalizedEntry)) {
               // create new entry
               try {
@@ -455,7 +459,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   isoStrapi
                 );
 
-                const message = `Created new entry ${uid}[${createdEntry.id}] in language ${isoStrapi}`;
+                const message = `Created entry for ${uid} [${documentId}] in ${isoStrapi}`;
                 strapi.log.info(message);
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
@@ -466,7 +470,11 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 await notificationService.emit(EventType.DOWNLOAD, {
-                  message: `Cannot create an entry in ${isoStrapi} for ${uid}[${baseEntry.id}]: ${e.message}`,
+                  message: `Failed to create ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
+                  links: {
+                    strapi: strapiAdminEntryUrl,
+                    localazy: localazySearchUrl,
+                  },
                 });
                 // NOT marked — will be retried on next sync
               }
@@ -484,7 +492,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   isoStrapi
                 );
 
-                const message = `Updated ${uid}[${updatedEntry.id}] (${isoStrapi})`;
+                const message = `Updated ${uid} [${documentId}] in ${isoStrapi}`;
                 strapi.log.info(message);
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
@@ -495,7 +503,11 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                 strapi.log.error(e.message);
                 strapi.log.error(JSON.stringify(e.details?.errors || {}));
                 await notificationService.emit(EventType.DOWNLOAD, {
-                  message: `Cannot update an ${uid}[${currentLanguageLocalizedEntry.id}] (${isoStrapi}): ${e.message}`,
+                  message: `Failed to update ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
+                  links: {
+                    strapi: strapiAdminEntryUrl,
+                    localazy: localazySearchUrl,
+                  },
                 });
                 // NOT marked — will be retried on next sync
               }
@@ -504,7 +516,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             success = false;
             strapi.log.error(e.message);
             await notificationService.emit(EventType.DOWNLOAD, {
-              message: `An error occured while processing download: ${e.message}`,
+              message: `Error processing ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
             });
             // NOT marked — will be retried on next sync
           }

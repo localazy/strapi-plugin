@@ -62,45 +62,76 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     return entry;
   },
   async createLocalizationForAnExistingEntry(uid: UID.ContentType, baseEntry: any, newEntry: any) {
+    const newEntryLocale = newEntry.locale;
+    const filteredNewEntry = omitDeep(newEntry, ['createdAt', 'updatedAt']);
+    delete filteredNewEntry.id;
+
+    /**
+     * TODO: add correct publish/draft status and createdBy/updatedBy fields
+     *
+     * Set as draft
+     * Do not completely omit as it won't process the required fields
+     */
+    filteredNewEntry.publishedAt = null;
+
+    let createResult: any = null;
+    let createError: any = null;
     try {
-      const newEntryLocale = newEntry.locale;
-      const filteredNewEntry = omitDeep(newEntry, ['createdAt', 'updatedAt']);
-      delete filteredNewEntry.id;
-
-      /**
-       * TODO: add correct publish/draft status and createdBy/updatedBy fields
-       *
-       * Set as draft
-       * Do not completely omit as it won't process the required fields
-       */
-      filteredNewEntry.publishedAt = null;
-
-      await strapi.documents(uid).create({
+      createResult = await strapi.documents(uid).create({
         locale: newEntryLocale,
         data: filteredNewEntry,
       });
-
-      const insertedEntry = await this.getEntryInLocale(uid, baseEntry.documentId, newEntryLocale);
-
-      return insertedEntry;
-    } catch (e) {
-      strapi.log.error(e);
-      throw e;
+    } catch (e: any) {
+      createError = e;
     }
+
+    if (createError) {
+      const detail =
+        createError.details?.errors?.[0]?.message ||
+        createError.details?.message ||
+        createError.message;
+      throw new Error(detail);
+    }
+
+    // If create returned null/undefined, try to find the entry anyway (it may have been created by a middleware)
+    const insertedEntry = createResult || (await this.getEntryInLocale(uid, baseEntry.documentId, newEntryLocale));
+
+    if (!insertedEntry) {
+      throw new Error(
+        `Entry was not created — Strapi may have silently rejected it. Check the server logs for details.`
+      );
+    }
+
+    return insertedEntry;
   },
   async updateLocalizationForAnExistingEntry(uid, localizedDocumentId, data, locale: string) {
+    let updateError: any = null;
+    let updatedEntry: any = null;
     try {
-      const updatedEntry = await strapi.documents(uid as any).update({
+      updatedEntry = await strapi.documents(uid as any).update({
         documentId: localizedDocumentId,
         locale,
         data,
       });
-
-      return updatedEntry;
-    } catch (e) {
-      strapi.log.error(e);
-      throw e;
+    } catch (e: any) {
+      updateError = e;
     }
+
+    if (updateError) {
+      const detail =
+        updateError.details?.errors?.[0]?.message ||
+        updateError.details?.message ||
+        updateError.message;
+      throw new Error(detail);
+    }
+
+    if (!updatedEntry) {
+      throw new Error(
+        `Entry was not updated — Strapi may have silently rejected it. Check the server logs for details.`
+      );
+    }
+
+    return updatedEntry;
   },
 });
 
