@@ -55,7 +55,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const collectionsNames = getCollectionsNames(setup);
     const models = await StrapiService.getModels();
 
-    let pickedFlattenStrapiContent: Record<string, string> = {};
+    let pickedFlattenStrapiContent: Record<string, string | { limit: number }> = {};
     for (const collectionName of collectionsNames) {
       const currentModel = models.find((model) => model.collectionName === collectionName);
       const modelUid = currentModel.uid;
