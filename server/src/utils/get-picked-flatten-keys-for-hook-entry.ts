@@ -3,6 +3,7 @@ import config from '../config';
 import { omitDeep } from './omit-deep';
 import { flattenObject } from './flatten-object';
 import { pickEntries } from './pick-entries';
+import { getCharacterLimitsMetadata } from './get-character-limits-metadata';
 import { findSetupModelByCollectionName, getPickPaths } from './transfer-setup-utils';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
 import { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
@@ -200,8 +201,15 @@ export default async (params: HookParams) => {
   // get only enabled fields; "__component" will be filtered out inside of the function
   const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
 
+  // Add character limit metadata for fields that have maxLength defined in the content type schema
+  const characterLimitsMetadata = getCharacterLimitsMetadata(pickedFlatten, modelUid);
+  const pickedFlattenWithMetadata = {
+    ...pickedFlatten,
+    ...characterLimitsMetadata,
+  };
+
   return {
-    pickedFlatten,
+    pickedFlatten: pickedFlattenWithMetadata,
     eventEntryLocale,
     projectSourceLanguageCode,
   };
