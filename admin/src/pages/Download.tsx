@@ -106,10 +106,8 @@ const Download: React.FC<DownloadProps> = (props) => {
       // Re-check cursor so incremental button enables after first (partial) sync
       try {
         const cursor = await PluginSettingsService.getSyncCursor();
-        setHasSyncCursor(
-          cursor?.processedKeys !== undefined && Object.keys(cursor.processedKeys).length > 0
-        );
-      } catch (_e) {
+        setHasSyncCursor(cursor?.processedKeys !== undefined && Object.keys(cursor.processedKeys).length > 0);
+      } catch {
         // ignore — button state stays as is
       }
     });
@@ -134,9 +132,7 @@ const Download: React.FC<DownloadProps> = (props) => {
 
       setModelChanged(modelChangedResult);
       setLocalesIncompatible(!localesCompatibleResult);
-      setHasSyncCursor(
-        syncCursor?.processedKeys !== undefined && Object.keys(syncCursor.processedKeys).length > 0
-      );
+      setHasSyncCursor(syncCursor?.processedKeys !== undefined && Object.keys(syncCursor.processedKeys).length > 0);
 
       const projectLanguagesWithoutDefaultLanguage =
         project?.languages?.filter((language) => language.id !== project.sourceLanguage) || [];

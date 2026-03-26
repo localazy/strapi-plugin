@@ -1,7 +1,7 @@
 import { Core } from '@strapi/strapi';
 import { getPluginSettingsService } from '../core';
 
-const PluginSettingsController = ({ strapi }: { strapi: Core.Strapi }) => ({
+const PluginSettingsController = ({ strapi: _strapi }: { strapi: Core.Strapi }) => ({
   async getContentTransferSetup(ctx) {
     ctx.body = await getPluginSettingsService().getContentTransferSetup();
   },

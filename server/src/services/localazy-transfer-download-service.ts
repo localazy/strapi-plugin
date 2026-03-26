@@ -236,9 +236,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     /**
      * Helper: mark Localazy key IDs as processed (per-language) and persist
      */
-    const markKeysProcessed = async (
-      keyIds: Array<{ lang: string; id: string; event: number | undefined }>
-    ) => {
+    const markKeysProcessed = async (keyIds: Array<{ lang: string; id: string; event: number | undefined }>) => {
       for (const { lang, id, event } of keyIds) {
         if (event !== undefined) {
           if (!processedKeys[lang]) {
@@ -260,10 +258,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     const jsonFields = [];
 
     // Track which Localazy keys contribute to each Strapi entry: "isoStrapi:uid:documentId" → [{lang, id, event}]
-    const entryKeySourceMap: Record<
-      string,
-      Array<{ lang: string; id: string; event: number | undefined }>
-    > = {};
+    const entryKeySourceMap: Record<string, Array<{ lang: string; id: string; event: number | undefined }>> = {};
 
     for (const [isoLocalazy, keys] of Object.entries<any>(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
@@ -414,9 +409,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             });
 
             if (isEmpty(baseEntry)) {
-              strapi.log.info(
-                `Source language entry ${uid}[${documentId}] does not exist anymore, skipping...`
-              );
+              strapi.log.info(`Source language entry ${uid}[${documentId}] does not exist anymore, skipping...`);
               await markKeysProcessed(sourceKeys);
               continue;
             }
@@ -451,7 +444,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             if (isEmpty(currentLanguageLocalizedEntry)) {
               // create new entry
               try {
-                const createdEntry = await StrapiLocalazyI18nService.createEntry(
+                await StrapiLocalazyI18nService.createEntry(
                   uid,
                   strapiContentTypesModels,
                   translatedModel,
@@ -483,7 +476,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               try {
                 const localizedDocumentId = currentLanguageLocalizedEntry.documentId;
 
-                const updatedEntry = await StrapiLocalazyI18nService.updateEntry(
+                await StrapiLocalazyI18nService.updateEntry(
                   uid as any,
                   localizedDocumentId,
                   strapiContentTypesModels,
@@ -524,7 +517,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       }
     }
 
-    const totalProcessedKeys = Object.values(processedKeys).reduce((sum, langKeys) => sum + Object.keys(langKeys).length, 0);
+    const totalProcessedKeys = Object.values(processedKeys).reduce(
+      (sum, langKeys) => sum + Object.keys(langKeys).length,
+      0
+    );
     strapi.log.info(
       `Download finished. Tracked ${totalProcessedKeys} processed keys across ${Object.keys(processedKeys).length} languages.`
     );
