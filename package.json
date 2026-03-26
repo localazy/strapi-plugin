@@ -65,7 +65,8 @@
     "test:ts:front": "run -T tsc -p admin/tsconfig.json",
     "verify": "strapi-plugin verify",
     "watch": "strapi-plugin watch",
-    "watch:link": "strapi-plugin watch:link"
+    "watch:link": "strapi-plugin watch:link",
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
