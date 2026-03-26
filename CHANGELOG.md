@@ -1,4 +1,5 @@
 # 1.1.0 (2026-03-26)
+
 ### 🔀 Pull Requests
 
 - [Add GH Hooks #114](https://github.com/localazy/strapi-plugin/pull/114)
