@@ -1,3 +1,27 @@
+# 1.1.0 (2026-03-26)
+### 🔀 Pull Requests
+
+- [Add GH Hooks #114](https://github.com/localazy/strapi-plugin/pull/114)
+- [track Strapi instance version in analytics events #112](https://github.com/localazy/strapi-plugin/pull/112)
+- [Add a character limit during uploading #111](https://github.com/localazy/strapi-plugin/pull/111)
+
+### ✨ Features
+
+- track Strapi instance version in analytics events ([050936f](https://github.com/localazy/strapi-plugin/commit/050936f)) ([#112](https://github.com/localazy/strapi-plugin/pull/112))
+- add character limit metadata during Localazy upload ([e60f73c](https://github.com/localazy/strapi-plugin/commit/e60f73c)) ([#111](https://github.com/localazy/strapi-plugin/pull/111))
+
+### 🐛 Bug Fixes
+
+- replace yarn-specific `run -T` with `tsc --noEmit` in type-check scripts ([237101e](https://github.com/localazy/strapi-plugin/commit/237101e)) ([#114](https://github.com/localazy/strapi-plugin/pull/114))
+- resolve ESLint errors and Prettier formatting issues ([237101e](https://github.com/localazy/strapi-plugin/commit/237101e)) ([#114](https://github.com/localazy/strapi-plugin/pull/114))
+- Fix character limits metadata not matching flat key format ([e60f73c](https://github.com/localazy/strapi-plugin/commit/e60f73c)) ([#111](https://github.com/localazy/strapi-plugin/pull/111))
+- Update tests to use bracket notation for flat keys ([e60f73c](https://github.com/localazy/strapi-plugin/commit/e60f73c)) ([#111](https://github.com/localazy/strapi-plugin/pull/111))
+
+### 🧰 Other Commits
+
+- add git hooks and CI workflow ([237101e](https://github.com/localazy/strapi-plugin/commit/237101e)) ([#114](https://github.com/localazy/strapi-plugin/pull/114))
+- Use strict type for pickedFlattenStrapiContent ([e60f73c](https://github.com/localazy/strapi-plugin/commit/e60f73c)) ([#111](https://github.com/localazy/strapi-plugin/pull/111))
+
 ## 1.0.11 (2026-03-25)
 
 ### 🔀 Pull Requests
