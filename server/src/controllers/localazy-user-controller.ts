@@ -1,7 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import { getLocalazyUserService } from '../core';
 
-const LocalazyUserController = ({ strapi }: { strapi: Core.Strapi }) => ({
+const LocalazyUserController = ({ strapi: _strapi }: { strapi: Core.Strapi }) => ({
   async getUser(ctx) {
     ctx.body = await getLocalazyUserService().getUser();
   },

@@ -12,7 +12,7 @@ permissions:
 jobs:
   ci:
     name: CI Init
-    runs-on: [ self-hosted, Linux ]
+    runs-on: [self-hosted, Linux]
     outputs:
       action: ${{ steps.init.outputs.action }}
     steps:
@@ -23,7 +23,7 @@ jobs:
     name: Prepare Release PR
     needs: ci
     if: needs.ci.outputs.action == 'prepare'
-    runs-on: [ self-hosted, Linux ]
+    runs-on: [self-hosted, Linux]
     steps:
       - uses: localazy/release/prepare@v2
         with:
@@ -34,9 +34,9 @@ jobs:
 
   publish:
     name: Publish Release
-    needs: [ ci ]
+    needs: [ci]
     if: needs.ci.outputs.action == 'publish'
-    runs-on: [ self-hosted, Linux ]
+    runs-on: [self-hosted, Linux]
     steps:
       - uses: localazy/release/publish@v2
         with:

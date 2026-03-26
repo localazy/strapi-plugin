@@ -21,6 +21,7 @@ npm run verify             # Strapi plugin verification
 ```
 
 Run a single test file:
+
 ```bash
 npx jest --config server/jest.config.ts server/src/utils/__tests__/<file>.test.ts
 ```
@@ -32,6 +33,7 @@ Node version: specified in `.nvmrc` (currently 20).
 The plugin follows the standard Strapi v5 plugin structure with two main entry points:
 
 ### `server/src/` — Backend (Node.js, CommonJS)
+
 - **`index.ts`** — Exports the plugin's server-side API: `register`, `bootstrap`, `destroy`, config, controllers, routes, services, content-types, policies, middlewares.
 - **`services/`** — Core business logic:
   - `localazy-transfer-upload-service.ts` / `localazy-transfer-download-service.ts` — Content transfer to/from Localazy
@@ -49,6 +51,7 @@ The plugin follows the standard Strapi v5 plugin structure with two main entry p
 - **`lifecycles/`** — Strapi content-type lifecycle hooks
 
 ### `admin/src/` — Frontend (React + TypeScript)
+
 - **`pages/`** — Top-level page components: Login, Overview, Upload, Download, GlobalSettings, ContentTransferSetup, etc.
 - **`modules/`** — Feature modules organized by domain: `login/`, `overview/`, `localazy-upload/`, `localazy-download/`, `plugin-settings/`, `entry-exclusion/`, `alerts/`, `strapi/`, `user/`, `@common/`
 - **`state/`** — Global state management (uses `react-hooks-global-state`)
@@ -56,6 +59,7 @@ The plugin follows the standard Strapi v5 plugin structure with two main entry p
 - **`plugins/`** — Plugin-level React integrations
 
 ### `install/` — Post-install CLI (`npx @localazy/strapi-plugin`)
+
 Guides users through bundler config setup (Vite/Webpack examples).
 
 ## Testing

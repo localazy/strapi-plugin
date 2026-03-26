@@ -43,7 +43,7 @@ export default [
       ...eslintPluginTypescript.configs.recommended.rules,
       ...eslintPluginReact.configs.recommended.rules,
       ...eslintPluginJsxA11y.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react/prop-types': 'off',

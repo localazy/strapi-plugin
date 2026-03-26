@@ -29,10 +29,6 @@ import { AdminPanelUser } from '../modules/plugin-settings/models/admin-panel-us
 // import and load resources
 import '../i18n';
 
-const FieldWithMaxWidth = (props: any) => {
-  return <Box maxWidth={props.maxWidth}>{props.children}</Box>;
-};
-
 const GlobalSettings: React.FC = () => {
   /**
    * Translation function

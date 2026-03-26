@@ -86,10 +86,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (createError) {
-      const detail =
-        createError.details?.errors?.[0]?.message ||
-        createError.details?.message ||
-        createError.message;
+      const detail = createError.details?.errors?.[0]?.message || createError.details?.message || createError.message;
       throw new Error(detail);
     }
 
@@ -118,10 +115,7 @@ const StrapiI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (updateError) {
-      const detail =
-        updateError.details?.errors?.[0]?.message ||
-        updateError.details?.message ||
-        updateError.message;
+      const detail = updateError.details?.errors?.[0]?.message || updateError.details?.message || updateError.message;
       throw new Error(detail);
     }
 
