@@ -7,6 +7,7 @@ import {
   getPickPathsWithComponents,
 } from '../utils/transfer-setup-utils';
 import { pickEntries } from '../utils/pick-entries';
+import { getCharacterLimitsMetadata } from '../utils/get-character-limits-metadata';
 import config from '../config';
 import { isoStrapiToLocalazy } from '../utils/iso-locales-utils';
 import { omitDeep } from '../utils/omit-deep';
@@ -54,7 +55,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const collectionsNames = getCollectionsNames(setup);
     const models = await StrapiService.getModels();
 
-    let pickedFlattenStrapiContent: Record<string, string> = {};
+    let pickedFlattenStrapiContent: Record<string, string | { limit: number }> = {};
     for (const collectionName of collectionsNames) {
       const currentModel = models.find((model) => model.collectionName === collectionName);
       const modelUid = currentModel.uid;
@@ -143,12 +144,18 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         });
         // get only enabled fields; "__component" will be filtered out inside of the function
         const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
-        // TODO: upload some meta data with the content?
         pickedFlattenStrapiContent = {
           ...pickedFlattenStrapiContent,
           ...pickedFlatten,
         };
       });
+
+      // Add character limit metadata for fields that have maxLength defined in the content type schema
+      const characterLimitsMetadata = getCharacterLimitsMetadata(pickedFlattenStrapiContent, modelUid);
+      pickedFlattenStrapiContent = {
+        ...pickedFlattenStrapiContent,
+        ...characterLimitsMetadata,
+      };
     }
 
     const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
