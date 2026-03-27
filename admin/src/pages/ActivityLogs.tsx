@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Typography, Tabs, Dialog, Alert, Field } from '@strapi/design-system';
-import { Trash } from '@strapi/icons';
+import { Trash, CaretUp, CaretDown } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
@@ -26,22 +26,95 @@ type SessionItem = {
   summary: string;
 };
 
+type SortKey = 'status' | 'startedAt' | 'duration' | 'initiatedBy' | 'summary';
+type SortDirection = 'asc' | 'desc';
+
+const getDuration = (session: SessionItem): number => {
+  if (!session.finishedAt) return Infinity;
+  return session.finishedAt - session.startedAt;
+};
+
+const compareSessions = (a: SessionItem, b: SessionItem, sortKey: SortKey, direction: SortDirection): number => {
+  let cmp = 0;
+  switch (sortKey) {
+    case 'status':
+      cmp = a.status.localeCompare(b.status);
+      break;
+    case 'startedAt':
+      cmp = a.startedAt - b.startedAt;
+      break;
+    case 'duration':
+      cmp = getDuration(a) - getDuration(b);
+      break;
+    case 'initiatedBy':
+      cmp = a.initiatedBy.localeCompare(b.initiatedBy);
+      break;
+    case 'summary':
+      cmp = (a.summary || '').localeCompare(b.summary || '');
+      break;
+  }
+  return direction === 'asc' ? cmp : -cmp;
+};
+
+const SortableHeader: React.FC<{
+  label: string;
+  sortKey: SortKey;
+  activeSortKey: SortKey;
+  direction: SortDirection;
+  onSort: (key: SortKey) => void;
+}> = ({ label, sortKey, activeSortKey, direction, onSort }) => {
+  const isActive = sortKey === activeSortKey;
+  return (
+    <th
+      onClick={() => onSort(sortKey)}
+      style={{
+        textAlign: 'left',
+        padding: '12px 16px',
+        borderBottom: '1px solid #eaeaef',
+        cursor: 'pointer',
+        userSelect: 'none',
+      }}
+    >
+      <Box display='flex' alignItems='center' gap={1}>
+        <Typography variant='sigma' textColor={isActive ? 'primary600' : 'neutral600'}>
+          {label}
+        </Typography>
+        {isActive && (direction === 'asc' ? <CaretUp width={8} height={8} /> : <CaretDown width={8} height={8} />)}
+      </Box>
+    </th>
+  );
+};
+
 const SessionsTable: React.FC<{
   sessions: SessionItem[];
   searchQuery: string;
   onSessionClick: (sessionId: string) => void;
   t: (key: string) => string;
 }> = ({ sessions, searchQuery, onSessionClick, t }) => {
-  const filteredSessions = sessions.filter((session) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      session.summary.toLowerCase().includes(query) ||
-      session.initiatedBy.toLowerCase().includes(query) ||
-      session.status.toLowerCase().includes(query) ||
-      formatDate(session.startedAt).toLowerCase().includes(query)
-    );
-  });
+  const [sortKey, setSortKey] = useState<SortKey>('startedAt');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+  const onSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  const filteredSessions = sessions
+    .filter((session) => {
+      if (!searchQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        session.summary.toLowerCase().includes(query) ||
+        session.initiatedBy.toLowerCase().includes(query) ||
+        session.status.toLowerCase().includes(query) ||
+        formatDate(session.startedAt).toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => compareSessions(a, b, sortKey, sortDirection));
 
   if (filteredSessions.length === 0) {
     return (
@@ -58,31 +131,11 @@ const SessionsTable: React.FC<{
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid #eaeaef' }}>
-              <Typography variant='sigma' textColor='neutral600'>
-                {t('activity_logs.status')}
-              </Typography>
-            </th>
-            <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid #eaeaef' }}>
-              <Typography variant='sigma' textColor='neutral600'>
-                {t('activity_logs.started_at')}
-              </Typography>
-            </th>
-            <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid #eaeaef' }}>
-              <Typography variant='sigma' textColor='neutral600'>
-                {t('activity_logs.duration')}
-              </Typography>
-            </th>
-            <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid #eaeaef' }}>
-              <Typography variant='sigma' textColor='neutral600'>
-                {t('activity_logs.initiated_by')}
-              </Typography>
-            </th>
-            <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid #eaeaef' }}>
-              <Typography variant='sigma' textColor='neutral600'>
-                {t('activity_logs.summary')}
-              </Typography>
-            </th>
+            <SortableHeader label={t('activity_logs.status')} sortKey='status' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
+            <SortableHeader label={t('activity_logs.started_at')} sortKey='startedAt' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
+            <SortableHeader label={t('activity_logs.duration')} sortKey='duration' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
+            <SortableHeader label={t('activity_logs.initiated_by')} sortKey='initiatedBy' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
+            <SortableHeader label={t('activity_logs.summary')} sortKey='summary' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
           </tr>
         </thead>
         <tbody>
