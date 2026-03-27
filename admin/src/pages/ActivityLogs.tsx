@@ -271,8 +271,8 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
     debouncedSaveSortPrefs(updated);
   };
 
-  const fetchSessions = async (type?: string) => {
-    setIsLoading(true);
+  const fetchSessions = async (type?: string, showLoader = true) => {
+    if (showLoader) setIsLoading(true);
     try {
       const data = await ActivityLogsService.getSessions(type);
       setSessions(data || []);
@@ -280,13 +280,12 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
       console.error('Failed to fetch activity logs:', e);
       setSessions([]);
     }
-    setIsLoading(false);
+    if (showLoader) setIsLoading(false);
   };
 
   const onTabChange = (value: string) => {
     setActiveTab(value);
-    setSearchQuery('');
-    fetchSessions(value);
+    fetchSessions(value, false);
   };
 
   const onSessionClick = (sessionId: string) => {
