@@ -7,7 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
 import { formatDate, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
+import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import { PLUGIN_ID } from '../pluginId';
+import { PLUGIN_ROUTES } from '../modules/@common/utils/redirect-to-plugin-route';
 
 export type ActivityLogsProps = {
   title: string;
@@ -172,6 +174,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
 
   useEffect(() => {
     fetchSessions('upload');
+    PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
   }, []);
 
   return (
