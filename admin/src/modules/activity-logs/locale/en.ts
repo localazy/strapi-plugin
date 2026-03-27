@@ -28,4 +28,5 @@ export default {
   clear: 'Clear',
   date_from: 'From',
   date_to: 'To',
+  retention_info: 'Activity logs are retained for the past year. Older entries are automatically removed.',
 };

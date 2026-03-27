@@ -1,8 +1,22 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field, DatePicker } from '@strapi/design-system';
-import { Trash, Download, CaretUp, CaretDown } from '@strapi/icons';
+import {
+  Box,
+  Flex,
+  Button,
+  Typography,
+  Tabs,
+  Dialog,
+  Alert,
+  Field,
+  DatePicker,
+  Pagination,
+  PreviousLink,
+  NextLink,
+  PageLink,
+} from '@strapi/design-system';
+import { Trash, Download, CaretUp, CaretDown, Information } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
@@ -89,6 +103,7 @@ const SortableHeader: React.FC<{
 };
 
 const DEFAULT_SORT: { key: SortKey; direction: SortDirection } = { key: 'startedAt', direction: 'desc' };
+const PAGE_SIZE = 20;
 
 const SessionsTable: React.FC<{
   sessions: SessionItem[];
@@ -107,17 +122,25 @@ const SessionsTable: React.FC<{
     (stored?.direction as SortDirection) || DEFAULT_SORT.direction
   );
 
+  const [page, setPage] = useState(1);
+
   useEffect(() => {
     const pref = sortPreferences[eventType];
     if (pref?.key) setSortKey(pref.key as SortKey);
     if (pref?.direction) setSortDirection(pref.direction as SortDirection);
   }, [eventType, sortPreferences]);
 
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, dateFrom, dateTo, eventType]);
+
   const onSort = (key: SortKey) => {
     const newDirection = key === sortKey ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
     setSortKey(key);
     setSortDirection(newDirection);
     onSortChange(eventType, key, newDirection);
+    setPage(1);
   };
 
   const filteredSessions = sessions
@@ -149,6 +172,11 @@ const SessionsTable: React.FC<{
       );
     })
     .sort((a, b) => compareSessions(a, b, sortKey, sortDirection));
+
+  const totalCount = filteredSessions.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedSessions = filteredSessions.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   if (filteredSessions.length === 0) {
     return (
@@ -203,7 +231,7 @@ const SessionsTable: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {filteredSessions.map((session) => (
+          {paginatedSessions.map((session) => (
             <tr
               key={session.id}
               onClick={() => onSessionClick(session.id)}
@@ -240,6 +268,15 @@ const SessionsTable: React.FC<{
           ))}
         </tbody>
       </table>
+      <Box paddingTop={4}>
+        <Pagination activePage={safePage} pageCount={totalPages}>
+          <PreviousLink onClick={() => setPage(Math.max(1, safePage - 1))} />
+          {Array.from({ length: totalPages }, (_, i) => (
+            <PageLink key={i + 1} number={i + 1} onClick={() => setPage(i + 1)} />
+          ))}
+          <NextLink onClick={() => setPage(Math.min(totalPages, safePage + 1))} />
+        </Pagination>
+      </Box>
     </Box>
   );
 };
@@ -346,6 +383,14 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
         }
         as='h2'
       />
+      <Box paddingRight={10} paddingLeft={10} paddingBottom={4}>
+        <Flex gap={2} alignItems='center'>
+          <Information width={14} height={14} fill='neutral500' />
+          <Typography variant='pi' textColor='neutral500'>
+            {t('activity_logs.retention_info')}
+          </Typography>
+        </Flex>
+      </Box>
       {isLoading && <Loader />}
       {!isLoading && (
         <Box paddingRight={10} paddingLeft={10}>
