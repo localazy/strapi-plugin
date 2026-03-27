@@ -8,6 +8,7 @@ export default {
   search_entries_placeholder: 'Search entries...',
   no_sessions: 'No activity logs found.',
   no_entries: 'No log entries found.',
+  export_logs: 'Export logs',
   clear_logs: 'Clear logs',
   clear_logs_confirm: 'Are you sure you want to clear all activity logs? This action cannot be undone.',
   clear_logs_success: 'Activity logs cleared successfully.',

@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field, DatePicker } from '@strapi/design-system';
-import { Trash, CaretUp, CaretDown } from '@strapi/icons';
+import { Trash, Download, CaretUp, CaretDown } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
+import { exportLogsAsJson } from '../modules/activity-logs/utils/export-logs';
 import { formatDate, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import { PLUGIN_ID } from '../pluginId';
@@ -292,6 +293,14 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
     navigate(`/plugins/${PLUGIN_ID}/activity-logs/${sessionId}`);
   };
 
+  const onExportLogs = async () => {
+    try {
+      await exportLogsAsJson();
+    } catch (e) {
+      console.error('Failed to export activity logs:', e);
+    }
+  };
+
   const onClearLogs = async () => {
     try {
       await ActivityLogsService.clearSessions();
@@ -326,9 +335,14 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
         title={props.title}
         subtitle={props.subtitle}
         primaryAction={
-          <Button variant='danger-light' startIcon={<Trash />} onClick={() => setShowClearConfirm(true)}>
-            {t('activity_logs.clear_logs')}
-          </Button>
+          <Flex gap={2}>
+            <Button variant='secondary' startIcon={<Download />} onClick={onExportLogs}>
+              {t('activity_logs.export_logs')}
+            </Button>
+            <Button variant='danger-light' startIcon={<Trash />} onClick={() => setShowClearConfirm(true)}>
+              {t('activity_logs.clear_logs')}
+            </Button>
+          </Flex>
         }
         as='h2'
       />
