@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Typography, Tabs, Dialog, Alert, Field } from '@strapi/design-system';
+import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field } from '@strapi/design-system';
 import { Trash, CaretUp, CaretDown } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
@@ -75,12 +75,12 @@ const SortableHeader: React.FC<{
         userSelect: 'none',
       }}
     >
-      <Box display='flex' alignItems='center' gap={1}>
+      <Flex alignItems='center' gap={1}>
         <Typography variant='sigma' textColor={isActive ? 'primary600' : 'neutral600'}>
           {label}
         </Typography>
         {isActive && (direction === 'asc' ? <CaretUp width={8} height={8} /> : <CaretDown width={8} height={8} />)}
-      </Box>
+      </Flex>
     </th>
   );
 };
