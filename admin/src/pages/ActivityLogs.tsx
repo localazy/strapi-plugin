@@ -6,9 +6,8 @@ import { Trash } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
-import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
+import { formatDate, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
 import { PLUGIN_ID } from '../pluginId';
-import { PLUGIN_ROUTES } from '../modules/@common/utils/redirect-to-plugin-route';
 
 export type ActivityLogsProps = {
   title: string;
@@ -23,31 +22,6 @@ type SessionItem = {
   finishedAt?: number;
   initiatedBy: string;
   summary: string;
-};
-
-const formatDate = (timestamp: number): string => {
-  return new Date(timestamp).toLocaleString();
-};
-
-const formatDuration = (start: number, end?: number): string => {
-  if (!end) return '-';
-  const diff = end - start;
-  if (diff < 1000) return `${diff}ms`;
-  if (diff < 60000) return `${Math.round(diff / 1000)}s`;
-  return `${Math.round(diff / 60000)}m ${Math.round((diff % 60000) / 1000)}s`;
-};
-
-const getStatusColor = (status: string): string => {
-  switch (status) {
-    case 'completed':
-      return 'success600';
-    case 'failed':
-      return 'danger600';
-    case 'in-progress':
-      return 'warning600';
-    default:
-      return 'neutral600';
-  }
 };
 
 const SessionsTable: React.FC<{
@@ -198,7 +172,6 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
 
   useEffect(() => {
     fetchSessions('upload');
-    PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
   }, []);
 
   return (

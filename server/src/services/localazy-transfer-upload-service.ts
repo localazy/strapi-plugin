@@ -198,7 +198,21 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     });
     await activityLogsService.addEntry(sessionId, 'Uploading collections to Localazy...');
 
-    await LocalazyUploadService.upload(importFile, uploadConfig);
+    try {
+      await LocalazyUploadService.upload(importFile, uploadConfig);
+    } catch (error) {
+      success = false;
+      const errorMessage = `Upload to Localazy failed: ${error instanceof Error ? error.message : String(error)}`;
+      strapi.log.error(errorMessage);
+      await notificationService.emit(EventType.UPLOAD_FINISHED, {
+        success,
+        message: errorMessage,
+      });
+      await activityLogsService.addEntry(sessionId, errorMessage);
+      await activityLogsService.finishSession(sessionId, 'failed', errorMessage);
+      console.timeEnd('upload');
+      return;
+    }
 
     strapi.log.info('Upload finished in');
 

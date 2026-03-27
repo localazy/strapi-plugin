@@ -5,33 +5,21 @@ const axiosInstance = createStrapiApiAxiosInstance();
 
 export default class ActivityLogsService {
   static async getSessions(type?: string) {
-    try {
-      const params = type ? `?type=${type}` : '';
-      const result = await axiosInstance.get(`${BASE_PATH}${params}`);
+    const params = type ? `?type=${type}` : '';
+    const result = await axiosInstance.get(`${BASE_PATH}${params}`);
 
-      return result.data;
-    } catch (e) {
-      throw e;
-    }
+    return result.data;
   }
 
   static async getSession(sessionId: string) {
-    try {
-      const result = await axiosInstance.get(`${BASE_PATH}/${sessionId}`);
+    const result = await axiosInstance.get(`${BASE_PATH}/${sessionId}`);
 
-      return result.data;
-    } catch (e) {
-      throw e;
-    }
+    return result.data;
   }
 
   static async clearSessions() {
-    try {
-      const result = await axiosInstance.delete(`${BASE_PATH}`);
+    const result = await axiosInstance.delete(`${BASE_PATH}`);
 
-      return result.data;
-    } catch (e) {
-      throw e;
-    }
+    return result.data;
   }
 }
