@@ -8,6 +8,7 @@ import StrapiI18nService from './strapi-i18n-service';
 import LocalazyUploadService from './localazy-upload-service';
 import StrapiLocalazyI18nService from './strapi-localazy-i18n-service';
 import EntryExclusionService from './entry-exclusion-service';
+import ActivityLogsService from './activity-logs-service';
 
 export default {
   LocalazyUserService,
@@ -20,4 +21,5 @@ export default {
   LocalazyUploadService,
   StrapiLocalazyI18nService,
   EntryExclusionService,
+  ActivityLogsService,
 };

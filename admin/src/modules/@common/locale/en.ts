@@ -6,6 +6,7 @@ export default {
   upload_to_localazy: 'Upload to Localazy',
   download_to_strapi: 'Download to Strapi',
   overview: 'Overview',
+  activity_logs: 'Activity Logs',
   loading_content: 'Loading content...',
   report_will_be_available_after_an_action: 'Report will be available after performing an action...',
   report: 'Report',

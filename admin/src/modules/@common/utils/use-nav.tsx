@@ -1,4 +1,4 @@
-import { House, Upload, Download } from '@strapi/icons';
+import { House, Upload, Download, ClockCounterClockwise } from '@strapi/icons';
 import { PLUGIN_ID } from '../../../pluginId';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +36,14 @@ const useNav: () => NavItem[] = () => {
       description: t('download.description'),
       icon: <Download />,
       to: `/plugins/${PLUGIN_ID}/download`,
+      active: false,
+    },
+    {
+      id: 'activity-logs',
+      label: t('common.activity_logs'),
+      description: t('activity_logs.description'),
+      icon: <ClockCounterClockwise />,
+      to: `/plugins/${PLUGIN_ID}/activity-logs`,
       active: false,
     },
   ];

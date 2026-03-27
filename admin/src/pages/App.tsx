@@ -18,6 +18,8 @@ import Loader from '../modules/@common/components/PluginPageLoader';
 import '../i18n';
 import { Upload } from './Upload';
 import Download from './Download';
+import ActivityLogs from './ActivityLogs';
+import ActivityLogDetail from './ActivityLogDetail';
 
 const App = () => {
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
@@ -65,6 +67,11 @@ const App = () => {
             />
             <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
             <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
+            <Route path={`activity-logs`} element={<ActivityLogs title={headerTitle} subtitle={headerSubtitle} />} />
+            <Route
+              path={`activity-logs/:sessionId`}
+              element={<ActivityLogDetail title={headerTitle} subtitle={headerSubtitle} />}
+            />
             <Route path='*' element={<Page.Error />} />
           </Routes>
         </Layouts.Root>
