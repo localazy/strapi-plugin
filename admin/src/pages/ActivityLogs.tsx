@@ -366,7 +366,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_from')}
                   value={dateFrom}
-                  onChange={(date) => {
+                  onChange={(date: Date | undefined) => {
                     if (!date) {
                       setDateFrom(undefined);
                       return;
@@ -384,7 +384,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_to')}
                   value={dateTo}
-                  onChange={(date) => {
+                  onChange={(date: Date | undefined) => {
                     if (!date) {
                       setDateTo(undefined);
                       return;
