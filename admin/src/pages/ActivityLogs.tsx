@@ -321,7 +321,11 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_from')}
                   value={dateFrom}
-                  onChange={(date) => setDateFrom(date)}
+                  onChange={(date) => {
+                    if (!date) { setDateFrom(undefined); return; }
+                    // Normalize UTC midnight from DatePicker to local midnight
+                    setDateFrom(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+                  }}
                   onClear={() => setDateFrom(undefined)}
                   clearLabel={t('activity_logs.clear')}
                   size='S'
@@ -331,7 +335,10 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_to')}
                   value={dateTo}
-                  onChange={(date) => setDateTo(date)}
+                  onChange={(date) => {
+                    if (!date) { setDateTo(undefined); return; }
+                    setDateTo(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+                  }}
                   onClear={() => setDateTo(undefined)}
                   clearLabel={t('activity_logs.clear')}
                   size='S'
