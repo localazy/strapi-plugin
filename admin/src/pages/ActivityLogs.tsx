@@ -91,16 +91,28 @@ const SessionsTable: React.FC<{
   onSessionClick: (sessionId: string) => void;
   t: (key: string) => string;
 }> = ({ sessions, searchQuery, onSessionClick, t }) => {
-  const [sortKey, setSortKey] = useState<SortKey>('startedAt');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const SORT_STORAGE_KEY = 'localazy-activity-logs-sort';
+
+  const getStoredSort = (): { key: SortKey; direction: SortDirection } => {
+    try {
+      const stored = localStorage.getItem(SORT_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.key && parsed.direction) return parsed;
+      }
+    } catch { /* ignore */ }
+    return { key: 'startedAt', direction: 'desc' };
+  };
+
+  const storedSort = getStoredSort();
+  const [sortKey, setSortKey] = useState<SortKey>(storedSort.key);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(storedSort.direction);
 
   const onSort = (key: SortKey) => {
-    if (key === sortKey) {
-      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortKey(key);
-      setSortDirection('asc');
-    }
+    const newDirection = key === sortKey ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
+    setSortKey(key);
+    setSortDirection(newDirection);
+    localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify({ key, direction: newDirection }));
   };
 
   const filteredSessions = sessions
