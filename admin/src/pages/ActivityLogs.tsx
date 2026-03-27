@@ -102,7 +102,9 @@ const SessionsTable: React.FC<{
 }> = ({ sessions, searchQuery, dateFrom, dateTo, eventType, sortPreferences, onSortChange, onSessionClick, t }) => {
   const stored = sortPreferences[eventType];
   const [sortKey, setSortKey] = useState<SortKey>((stored?.key as SortKey) || DEFAULT_SORT.key);
-  const [sortDirection, setSortDirection] = useState<SortDirection>((stored?.direction as SortDirection) || DEFAULT_SORT.direction);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    (stored?.direction as SortDirection) || DEFAULT_SORT.direction
+  );
 
   useEffect(() => {
     const pref = sortPreferences[eventType];
@@ -119,15 +121,22 @@ const SessionsTable: React.FC<{
 
   const filteredSessions = sessions
     .filter((session) => {
-      // DatePicker returns Date at midnight UTC for the selected calendar date.
-      // Convert to local start-of-day / end-of-day for comparison with session timestamps.
       if (dateFrom) {
-        const startOfDay = new Date(dateFrom.getUTCFullYear(), dateFrom.getUTCMonth(), dateFrom.getUTCDate());
-        if (session.startedAt < startOfDay.getTime()) return false;
+        // dateFrom is stored as UTC midnight; convert to local start-of-day for comparison
+        const startOfDay = new Date(dateFrom.getUTCFullYear(), dateFrom.getUTCMonth(), dateFrom.getUTCDate()).getTime();
+        if (session.startedAt < startOfDay) return false;
       }
       if (dateTo) {
-        const endOfDay = new Date(dateTo.getUTCFullYear(), dateTo.getUTCMonth(), dateTo.getUTCDate(), 23, 59, 59, 999);
-        if (session.startedAt > endOfDay.getTime()) return false;
+        const endOfDay = new Date(
+          dateTo.getUTCFullYear(),
+          dateTo.getUTCMonth(),
+          dateTo.getUTCDate(),
+          23,
+          59,
+          59,
+          999
+        ).getTime();
+        if (session.startedAt > endOfDay) return false;
       }
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
@@ -155,11 +164,41 @@ const SessionsTable: React.FC<{
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <SortableHeader label={t('activity_logs.status')} sortKey='status' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
-            <SortableHeader label={t('activity_logs.started_at')} sortKey='startedAt' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
-            <SortableHeader label={t('activity_logs.duration')} sortKey='duration' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
-            <SortableHeader label={t('activity_logs.initiated_by')} sortKey='initiatedBy' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
-            <SortableHeader label={t('activity_logs.summary')} sortKey='summary' activeSortKey={sortKey} direction={sortDirection} onSort={onSort} />
+            <SortableHeader
+              label={t('activity_logs.status')}
+              sortKey='status'
+              activeSortKey={sortKey}
+              direction={sortDirection}
+              onSort={onSort}
+            />
+            <SortableHeader
+              label={t('activity_logs.started_at')}
+              sortKey='startedAt'
+              activeSortKey={sortKey}
+              direction={sortDirection}
+              onSort={onSort}
+            />
+            <SortableHeader
+              label={t('activity_logs.duration')}
+              sortKey='duration'
+              activeSortKey={sortKey}
+              direction={sortDirection}
+              onSort={onSort}
+            />
+            <SortableHeader
+              label={t('activity_logs.initiated_by')}
+              sortKey='initiatedBy'
+              activeSortKey={sortKey}
+              direction={sortDirection}
+              onSort={onSort}
+            />
+            <SortableHeader
+              label={t('activity_logs.summary')}
+              sortKey='summary'
+              activeSortKey={sortKey}
+              direction={sortDirection}
+              onSort={onSort}
+            />
           </tr>
         </thead>
         <tbody>
@@ -273,7 +312,9 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
         if (settings?.activityLogsSort) {
           setSortPreferences(settings.activityLogsSort);
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       fetchSessions('upload');
     };
     init();
@@ -311,7 +352,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
             hasRadius
             shadow='tableShadow'
           >
-            <Flex marginBottom={4} gap={3} wrap='wrap'>
+            <Flex marginBottom={4} gap={3} wrap='wrap' alignItems='center'>
               <Box grow={1} basis='200px'>
                 <Field.Root>
                   <Field.Input
@@ -325,20 +366,34 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_from')}
                   value={dateFrom}
-                  onChange={(date) => setDateFrom(date)}
+                  onChange={(date) => {
+                    if (!date) {
+                      setDateFrom(undefined);
+                      return;
+                    }
+                    // DatePicker onChange returns local Date, but value prop expects UTC midnight.
+                    // Convert local year/month/day to a UTC midnight Date to keep the round-trip stable.
+                    setDateFrom(new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())));
+                  }}
                   onClear={() => setDateFrom(undefined)}
                   clearLabel={t('activity_logs.clear')}
-                  size='S'
+                  size='M'
                 />
               </Box>
               <Box basis='160px'>
                 <DatePicker
                   placeholder={t('activity_logs.date_to')}
                   value={dateTo}
-                  onChange={(date) => setDateTo(date)}
+                  onChange={(date) => {
+                    if (!date) {
+                      setDateTo(undefined);
+                      return;
+                    }
+                    setDateTo(new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())));
+                  }}
                   onClear={() => setDateTo(undefined)}
                   clearLabel={t('activity_logs.clear')}
-                  size='S'
+                  size='M'
                 />
               </Box>
             </Flex>
@@ -349,13 +404,43 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <Tabs.Trigger value='webhook'>{t('activity_logs.tab_webhooks')}</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value='upload'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='upload' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable
+                  sessions={sessions}
+                  searchQuery={searchQuery}
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  eventType='upload'
+                  sortPreferences={sortPreferences}
+                  onSortChange={onSortChange}
+                  onSessionClick={onSessionClick}
+                  t={t}
+                />
               </Tabs.Content>
               <Tabs.Content value='download'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='download' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable
+                  sessions={sessions}
+                  searchQuery={searchQuery}
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  eventType='download'
+                  sortPreferences={sortPreferences}
+                  onSortChange={onSortChange}
+                  onSessionClick={onSessionClick}
+                  t={t}
+                />
               </Tabs.Content>
               <Tabs.Content value='webhook'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='webhook' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable
+                  sessions={sessions}
+                  searchQuery={searchQuery}
+                  dateFrom={dateFrom}
+                  dateTo={dateTo}
+                  eventType='webhook'
+                  sortPreferences={sortPreferences}
+                  onSortChange={onSortChange}
+                  onSessionClick={onSessionClick}
+                  t={t}
+                />
               </Tabs.Content>
             </Tabs.Root>
           </Box>
