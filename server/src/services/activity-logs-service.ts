@@ -3,7 +3,7 @@ import getStrapiStore from '../db/model/utils/get-strapi-store';
 import { KEY, ActivityLogs, ActivityLogSession, ActivityLogEntry, emptyActivityLogs } from '../db/model/activity-logs';
 import { generateRandomId } from '../utils/generate-random-id';
 
-const MAX_SESSIONS = 100;
+const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
 
 // Simple mutex to prevent concurrent read-modify-write races on the store
 let writeLock: Promise<void> = Promise.resolve();
@@ -55,10 +55,9 @@ const ActivityLogsService = ({ strapi }: { strapi: Core.Strapi }) => ({
 
       logs.sessions.unshift(session);
 
-      // Keep max sessions
-      if (logs.sessions.length > MAX_SESSIONS) {
-        logs.sessions = logs.sessions.slice(0, MAX_SESSIONS);
-      }
+      // Evict sessions older than 1 year
+      const cutoff = Date.now() - ONE_YEAR_MS;
+      logs.sessions = logs.sessions.filter((s) => s.startedAt >= cutoff);
 
       await this.saveActivityLogs(logs);
 
