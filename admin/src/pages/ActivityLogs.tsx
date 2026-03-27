@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Typography, Tabs, Dialog, Alert, Field } from '@strapi/design-system';
@@ -85,34 +85,32 @@ const SortableHeader: React.FC<{
   );
 };
 
+const DEFAULT_SORT: { key: SortKey; direction: SortDirection } = { key: 'startedAt', direction: 'desc' };
+
 const SessionsTable: React.FC<{
   sessions: SessionItem[];
   searchQuery: string;
+  eventType: string;
+  sortPreferences: Record<string, { key: string; direction: string }>;
+  onSortChange: (eventType: string, key: SortKey, direction: SortDirection) => void;
   onSessionClick: (sessionId: string) => void;
   t: (key: string) => string;
-}> = ({ sessions, searchQuery, onSessionClick, t }) => {
-  const SORT_STORAGE_KEY = 'localazy-activity-logs-sort';
+}> = ({ sessions, searchQuery, eventType, sortPreferences, onSortChange, onSessionClick, t }) => {
+  const stored = sortPreferences[eventType];
+  const [sortKey, setSortKey] = useState<SortKey>((stored?.key as SortKey) || DEFAULT_SORT.key);
+  const [sortDirection, setSortDirection] = useState<SortDirection>((stored?.direction as SortDirection) || DEFAULT_SORT.direction);
 
-  const getStoredSort = (): { key: SortKey; direction: SortDirection } => {
-    try {
-      const stored = localStorage.getItem(SORT_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed.key && parsed.direction) return parsed;
-      }
-    } catch { /* ignore */ }
-    return { key: 'startedAt', direction: 'desc' };
-  };
-
-  const storedSort = getStoredSort();
-  const [sortKey, setSortKey] = useState<SortKey>(storedSort.key);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(storedSort.direction);
+  useEffect(() => {
+    const pref = sortPreferences[eventType];
+    if (pref?.key) setSortKey(pref.key as SortKey);
+    if (pref?.direction) setSortDirection(pref.direction as SortDirection);
+  }, [eventType, sortPreferences]);
 
   const onSort = (key: SortKey) => {
     const newDirection = key === sortKey ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'asc';
     setSortKey(key);
     setSortDirection(newDirection);
-    localStorage.setItem(SORT_STORAGE_KEY, JSON.stringify({ key, direction: newDirection }));
+    onSortChange(eventType, key, newDirection);
   };
 
   const filteredSessions = sessions
@@ -202,6 +200,21 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearSuccess, setClearSuccess] = useState(false);
+  const [sortPreferences, setSortPreferences] = useState<Record<string, { key: string; direction: string }>>({});
+  const saveSortTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSaveSortPrefs = useCallback((prefs: Record<string, { key: string; direction: string }>) => {
+    if (saveSortTimerRef.current) clearTimeout(saveSortTimerRef.current);
+    saveSortTimerRef.current = setTimeout(() => {
+      PluginSettingsService.updatePluginSettings({ activityLogsSort: prefs });
+    }, 1000);
+  }, []);
+
+  const onSortChange = (eventType: string, key: SortKey, direction: SortDirection) => {
+    const updated = { ...sortPreferences, [eventType]: { key, direction } };
+    setSortPreferences(updated);
+    debouncedSaveSortPrefs(updated);
+  };
 
   const fetchSessions = async (type?: string) => {
     setIsLoading(true);
@@ -238,7 +251,16 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   };
 
   useEffect(() => {
-    fetchSessions('upload');
+    const init = async () => {
+      try {
+        const settings = await PluginSettingsService.getPluginSettings();
+        if (settings?.activityLogsSort) {
+          setSortPreferences(settings.activityLogsSort);
+        }
+      } catch { /* ignore */ }
+      fetchSessions('upload');
+    };
+    init();
     PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
   }, []);
 
@@ -289,13 +311,13 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <Tabs.Trigger value='webhook'>{t('activity_logs.tab_webhooks')}</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value='upload'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='upload' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
               <Tabs.Content value='download'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='download' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
               <Tabs.Content value='webhook'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='webhook' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
             </Tabs.Root>
           </Box>
