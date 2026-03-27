@@ -79,7 +79,9 @@ const SortableHeader: React.FC<{
         <Typography variant='sigma' textColor={isActive ? 'primary600' : 'neutral600'}>
           {label}
         </Typography>
-        {isActive && (direction === 'asc' ? <CaretUp width={8} height={8} /> : <CaretDown width={8} height={8} />)}
+        <span style={{ width: 8, display: 'inline-flex', flexShrink: 0 }}>
+          {isActive && (direction === 'asc' ? <CaretUp width={8} height={8} /> : <CaretDown width={8} height={8} />)}
+        </span>
       </Flex>
     </th>
   );
