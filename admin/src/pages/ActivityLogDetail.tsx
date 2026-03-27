@@ -31,7 +31,6 @@ type SessionDetail = {
   entries: LogEntry[];
 };
 
-
 const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
   const { t } = useTranslation();
   const { sessionId } = useParams<{ sessionId: string }>();
