@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Layouts, BackButton } from '@strapi/strapi/admin';
+import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Flex, Field, Divider } from '@strapi/design-system';
+import { Box, Typography, Flex, Field, Divider, Link } from '@strapi/design-system';
+import { ArrowLeft } from '@strapi/icons';
 import { useParams } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
 import { formatDate, formatTime, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
@@ -77,7 +79,11 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
       <Layouts.Header
         title={props.title}
         subtitle={props.subtitle}
-        navigationAction={<BackButton fallback={`/plugins/${PLUGIN_ID}/activity-logs`} />}
+        navigationAction={
+          <Link tag={NavLink} to={`/plugins/${PLUGIN_ID}/activity-logs`} startIcon={<ArrowLeft />}>
+            {t('activity_logs.back_to_list')}
+          </Link>
+        }
       />
       {isLoading && <Loader />}
       {!isLoading && !session && (
