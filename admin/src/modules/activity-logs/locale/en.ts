@@ -24,4 +24,7 @@ export default {
   status_completed: 'Completed',
   status_failed: 'Failed',
   close: 'Close',
+  clear: 'Clear',
+  date_from: 'From',
+  date_to: 'To',
 };

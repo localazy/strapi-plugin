@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field } from '@strapi/design-system';
+import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field, DatePicker } from '@strapi/design-system';
 import { Trash, CaretUp, CaretDown } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
@@ -92,12 +92,14 @@ const DEFAULT_SORT: { key: SortKey; direction: SortDirection } = { key: 'started
 const SessionsTable: React.FC<{
   sessions: SessionItem[];
   searchQuery: string;
+  dateFrom?: Date;
+  dateTo?: Date;
   eventType: string;
   sortPreferences: Record<string, { key: string; direction: string }>;
   onSortChange: (eventType: string, key: SortKey, direction: SortDirection) => void;
   onSessionClick: (sessionId: string) => void;
   t: (key: string) => string;
-}> = ({ sessions, searchQuery, eventType, sortPreferences, onSortChange, onSessionClick, t }) => {
+}> = ({ sessions, searchQuery, dateFrom, dateTo, eventType, sortPreferences, onSortChange, onSessionClick, t }) => {
   const stored = sortPreferences[eventType];
   const [sortKey, setSortKey] = useState<SortKey>((stored?.key as SortKey) || DEFAULT_SORT.key);
   const [sortDirection, setSortDirection] = useState<SortDirection>((stored?.direction as SortDirection) || DEFAULT_SORT.direction);
@@ -117,6 +119,12 @@ const SessionsTable: React.FC<{
 
   const filteredSessions = sessions
     .filter((session) => {
+      if (dateFrom && session.startedAt < dateFrom.getTime()) return false;
+      if (dateTo) {
+        const endOfDay = new Date(dateTo);
+        endOfDay.setHours(23, 59, 59, 999);
+        if (session.startedAt > endOfDay.getTime()) return false;
+      }
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
       return (
@@ -200,6 +208,8 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [activeTab, setActiveTab] = useState('upload');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearSuccess, setClearSuccess] = useState(false);
   const [sortPreferences, setSortPreferences] = useState<Record<string, { key: string; direction: string }>>({});
@@ -297,15 +307,37 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
             hasRadius
             shadow='tableShadow'
           >
-            <Box marginBottom={4}>
-              <Field.Root>
-                <Field.Input
-                  placeholder={t('activity_logs.search_placeholder')}
-                  value={searchQuery}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+            <Flex marginBottom={4} gap={3} wrap='wrap'>
+              <Box grow={1} basis='200px'>
+                <Field.Root>
+                  <Field.Input
+                    placeholder={t('activity_logs.search_placeholder')}
+                    value={searchQuery}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                  />
+                </Field.Root>
+              </Box>
+              <Box basis='160px'>
+                <DatePicker
+                  placeholder={t('activity_logs.date_from')}
+                  value={dateFrom}
+                  onChange={(date) => setDateFrom(date)}
+                  onClear={() => setDateFrom(undefined)}
+                  clearLabel={t('activity_logs.clear')}
+                  size='S'
                 />
-              </Field.Root>
-            </Box>
+              </Box>
+              <Box basis='160px'>
+                <DatePicker
+                  placeholder={t('activity_logs.date_to')}
+                  value={dateTo}
+                  onChange={(date) => setDateTo(date)}
+                  onClear={() => setDateTo(undefined)}
+                  clearLabel={t('activity_logs.clear')}
+                  size='S'
+                />
+              </Box>
+            </Flex>
             <Tabs.Root value={activeTab} onValueChange={onTabChange}>
               <Tabs.List>
                 <Tabs.Trigger value='upload'>{t('activity_logs.tab_upload')}</Tabs.Trigger>
@@ -313,13 +345,13 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <Tabs.Trigger value='webhook'>{t('activity_logs.tab_webhooks')}</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value='upload'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='upload' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='upload' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
               <Tabs.Content value='download'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='download' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='download' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
               <Tabs.Content value='webhook'>
-                <SessionsTable sessions={sessions} searchQuery={searchQuery} eventType='webhook' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
+                <SessionsTable sessions={sessions} searchQuery={searchQuery} dateFrom={dateFrom} dateTo={dateTo} eventType='webhook' sortPreferences={sortPreferences} onSortChange={onSortChange} onSessionClick={onSessionClick} t={t} />
               </Tabs.Content>
             </Tabs.Root>
           </Box>
