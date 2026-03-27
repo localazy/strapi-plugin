@@ -173,7 +173,6 @@ const Download: React.FC<DownloadProps> = (props) => {
             </Button>
           </Flex>
         }
-        as='h2'
       />
       {isLoading && <Loader />}
       {!isLoading && (

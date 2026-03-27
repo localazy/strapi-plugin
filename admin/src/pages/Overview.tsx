@@ -63,7 +63,6 @@ const Overview: React.FC<OverviewProps> = ({ title, subtitle, isLoadingProp = fa
         title={title}
         subtitle={subtitle}
         primaryAction={<LogoutButton onResultFetched={onLoggedOut} />}
-        as='h2'
       />
       {(isLoadingProp || isLoading) && <Loader />}
       {!(isLoadingProp || isLoading) && (

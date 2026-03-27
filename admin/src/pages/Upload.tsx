@@ -129,7 +129,6 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
             {t('upload.upload_to_localazy')}
           </Button>
         }
-        as='h2'
       />
       {isLoading && <Loader />}
       {!isLoading && (

@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { DesignSystemProvider, Box } from '@strapi/design-system';
+import { Box, DesignSystemProvider } from '@strapi/design-system';
 import { useEffect } from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
 import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
@@ -13,6 +13,7 @@ import SideNav from '../modules/@common/components/SideNav';
 import Overview from './Overview';
 import { getDefaultTheme } from '../modules/strapi/utils/get-default-theme';
 import Loader from '../modules/@common/components/PluginPageLoader';
+import { HeadingFixGlobalStyle } from '../modules/@common/styles/heading-fix';
 
 // import and load resources
 import '../i18n';
@@ -56,6 +57,7 @@ const App = () => {
 
   return (
     <DesignSystemProvider theme={getDefaultTheme()}>
+      <HeadingFixGlobalStyle />
       <Box background='neutral100'>
         <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
           {isFetchingIdentity && <Loader />}

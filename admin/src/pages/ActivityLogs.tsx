@@ -381,7 +381,6 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
             </Button>
           </Flex>
         }
-        as='h2'
       />
       <Box paddingRight={10} paddingLeft={10} paddingBottom={4}>
         <Flex gap={2} alignItems='center'>

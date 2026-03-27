@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, BackButton } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Typography, Flex, Field, Divider } from '@strapi/design-system';
-import { ArrowLeft } from '@strapi/icons';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Typography, Flex, Field, Divider } from '@strapi/design-system';
+import { useParams } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
 import { formatDate, formatTime, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
@@ -34,7 +33,6 @@ type SessionDetail = {
 const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
   const { t } = useTranslation();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<SessionDetail | null>(null);
@@ -61,10 +59,6 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
     return entry.message.toLowerCase().includes(query) || formatTime(entry.timestamp).toLowerCase().includes(query);
   });
 
-  const onBackClick = () => {
-    navigate(`/plugins/${PLUGIN_ID}/activity-logs`);
-  };
-
   const getStatusLabel = (status: string): string => {
     switch (status) {
       case 'in-progress':
@@ -83,12 +77,7 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
       <Layouts.Header
         title={props.title}
         subtitle={props.subtitle}
-        navigationAction={
-          <Button variant='ghost' startIcon={<ArrowLeft />} onClick={onBackClick}>
-            {t('activity_logs.back_to_list')}
-          </Button>
-        }
-        as='h2'
+        navigationAction={<BackButton fallback={`/plugins/${PLUGIN_ID}/activity-logs`} />}
       />
       {isLoading && <Loader />}
       {!isLoading && !session && (
