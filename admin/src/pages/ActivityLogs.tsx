@@ -119,10 +119,14 @@ const SessionsTable: React.FC<{
 
   const filteredSessions = sessions
     .filter((session) => {
-      if (dateFrom && session.startedAt < dateFrom.getTime()) return false;
+      // DatePicker returns Date at midnight UTC for the selected calendar date.
+      // Convert to local start-of-day / end-of-day for comparison with session timestamps.
+      if (dateFrom) {
+        const startOfDay = new Date(dateFrom.getUTCFullYear(), dateFrom.getUTCMonth(), dateFrom.getUTCDate());
+        if (session.startedAt < startOfDay.getTime()) return false;
+      }
       if (dateTo) {
-        const endOfDay = new Date(dateTo);
-        endOfDay.setHours(23, 59, 59, 999);
+        const endOfDay = new Date(dateTo.getUTCFullYear(), dateTo.getUTCMonth(), dateTo.getUTCDate(), 23, 59, 59, 999);
         if (session.startedAt > endOfDay.getTime()) return false;
       }
       if (!searchQuery) return true;
@@ -321,11 +325,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_from')}
                   value={dateFrom}
-                  onChange={(date) => {
-                    if (!date) { setDateFrom(undefined); return; }
-                    // Normalize UTC midnight from DatePicker to local midnight
-                    setDateFrom(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-                  }}
+                  onChange={(date) => setDateFrom(date)}
                   onClear={() => setDateFrom(undefined)}
                   clearLabel={t('activity_logs.clear')}
                   size='S'
@@ -335,10 +335,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <DatePicker
                   placeholder={t('activity_logs.date_to')}
                   value={dateTo}
-                  onChange={(date) => {
-                    if (!date) { setDateTo(undefined); return; }
-                    setDateTo(new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-                  }}
+                  onChange={(date) => setDateTo(date)}
                   onClear={() => setDateTo(undefined)}
                   clearLabel={t('activity_logs.clear')}
                   size='S'
