@@ -11,6 +11,14 @@ const ActivityLogsRoutes = [
   },
   {
     method: 'GET',
+    path: `${ROUTE_PREFIX}/export`,
+    handler: 'ActivityLogsController.exportSessions',
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: 'GET',
     path: `${ROUTE_PREFIX}/:sessionId`,
     handler: 'ActivityLogsController.getSession',
     config: {

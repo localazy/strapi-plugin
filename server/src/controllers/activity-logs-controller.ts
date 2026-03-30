@@ -18,6 +18,10 @@ const ActivityLogsController = ({ strapi: _strapi }: { strapi: Core.Strapi }) =>
     ctx.body = session;
   },
 
+  async exportSessions(ctx) {
+    ctx.body = await getActivityLogsService().getAllSessionsWithEntries();
+  },
+
   async clearSessions(ctx) {
     await getActivityLogsService().clearSessions();
     ctx.body = { success: true };

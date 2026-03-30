@@ -14,6 +14,7 @@ import Overview from './Overview';
 import { getDefaultTheme } from '../modules/strapi/utils/get-default-theme';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import { HeadingFixGlobalStyle } from '../modules/@common/styles/heading-fix';
+import PluginErrorBoundary from '../components/PluginErrorBoundary';
 
 // import and load resources
 import '../i18n';
@@ -58,26 +59,31 @@ const App = () => {
   return (
     <DesignSystemProvider theme={getDefaultTheme()}>
       <HeadingFixGlobalStyle />
-      <Box background='neutral100'>
-        <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
-          {isFetchingIdentity && <Loader />}
-          <Routes>
-            <Route path={`login`} element={<Login title={headerTitle} subtitle={headerSubtitle} isLoading={false} />} />
-            <Route
-              path={`overview`}
-              element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
-            />
-            <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route path={`activity-logs`} element={<ActivityLogs title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route
-              path={`activity-logs/:sessionId`}
-              element={<ActivityLogDetail title={headerTitle} subtitle={headerSubtitle} />}
-            />
-            <Route path='*' element={<Page.Error />} />
-          </Routes>
-        </Layouts.Root>
-      </Box>
+      <PluginErrorBoundary>
+        <Box background='neutral100'>
+          <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
+            {isFetchingIdentity && <Loader />}
+            <Routes>
+              <Route
+                path={`login`}
+                element={<Login title={headerTitle} subtitle={headerSubtitle} isLoading={false} />}
+              />
+              <Route
+                path={`overview`}
+                element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
+              />
+              <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route path={`activity-logs`} element={<ActivityLogs title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route
+                path={`activity-logs/:sessionId`}
+                element={<ActivityLogDetail title={headerTitle} subtitle={headerSubtitle} />}
+              />
+              <Route path='*' element={<Page.Error />} />
+            </Routes>
+          </Layouts.Root>
+        </Box>
+      </PluginErrorBoundary>
     </DesignSystemProvider>
   );
 };

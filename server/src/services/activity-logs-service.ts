@@ -27,7 +27,7 @@ const ActivityLogsService = ({ strapi }: { strapi: Core.Strapi }) => ({
     const pluginStore = getStrapiStore(strapi);
     const logs = (await pluginStore.get({ key: KEY })) as ActivityLogs;
 
-    return logs || emptyActivityLogs;
+    return logs || { sessions: [] };
   },
 
   async saveActivityLogs(logs: ActivityLogs): Promise<void> {
@@ -114,6 +114,11 @@ const ActivityLogsService = ({ strapi }: { strapi: Core.Strapi }) => ({
       ...s,
       entries: [],
     }));
+  },
+
+  async getAllSessionsWithEntries(): Promise<ActivityLogSession[]> {
+    const logs = await this.getActivityLogs();
+    return logs.sessions;
   },
 
   async getSession(sessionId: string): Promise<ActivityLogSession | null> {

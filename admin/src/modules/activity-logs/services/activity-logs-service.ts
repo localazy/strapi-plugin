@@ -17,6 +17,12 @@ export default class ActivityLogsService {
     return result.data;
   }
 
+  static async exportSessions() {
+    const result = await axiosInstance.get(`${BASE_PATH}/export`);
+
+    return result.data;
+  }
+
   static async clearSessions() {
     const result = await axiosInstance.delete(`${BASE_PATH}`);
 

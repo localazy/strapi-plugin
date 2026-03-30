@@ -15,6 +15,7 @@ import {
   PreviousLink,
   NextLink,
   PageLink,
+  Dots,
 } from '@strapi/design-system';
 import { Trash, Download, CaretUp, CaretDown, Information } from '@strapi/icons';
 import { useNavigate } from 'react-router-dom';
@@ -271,9 +272,36 @@ const SessionsTable: React.FC<{
       <Box paddingTop={4}>
         <Pagination activePage={safePage} pageCount={totalPages}>
           <PreviousLink onClick={() => setPage(Math.max(1, safePage - 1))} />
-          {Array.from({ length: totalPages }, (_, i) => (
-            <PageLink key={i + 1} number={i + 1} onClick={() => setPage(i + 1)} />
-          ))}
+          {(() => {
+            const pages: React.ReactNode[] = [];
+            const WINDOW = 2;
+
+            if (totalPages <= 7) {
+              for (let i = 1; i <= totalPages; i++) {
+                pages.push(<PageLink key={i} number={i} onClick={() => setPage(i)} />);
+              }
+            } else {
+              pages.push(<PageLink key={1} number={1} onClick={() => setPage(1)} />);
+
+              if (safePage > 1 + WINDOW + 1) {
+                pages.push(<Dots key='dots-start' />);
+              }
+
+              const start = Math.max(2, safePage - WINDOW);
+              const end = Math.min(totalPages - 1, safePage + WINDOW);
+              for (let i = start; i <= end; i++) {
+                pages.push(<PageLink key={i} number={i} onClick={() => setPage(i)} />);
+              }
+
+              if (safePage < totalPages - WINDOW - 1) {
+                pages.push(<Dots key='dots-end' />);
+              }
+
+              pages.push(<PageLink key={totalPages} number={totalPages} onClick={() => setPage(totalPages)} />);
+            }
+
+            return pages;
+          })()}
           <NextLink onClick={() => setPage(Math.min(totalPages, safePage + 1))} />
         </Pagination>
       </Box>
