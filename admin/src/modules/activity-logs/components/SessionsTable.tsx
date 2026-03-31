@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import { Box, Typography, Pagination, PreviousLink, NextLink, PageLink, Dots } from '@strapi/design-system';
 import { formatDate, formatDuration } from '../utils/format-utils';
 import SortableHeader from './SortableHeader';
@@ -47,6 +48,7 @@ const SessionsTable: React.FC<{
   onSessionClick: (sessionId: string) => void;
   t: (key: string) => string;
 }> = ({ sessions, searchQuery, dateFrom, dateTo, eventType, sortPreferences, onSortChange, onSessionClick, t }) => {
+  const theme = useTheme();
   const stored = sortPreferences[eventType];
   const [sortKey, setSortKey] = useState<SortKey>((stored?.key as SortKey) || DEFAULT_SORT.key);
   const [sortDirection, setSortDirection] = useState<SortDirection>(
@@ -163,9 +165,9 @@ const SessionsTable: React.FC<{
             <tr
               key={session.id}
               onClick={() => onSessionClick(session.id)}
-              style={{ cursor: 'pointer', borderBottom: '1px solid #eaeaef' }}
+              style={{ cursor: 'pointer', borderBottom: `1px solid ${theme.colors.neutral150}` }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '#f6f6f9';
+                (e.currentTarget as HTMLTableRowElement).style.backgroundColor = theme.colors.neutral100;
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'transparent';

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import { Box, Typography, Field, Divider, Flex, Link } from '@strapi/design-system';
@@ -20,6 +21,7 @@ export type ActivityLogDetailProps = {
 
 const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { sessionId } = useParams<{ sessionId: string }>();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -122,7 +124,7 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
                   paddingLeft={4}
                   paddingRight={4}
                   style={{
-                    borderBottom: index < filteredEntries.length - 1 ? '1px solid #eaeaef' : 'none',
+                    borderBottom: index < filteredEntries.length - 1 ? `1px solid ${theme.colors.neutral150}` : 'none',
                     fontFamily: 'monospace',
                   }}
                 >

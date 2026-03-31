@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flex, Typography } from '@strapi/design-system';
 import { CaretUp, CaretDown } from '@strapi/icons';
+import { useTheme } from 'styled-components';
 import type { SortKey, SortDirection } from '../models/activity-logs';
 
 const SortableHeader: React.FC<{
@@ -11,13 +12,14 @@ const SortableHeader: React.FC<{
   onSort: (key: SortKey) => void;
 }> = ({ label, sortKey, activeSortKey, direction, onSort }) => {
   const isActive = sortKey === activeSortKey;
+  const theme = useTheme();
   return (
     <th
       onClick={() => onSort(sortKey)}
       style={{
         textAlign: 'left',
         padding: '12px 16px',
-        borderBottom: '1px solid #eaeaef',
+        borderBottom: `1px solid ${theme.colors.neutral150}`,
         cursor: 'pointer',
         userSelect: 'none',
       }}
