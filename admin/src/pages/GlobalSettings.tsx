@@ -112,7 +112,7 @@ const GlobalSettings: React.FC = () => {
 
       setIsLoading(false);
     }
-    fetchData();
+    void fetchData();
   }, []);
 
   return (
@@ -129,7 +129,7 @@ const GlobalSettings: React.FC = () => {
               startIcon={<Check />}
               disabled={!hasUnsavedChanges}
               onClick={() => {
-                saveGlobalSettings(formModel);
+                void saveGlobalSettings(formModel);
               }}
             >
               {t('plugin_settings.save')}

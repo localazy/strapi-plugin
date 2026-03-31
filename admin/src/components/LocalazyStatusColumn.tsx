@@ -28,7 +28,7 @@ const LocalazyStatusColumn = ({ data, model }: any) => {
       }
     };
 
-    checkStatus();
+    void checkStatus();
   }, [data?.documentId, model]);
 
   if (isLoading) {

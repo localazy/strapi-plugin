@@ -47,7 +47,7 @@ const ErrorFallback: React.FC<{ error: Error; reset: () => void }> = ({ error, r
   const { setIdentity } = useLocalazyIdentity();
 
   const handleDisconnect = useCallback(() => {
-    LocalazyUserService.deleteIdentity().then();
+    void LocalazyUserService.deleteIdentity();
     setIdentity(emptyIdentity);
     reset();
   }, [setIdentity, reset]);

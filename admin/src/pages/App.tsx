@@ -53,7 +53,7 @@ const App = () => {
       }
     };
 
-    fetchData();
+    void fetchData();
   }, [isLoggedIn, isFetchingIdentity, normalizedPath]);
 
   return (

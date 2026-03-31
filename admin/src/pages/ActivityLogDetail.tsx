@@ -38,7 +38,7 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
       }
       setIsLoading(false);
     };
-    fetchSession().then();
+    void fetchSession();
   }, [sessionId]);
 
   const filteredEntries = (session?.entries || []).filter((entry) => {

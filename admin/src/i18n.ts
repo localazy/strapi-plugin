@@ -34,7 +34,7 @@ const initI18nParams = () => {
   };
 };
 
-i18n
+void i18n
   // detect user language
   // pass the i18n instance to react-i18next.
   .use(initReactI18next)

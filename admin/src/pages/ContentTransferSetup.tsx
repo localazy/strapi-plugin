@@ -165,7 +165,7 @@ const ContentTransferSetup: React.FC = () => {
 
       setIsLoading(false);
     }
-    fetchData();
+    void fetchData();
   }, []);
 
   return (
@@ -182,7 +182,7 @@ const ContentTransferSetup: React.FC = () => {
               startIcon={<Check />}
               disabled={!hasUnsavedChanges}
               onClick={() => {
-                saveContentTransferSetup(formModel);
+                void saveContentTransferSetup(formModel);
               }}
             >
               {t('plugin_settings.save')}

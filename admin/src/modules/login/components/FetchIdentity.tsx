@@ -23,7 +23,7 @@ const FetchIdentity: React.FC = () => {
       }
     };
 
-    fetchIdentity();
+    void fetchIdentity();
   }, [setIdentity, setIsFetchingIdentity]);
 
   return null; // This component doesn't render anything

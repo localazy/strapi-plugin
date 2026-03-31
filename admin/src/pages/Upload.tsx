@@ -84,7 +84,7 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
     });
 
     // track upload
-    ProductAnalyticsService.trackUploadToLocalazy(identity.user.id, identity.project, {
+    void ProductAnalyticsService.trackUploadToLocalazy(identity.user.id, identity.project, {
       'Source Language Code': localazySourceLanguage.code,
     });
   };
@@ -105,11 +105,11 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
       setModelChanged(modelChangedResult);
       setLocalesIncompatible(!localesCompatibleResult);
 
-      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
+      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
 
       setIsLoading(false);
     }
-    initComponent();
+    void initComponent();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

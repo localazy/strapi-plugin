@@ -41,7 +41,7 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
       return config;
     },
     (error) => {
-      Promise.reject(error);
+      return Promise.reject(error);
     }
   );
 

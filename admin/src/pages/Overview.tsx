@@ -39,12 +39,12 @@ const Overview: React.FC<OverviewProps> = ({ title, subtitle, isLoadingProp = fa
       const project = await ProjectService.getConnectedProject();
       setConnectedProject(project);
 
-      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.OVERVIEW });
+      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.OVERVIEW });
 
       setIsLoading(false);
     }
 
-    initComponent();
+    void initComponent();
   }, []);
 
   /**
@@ -52,7 +52,7 @@ const Overview: React.FC<OverviewProps> = ({ title, subtitle, isLoadingProp = fa
    */
   const onLoggedOut = () => {
     // track user logout
-    ProductAnalyticsService.trackAppDisconnected(identity.user.id, identity.project);
+    void ProductAnalyticsService.trackAppDisconnected(identity.user.id, identity.project);
 
     navigateToPluginRoute(PLUGIN_ROUTES.LOGIN);
   };

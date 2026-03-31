@@ -7,7 +7,7 @@ import eslintPluginPrettier from 'eslint-plugin-prettier';
 
 export default [
   {
-    ignores: ['node_modules/', 'dist/', '.cache/'], // Ignore directories
+    ignores: ['node_modules/', 'dist/', '.cache/', 'server/jest.config.ts', 'server/jest.setup.ts'],
   },
   // TypeScript files configuration
   {
@@ -18,6 +18,7 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
+        project: ['./server/tsconfig.json', './admin/tsconfig.json'],
         ecmaFeatures: {
           jsx: true,
         },
@@ -49,6 +50,7 @@ export default [
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
       'prettier/prettier': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
       // TODO: disallow any
       '@typescript-eslint/no-explicit-any': 'off',
     },

@@ -73,7 +73,7 @@ const Download: React.FC<DownloadProps> = (props) => {
     setFormModel(newFormModel);
 
     try {
-      PluginSettingsService.updatePluginSettings(newFormModel);
+      void PluginSettingsService.updatePluginSettings(newFormModel);
     } catch (e: any) {
       console.error(e.message);
     }
@@ -113,7 +113,7 @@ const Download: React.FC<DownloadProps> = (props) => {
     });
 
     // track download
-    ProductAnalyticsService.trackDownloadToStrapi(identity.user.id, identity.project, {
+    void ProductAnalyticsService.trackDownloadToStrapi(identity.user.id, identity.project, {
       'Target Languages Codes': 'all',
     });
   };
@@ -140,12 +140,12 @@ const Download: React.FC<DownloadProps> = (props) => {
 
       setFormModel(globalSettings);
 
-      PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
+      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
 
       setIsLoading(false);
     }
 
-    initComponent();
+    void initComponent();
   }, []);
 
   return (
@@ -289,7 +289,7 @@ const Download: React.FC<DownloadProps> = (props) => {
                 variant='danger-light'
                 onClick={() => {
                   setShowFullSyncConfirm(false);
-                  onDownloadClick(true);
+                  void onDownloadClick(true);
                 }}
               >
                 {t('download.full_sync')}

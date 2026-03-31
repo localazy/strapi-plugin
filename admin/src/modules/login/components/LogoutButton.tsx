@@ -20,7 +20,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = (props) => {
 
     // delete identity from db
     // delete identity from app state
-    LocalazyUserService.deleteIdentity();
+    void LocalazyUserService.deleteIdentity();
     setIdentity(emptyIdentity);
 
     setIsLoading(false);
