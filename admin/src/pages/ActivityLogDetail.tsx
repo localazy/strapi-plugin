@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Flex, Field, Divider, Link } from '@strapi/design-system';
+import { Box, Typography, Field, Divider, Flex, Link } from '@strapi/design-system';
 import { ArrowLeft } from '@strapi/icons';
-import { useParams } from 'react-router-dom';
-import { NavLink } from 'react-router-dom';
+import { useParams, NavLink } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
-import { formatDate, formatTime, formatDuration, getStatusColor } from '../modules/activity-logs/utils/format-utils';
+import { formatTime } from '../modules/activity-logs/utils/format-utils';
+import SessionMetadata from '../modules/activity-logs/components/SessionMetadata';
+import HighlightMatch from '../modules/activity-logs/components/HighlightMatch';
 import { PLUGIN_ID } from '../pluginId';
+import useDebouncedSearch from '../modules/activity-logs/hooks/use-debounced-search';
+import type { SessionDetail } from '../modules/activity-logs/models/activity-logs';
 
 export type ActivityLogDetailProps = {
   title: string;
   subtitle: string;
-};
-
-type LogEntry = {
-  message: string;
-  timestamp: number;
-  data?: any;
-};
-
-type SessionDetail = {
-  id: string;
-  eventType: 'upload' | 'download' | 'webhook';
-  status: 'in-progress' | 'completed' | 'failed';
-  startedAt: number;
-  finishedAt?: number;
-  initiatedBy: string;
-  summary: string;
-  entries: LogEntry[];
 };
 
 const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
@@ -38,7 +24,7 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<SessionDetail | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchInput, searchQuery, onSearchChange } = useDebouncedSearch();
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -60,19 +46,6 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
     const query = searchQuery.toLowerCase();
     return entry.message.toLowerCase().includes(query) || formatTime(entry.timestamp).toLowerCase().includes(query);
   });
-
-  const getStatusLabel = (status: string): string => {
-    switch (status) {
-      case 'in-progress':
-        return t('activity_logs.status_in_progress');
-      case 'completed':
-        return t('activity_logs.status_completed');
-      case 'failed':
-        return t('activity_logs.status_failed');
-      default:
-        return status;
-    }
-  };
 
   return (
     <>
@@ -102,45 +75,7 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
             hasRadius
             shadow='tableShadow'
           >
-            <Flex gap={6} wrap='wrap'>
-              <Box>
-                <Typography variant='sigma' textColor='neutral600'>
-                  {t('activity_logs.status')}
-                </Typography>
-                <br />
-                <Typography variant='omega' textColor={getStatusColor(session.status)}>
-                  {getStatusLabel(session.status)}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant='sigma' textColor='neutral600'>
-                  {t('activity_logs.started_at')}
-                </Typography>
-                <br />
-                <Typography variant='omega'>{formatDate(session.startedAt)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='sigma' textColor='neutral600'>
-                  {t('activity_logs.duration')}
-                </Typography>
-                <br />
-                <Typography variant='omega'>{formatDuration(session.startedAt, session.finishedAt)}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='sigma' textColor='neutral600'>
-                  {t('activity_logs.initiated_by')}
-                </Typography>
-                <br />
-                <Typography variant='omega'>{session.initiatedBy}</Typography>
-              </Box>
-              <Box>
-                <Typography variant='sigma' textColor='neutral600'>
-                  {t('activity_logs.entries_count')}
-                </Typography>
-                <br />
-                <Typography variant='omega'>{session.entries.length}</Typography>
-              </Box>
-            </Flex>
+            <SessionMetadata session={session} showEntryCount={session.entries.length} />
             {session.summary && (
               <Box marginTop={4}>
                 <Typography variant='sigma' textColor='neutral600'>
@@ -166,8 +101,8 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
                 <Field.Root>
                   <Field.Input
                     placeholder={t('activity_logs.search_entries_placeholder')}
-                    value={searchQuery}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
                   />
                 </Field.Root>
               </Box>
@@ -197,10 +132,10 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
                       textColor='neutral500'
                       style={{ whiteSpace: 'nowrap', fontFamily: 'monospace' }}
                     >
-                      {formatTime(entry.timestamp)}
+                      <HighlightMatch text={formatTime(entry.timestamp)} query={searchQuery} />
                     </Typography>
                     <Typography variant='omega' style={{ fontFamily: 'monospace' }}>
-                      {entry.message}
+                      <HighlightMatch text={entry.message} query={searchQuery} />
                     </Typography>
                   </Flex>
                   {entry.data && (
