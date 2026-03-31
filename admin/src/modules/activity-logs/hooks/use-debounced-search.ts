@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { debounce } from 'lodash';
 
 const DEBOUNCE_MS = 300;
@@ -8,6 +8,12 @@ const useDebouncedSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const debouncedSetQuery = useMemo(() => debounce((value: string) => setSearchQuery(value), DEBOUNCE_MS), []);
+
+  useEffect(() => {
+    return () => {
+      debouncedSetQuery.cancel();
+    };
+  }, [debouncedSetQuery]);
 
   const onSearchChange = useCallback(
     (value: string) => {

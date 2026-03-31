@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Flex, Typography, Field, Button, Alert, Link, Loader, Dialog } from '@strapi/design-system';
-import { Check, WarningCircle, Link as LinkIcon } from '@strapi/icons';
+import { Check, WarningCircle, Information, Link as LinkIcon } from '@strapi/icons';
 import ProjectService from '../../@common/services/project-service';
 
 const WEBHOOK_PATH = '/api/localazy/public/transfer/download';
 const LOCALAZY_DOCS_URL = 'https://localazy.com/docs/general/webhooks';
 
-type WebhookState = 'loading' | 'configured' | 'not_configured' | 'deleted';
+type WebhookState = 'loading' | 'configured' | 'not_configured';
 
 function WebhookSetup() {
   const { t } = useTranslation();
 
   const [state, setState] = useState<WebhookState>('loading');
   const [configuredUrl, setConfiguredUrl] = useState('');
+  const [isLocalUrl, setIsLocalUrl] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -28,12 +29,12 @@ function WebhookSetup() {
       ]);
 
       setWebhookUrl(`${strapiUrlResult.url}${WEBHOOK_PATH}`);
+      setIsLocalUrl(strapiUrlResult.isLocal || false);
 
       if (statusResult.status === 'configured' && statusResult.url) {
         setState('configured');
         setConfiguredUrl(statusResult.url);
       } else {
-        // Check if we had a webhook that was deleted
         setState('not_configured');
       }
     } catch {
@@ -152,10 +153,21 @@ function WebhookSetup() {
                   <Field.Hint />
                 </Field.Root>
               </Box>
-              <Box marginBottom={4}>
-                <Typography variant='pi' textColor='warning600'>
-                  {t('plugin_settings.webhook_setup_ngrok_hint')}
-                </Typography>
+              <Box marginTop={3} marginBottom={4}>
+                {isLocalUrl && (
+                  <Flex gap={2} marginBottom={3} padding={3} background='warning100' hasRadius>
+                    <WarningCircle fill='warning600' width={16} height={16} style={{ flexShrink: 0 }} />
+                    <Typography variant='pi' textColor='warning800'>
+                      {t('plugin_settings.webhook_setup_local_warning')}
+                    </Typography>
+                  </Flex>
+                )}
+                <Flex gap={2} padding={3} background='primary100' hasRadius>
+                  <Information fill='primary600' width={16} height={16} style={{ flexShrink: 0 }} />
+                  <Typography variant='pi' textColor='primary800'>
+                    {t('plugin_settings.webhook_setup_ngrok_hint')}
+                  </Typography>
+                </Flex>
               </Box>
 
               {/* Step 3 */}

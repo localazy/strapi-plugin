@@ -106,4 +106,6 @@ export default {
   webhook_setup_step3_description:
     'This will register a webhook in your Localazy project that triggers on "Project Published" events. You can manage webhooks anytime in your Localazy project settings.',
   webhook_setup_confirm: 'Confirm & set up webhook',
+  webhook_setup_local_warning:
+    'The detected URL points to a local/private address. Localazy will not be able to reach this URL. Use a tunneling tool or replace with your public URL.',
 };

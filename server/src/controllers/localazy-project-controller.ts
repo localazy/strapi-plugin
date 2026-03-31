@@ -32,6 +32,19 @@ const LocalazyProjectController = ({ strapi }: { strapi: Core.Strapi }) => ({
   },
   async setupWebhook(ctx) {
     const { url } = ctx.request.body;
+    // Validate URL
+    if (!url || typeof url !== 'string') {
+      return ctx.badRequest('Webhook URL is required');
+    }
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return ctx.badRequest('Webhook URL must use http or https protocol');
+      }
+    } catch {
+      return ctx.badRequest('Invalid webhook URL');
+    }
+
     const LocalazyUserService = getLocalazyUserService();
     const user = await LocalazyUserService.getUser();
     const LocalazyPubApiService = getLocalazyPubAPIService();
@@ -72,7 +85,10 @@ const LocalazyProjectController = ({ strapi }: { strapi: Core.Strapi }) => ({
       const displayHost = host === '0.0.0.0' || host === '::' ? 'localhost' : host;
       url = `http://${displayHost}:${port}`;
     }
-    ctx.body = { url };
+    const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(
+      url
+    );
+    ctx.body = { url, isLocal };
   },
 });
 

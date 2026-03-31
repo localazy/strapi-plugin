@@ -23,7 +23,7 @@ export default class ProjectService {
     return result.data;
   }
 
-  static async getStrapiUrl(): Promise<{ url: string }> {
+  static async getStrapiUrl(): Promise<{ url: string; isLocal: boolean }> {
     const result = await strapiApiInstance.get(`/project/strapi-url`);
     return result.data;
   }
