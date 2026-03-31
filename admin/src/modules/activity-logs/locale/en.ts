@@ -4,7 +4,7 @@ export default {
   tab_upload: 'Upload',
   tab_download: 'Download',
   tab_webhooks: 'Webhooks',
-  search_placeholder: 'Search sessions...',
+  search_placeholder: 'Search by status, date, user, or summary...',
   search_entries_placeholder: 'Search entries...',
   no_sessions: 'No activity logs found.',
   no_entries: 'No log entries found.',

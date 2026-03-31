@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { debounce } from 'lodash';
 import { Layouts } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import {
@@ -105,6 +106,21 @@ const SortableHeader: React.FC<{
 
 const DEFAULT_SORT: { key: SortKey; direction: SortDirection } = { key: 'startedAt', direction: 'desc' };
 const PAGE_SIZE = 20;
+
+const HighlightMatch: React.FC<{ text: string; query: string }> = ({ text, query }) => {
+  if (!query) return <>{text}</>;
+  const index = text.toLowerCase().indexOf(query.toLowerCase());
+  if (index === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <span style={{ backgroundColor: '#fce588', borderRadius: '2px', padding: '0 1px' }}>
+        {text.slice(index, index + query.length)}
+      </span>
+      {text.slice(index + query.length)}
+    </>
+  );
+};
 
 const SessionsTable: React.FC<{
   sessions: SessionItem[];
@@ -246,24 +262,35 @@ const SessionsTable: React.FC<{
             >
               <td style={{ padding: '12px 16px' }}>
                 <Typography variant='omega' textColor={getStatusColor(session.status)}>
-                  {session.status === 'in-progress'
-                    ? t('activity_logs.status_in_progress')
-                    : session.status === 'completed'
-                      ? t('activity_logs.status_completed')
-                      : t('activity_logs.status_failed')}
+                  <HighlightMatch
+                    text={
+                      session.status === 'in-progress'
+                        ? t('activity_logs.status_in_progress')
+                        : session.status === 'completed'
+                          ? t('activity_logs.status_completed')
+                          : t('activity_logs.status_failed')
+                    }
+                    query={searchQuery}
+                  />
                 </Typography>
               </td>
               <td style={{ padding: '12px 16px' }}>
-                <Typography variant='omega'>{formatDate(session.startedAt)}</Typography>
+                <Typography variant='omega'>
+                  <HighlightMatch text={formatDate(session.startedAt)} query={searchQuery} />
+                </Typography>
               </td>
               <td style={{ padding: '12px 16px' }}>
                 <Typography variant='omega'>{formatDuration(session.startedAt, session.finishedAt)}</Typography>
               </td>
               <td style={{ padding: '12px 16px' }}>
-                <Typography variant='omega'>{session.initiatedBy}</Typography>
+                <Typography variant='omega'>
+                  <HighlightMatch text={session.initiatedBy} query={searchQuery} />
+                </Typography>
               </td>
               <td style={{ padding: '12px 16px' }}>
-                <Typography variant='omega'>{session.summary || '-'}</Typography>
+                <Typography variant='omega'>
+                  <HighlightMatch text={session.summary || '-'} query={searchQuery} />
+                </Typography>
               </td>
             </tr>
           ))}
@@ -316,7 +343,18 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState<SessionItem[]>([]);
   const [activeTab, setActiveTab] = useState('upload');
+  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const debouncedSetSearchQuery = useMemo(() => debounce((value: string) => setSearchQuery(value), 300), []);
+
+  const onSearchChange = useCallback(
+    (value: string) => {
+      setSearchInput(value);
+      debouncedSetSearchQuery(value);
+    },
+    [debouncedSetSearchQuery]
+  );
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -442,8 +480,8 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
                 <Field.Root>
                   <Field.Input
                     placeholder={t('activity_logs.search_placeholder')}
-                    value={searchQuery}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
                   />
                 </Field.Root>
               </Box>
