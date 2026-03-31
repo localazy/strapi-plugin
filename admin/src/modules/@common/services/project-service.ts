@@ -12,4 +12,19 @@ export default class ProjectService {
       throw e;
     }
   }
+
+  static async getWebhookStatus(): Promise<{ status: string; url?: string }> {
+    const result = await strapiApiInstance.get(`/project/webhooks`);
+    return result.data;
+  }
+
+  static async setupWebhook(url: string) {
+    const result = await strapiApiInstance.post(`/project/webhooks/setup`, { url });
+    return result.data;
+  }
+
+  static async getStrapiUrl(): Promise<{ url: string }> {
+    const result = await strapiApiInstance.get(`/project/strapi-url`);
+    return result.data;
+  }
 }

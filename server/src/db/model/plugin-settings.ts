@@ -5,6 +5,11 @@ export type SortPreference = {
   direction: 'asc' | 'desc';
 };
 
+export type WebhookConfig = {
+  url: string;
+  webhookId?: string;
+};
+
 export type PluginSettings = {
   defaultRoute: string | null;
   activityLogsSort?: {
@@ -12,6 +17,7 @@ export type PluginSettings = {
     download?: SortPreference;
     webhook?: SortPreference;
   };
+  webhookConfig?: WebhookConfig;
 };
 
 export const emptyPluginSettings: PluginSettings = {
