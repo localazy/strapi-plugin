@@ -1,3 +1,12 @@
+## 1.1.2 (2026-04-01)
+### 🔀 Pull Requests
+
+- [ensure README.md is included in npm publish #117](https://github.com/localazy/strapi-plugin/pull/117)
+
+### 🐛 Bug Fixes
+
+- ensure README.md is included in npm publish ([884741a](https://github.com/localazy/strapi-plugin/commit/884741a)) ([#117](https://github.com/localazy/strapi-plugin/pull/117))
+
 ## 1.1.1 (2026-04-01)
 
 ### 🔀 Pull Requests
