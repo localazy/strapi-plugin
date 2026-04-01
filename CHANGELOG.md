@@ -1,4 +1,5 @@
 ## 1.1.1 (2026-04-01)
+
 ### 🔀 Pull Requests
 
 - [Upload & Download & Webhook logs #115](https://github.com/localazy/strapi-plugin/pull/115)
