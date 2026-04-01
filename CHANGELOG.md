@@ -1,4 +1,5 @@
 ## 1.1.2 (2026-04-01)
+
 ### 🔀 Pull Requests
 
 - [ensure README.md is included in npm publish #117](https://github.com/localazy/strapi-plugin/pull/117)
