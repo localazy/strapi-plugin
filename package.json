@@ -50,7 +50,8 @@
   },
   "files": [
     "dist",
-    "install"
+    "install",
+    "README.md"
   ],
   "scripts": {
     "build": "strapi-plugin build",
@@ -66,7 +67,7 @@
     "verify": "strapi-plugin verify",
     "watch": "strapi-plugin watch",
     "watch:link": "strapi-plugin watch:link",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
