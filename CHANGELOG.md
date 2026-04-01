@@ -1,3 +1,45 @@
+## 1.1.1 (2026-04-01)
+### 🔀 Pull Requests
+
+- [Upload & Download & Webhook logs #115](https://github.com/localazy/strapi-plugin/pull/115)
+
+### ✨ Features
+
+- add Activity Logs section for upload, download, and webhook events ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add Export logs button with reusable JSON export utility ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add date range filter to Activity Logs ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add date range filter with Strapi DatePicker ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add error boundary, bulk export endpoint, pagination truncation ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add one-click webhook setup with modal walkthrough ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add pagination and retention info to Activity Logs ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add search term highlighting and debounced search input ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add sortable columns to Activity Logs sessions table ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- persist Activity Logs sort preference in localStorage ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- persist sort preferences per tab in plugin storage ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- retain activity logs for 1 year instead of last 100 sessions ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+
+### 🐛 Bug Fixes
+
+- add required disabled prop to BackButton ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- add type annotation to DatePicker onChange callbacks ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- address review feedback for Activity Logs ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- address review round 5 — URL validation, highlight, cleanup ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- correct date filter timezone handling ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- handle floating promise in ActivityLogDetail useEffect ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- normalize DatePicker UTC dates to local midnight ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- preserve filters when switching Activity Logs tabs ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- prevent table column shift when changing sort column ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- remove extra blank line in ActivityLogDetail ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- replace hardcoded colors with theme tokens for dark mode support ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- resolve heading and button styling across all pages ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- restore defaultRoute update on Activity Logs page ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- use Flex instead of Box for sortable header to avoid DOM warning ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+
+### 🧰 Other Commits
+
+- enable no-floating-promises lint rule and fix all violations ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+- split Activity Logs into reusable components ([10c49e0](https://github.com/localazy/strapi-plugin/commit/10c49e0)) ([#115](https://github.com/localazy/strapi-plugin/pull/115))
+
 # 1.1.0 (2026-03-26)
 
 ### 🔀 Pull Requests
