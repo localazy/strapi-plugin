@@ -1,5 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { DesignSystemProvider, Box } from '@strapi/design-system';
+import { Box, DesignSystemProvider } from '@strapi/design-system';
 import { useEffect } from 'react';
 import { useLocalazyIdentity } from '../state/localazy-identity';
 import { PLUGIN_ROUTES, useRedirectToPluginRoute } from '../modules/@common/utils/redirect-to-plugin-route';
@@ -13,11 +13,15 @@ import SideNav from '../modules/@common/components/SideNav';
 import Overview from './Overview';
 import { getDefaultTheme } from '../modules/strapi/utils/get-default-theme';
 import Loader from '../modules/@common/components/PluginPageLoader';
+import { HeadingFixGlobalStyle } from '../modules/@common/styles/heading-fix';
+import PluginErrorBoundary from '../components/PluginErrorBoundary';
 
 // import and load resources
 import '../i18n';
 import { Upload } from './Upload';
 import Download from './Download';
+import ActivityLogs from './ActivityLogs';
+import ActivityLogDetail from './ActivityLogDetail';
 
 const App = () => {
   const { navigateToPluginRoute } = useRedirectToPluginRoute();
@@ -49,26 +53,37 @@ const App = () => {
       }
     };
 
-    fetchData();
+    void fetchData();
   }, [isLoggedIn, isFetchingIdentity, normalizedPath]);
 
   return (
     <DesignSystemProvider theme={getDefaultTheme()}>
-      <Box background='neutral100'>
-        <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
-          {isFetchingIdentity && <Loader />}
-          <Routes>
-            <Route path={`login`} element={<Login title={headerTitle} subtitle={headerSubtitle} isLoading={false} />} />
-            <Route
-              path={`overview`}
-              element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
-            />
-            <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
-            <Route path='*' element={<Page.Error />} />
-          </Routes>
-        </Layouts.Root>
-      </Box>
+      <HeadingFixGlobalStyle />
+      <PluginErrorBoundary>
+        <Box background='neutral100'>
+          <Layouts.Root sideNav={isLoggedIn && <SideNav />}>
+            {isFetchingIdentity && <Loader />}
+            <Routes>
+              <Route
+                path={`login`}
+                element={<Login title={headerTitle} subtitle={headerSubtitle} isLoading={false} />}
+              />
+              <Route
+                path={`overview`}
+                element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
+              />
+              <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route path={`activity-logs`} element={<ActivityLogs title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route
+                path={`activity-logs/:sessionId`}
+                element={<ActivityLogDetail title={headerTitle} subtitle={headerSubtitle} />}
+              />
+              <Route path='*' element={<Page.Error />} />
+            </Routes>
+          </Layouts.Root>
+        </Box>
+      </PluginErrorBoundary>
     </DesignSystemProvider>
   );
 };

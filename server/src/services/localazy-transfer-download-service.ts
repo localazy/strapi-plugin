@@ -20,6 +20,7 @@ import {
   getStrapiLocalazyI18nService,
   getPluginSettingsService,
   getEntryExclusionService,
+  getActivityLogsService,
 } from '../core';
 import { Language, Locales } from '@localazy/api-client';
 import { SyncCursor } from '../db/model/sync-cursor';
@@ -63,6 +64,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       message: `Download started (${syncMode})`,
     });
 
+    const activityLogsService = getActivityLogsService();
+    const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
+    const isWebhook = requestInitiatorHelper.isInitiatedByLocalazyWebhook();
+    const initiatedBy = isWebhook ? 'Webhook' : 'Strapi User';
+    const sessionId = await activityLogsService.startSession(isWebhook ? 'webhook' : 'download', initiatedBy);
+    await activityLogsService.addEntry(sessionId, `Download started (${syncMode})`);
+
     let success = true;
 
     const StrapiService = getStrapiService();
@@ -88,6 +96,8 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         success,
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
+      await activityLogsService.finishSession(sessionId, 'failed', message);
       return;
     }
 
@@ -103,6 +113,8 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         success,
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
+      await activityLogsService.finishSession(sessionId, 'failed', message);
       return;
     }
 
@@ -121,6 +133,8 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         success,
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
+      await activityLogsService.finishSession(sessionId, 'failed', message);
       return;
     }
 
@@ -136,6 +150,8 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         success,
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
+      await activityLogsService.finishSession(sessionId, 'completed', message);
       return;
     }
 
@@ -165,6 +181,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         await notificationService.emit(EventType.DOWNLOAD, {
           message: `Created locale ${newLocale.code}`,
         });
+        await activityLogsService.addEntry(sessionId, `Created locale ${newLocale.code}`);
       } catch (e) {
         strapi.log.error(e.message);
         if (e.name === 'ValidationError') {
@@ -173,10 +190,12 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
           await notificationService.emit(EventType.DOWNLOAD, {
             message: `Language ${isoLocalazy} is not supported by Strapi`,
           });
+          await activityLogsService.addEntry(sessionId, `Language ${isoLocalazy} is not supported by Strapi`);
         } else {
           await notificationService.emit(EventType.DOWNLOAD, {
             message: e.message,
           });
+          await activityLogsService.addEntry(sessionId, e.message);
         }
       }
     }
@@ -213,6 +232,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         await notificationService.emit(EventType.DOWNLOAD, {
           message: `No keys found for language ${isoLocalazy}`,
         });
+        await activityLogsService.addEntry(sessionId, `No keys found for language ${isoLocalazy}`);
       } else {
         const newKeys = langKeys.filter((k) => {
           const storedEvent = langProcessedKeys[k.id];
@@ -221,6 +241,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         await notificationService.emit(EventType.DOWNLOAD, {
           message: `${syncMode}: ${newKeys.length} changed / ${langKeys.length} total keys for language ${isoLocalazy}`,
         });
+        await activityLogsService.addEntry(
+          sessionId,
+          `${syncMode}: ${newKeys.length} changed / ${langKeys.length} total keys for language ${isoLocalazy}`
+        );
       }
 
       localazyContent[isoLocalazy] = langKeys;
@@ -457,6 +481,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
+                await activityLogsService.addEntry(sessionId, message);
                 await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
@@ -469,6 +494,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                     localazy: localazySearchUrl,
                   },
                 });
+                await activityLogsService.addEntry(
+                  sessionId,
+                  `Failed to create ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
+                );
                 // NOT marked — will be retried on next sync
               }
             } else {
@@ -490,6 +519,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                 await notificationService.emit(EventType.DOWNLOAD, {
                   message,
                 });
+                await activityLogsService.addEntry(sessionId, message);
                 await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
@@ -502,6 +532,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                     localazy: localazySearchUrl,
                   },
                 });
+                await activityLogsService.addEntry(
+                  sessionId,
+                  `Failed to update ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
+                );
                 // NOT marked — will be retried on next sync
               }
             }
@@ -511,6 +545,10 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
             await notificationService.emit(EventType.DOWNLOAD, {
               message: `Error processing ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`,
             });
+            await activityLogsService.addEntry(
+              sessionId,
+              `Error processing ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
+            );
             // NOT marked — will be retried on next sync
           }
         }
@@ -528,6 +566,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
       success,
       message: 'Download finished',
     });
+    const finishMessage = `Download finished. Tracked ${totalProcessedKeys} processed keys across ${Object.keys(processedKeys).length} languages.`;
+    await activityLogsService.addEntry(sessionId, finishMessage);
+    await activityLogsService.finishSession(
+      sessionId,
+      success ? 'completed' : 'failed',
+      success ? 'Download completed successfully' : 'Download finished with errors'
+    );
     console.timeEnd('download');
   },
 });

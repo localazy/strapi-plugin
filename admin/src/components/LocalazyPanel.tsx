@@ -58,7 +58,7 @@ const LocalazyPanel: PanelComponent = () => {
       }
     };
 
-    loadExclusionState();
+    void loadExclusionState();
   }, [contentType, documentId]);
 
   // Handle toggle change

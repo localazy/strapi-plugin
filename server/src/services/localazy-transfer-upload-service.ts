@@ -18,6 +18,7 @@ import {
   getLocalazyUploadService,
   getPluginSettingsService,
   getEntryExclusionService,
+  getActivityLogsService,
 } from '../core';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
@@ -27,6 +28,10 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     await notificationService.emit(EventType.UPLOAD, {
       message: 'Upload started',
     });
+
+    const activityLogsService = getActivityLogsService();
+    const sessionId = await activityLogsService.startSession('upload', 'Strapi User');
+    await activityLogsService.addEntry(sessionId, 'Upload started');
 
     let success = true;
 
@@ -47,6 +52,8 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         success,
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
+      await activityLogsService.finishSession(sessionId, 'failed', message);
       strapi.log.info(message);
       return;
     }
@@ -71,6 +78,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         await notificationService.emit(EventType.UPLOAD, {
           message,
         });
+        await activityLogsService.addEntry(sessionId, message);
         strapi.log.info(message);
         continue;
       }
@@ -83,6 +91,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         await notificationService.emit(EventType.UPLOAD, {
           message,
         });
+        await activityLogsService.addEntry(sessionId, message);
         strapi.log.warn(message);
         continue;
       }
@@ -122,6 +131,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         await notificationService.emit(EventType.UPLOAD, {
           message,
         });
+        await activityLogsService.addEntry(sessionId, message);
         strapi.log.info(message);
         continue;
       }
@@ -130,6 +140,7 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       await notificationService.emit(EventType.UPLOAD, {
         message,
       });
+      await activityLogsService.addEntry(sessionId, message);
       strapi.log.info(message);
 
       /*
@@ -185,8 +196,23 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     await notificationService.emit(EventType.UPLOAD, {
       message: 'Uploading collections to Localazy...',
     });
+    await activityLogsService.addEntry(sessionId, 'Uploading collections to Localazy...');
 
-    await LocalazyUploadService.upload(importFile, uploadConfig);
+    try {
+      await LocalazyUploadService.upload(importFile, uploadConfig);
+    } catch (error) {
+      success = false;
+      const errorMessage = `Upload to Localazy failed: ${error instanceof Error ? error.message : String(error)}`;
+      strapi.log.error(errorMessage);
+      await notificationService.emit(EventType.UPLOAD_FINISHED, {
+        success,
+        message: errorMessage,
+      });
+      await activityLogsService.addEntry(sessionId, errorMessage);
+      await activityLogsService.finishSession(sessionId, 'failed', errorMessage);
+      console.timeEnd('upload');
+      return;
+    }
 
     strapi.log.info('Upload finished in');
 
@@ -194,6 +220,12 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       success,
       message: 'Upload finished',
     });
+    await activityLogsService.addEntry(sessionId, 'Upload finished');
+    await activityLogsService.finishSession(
+      sessionId,
+      success ? 'completed' : 'failed',
+      success ? 'Upload completed successfully' : 'Upload finished with errors'
+    );
     console.timeEnd('upload');
   },
 });

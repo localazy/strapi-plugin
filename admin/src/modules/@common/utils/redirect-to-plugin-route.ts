@@ -7,6 +7,7 @@ enum PLUGIN_ROUTES {
   UPLOAD = 'upload',
   DOWNLOAD = 'download',
   OVERVIEW = 'overview',
+  ACTIVITY_LOGS = 'activity-logs',
   // settings routes
   CONTENT_TRANSFER_SETUP = 'content-transfer-setup',
   GLOBAL_SETTINGS = 'global-settings',

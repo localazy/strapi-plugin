@@ -35,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ title, subtitle, isLoading = false }) => 
 
   useEffect(() => {
     if (isLoggedIn && identity.user && identity.project) {
-      ProductAnalyticsService.trackAppConnected(identity.user.id, identity.project);
+      void ProductAnalyticsService.trackAppConnected(identity.user.id, identity.project);
     }
   }, [isLoggedIn, identity]);
 

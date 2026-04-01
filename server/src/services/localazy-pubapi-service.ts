@@ -48,6 +48,25 @@ const LocalazyPubAPIService = ({ strapi }: { strapi: Core.Strapi }) => ({
       return null;
     }
   },
+  async listWebhooks(projectId: string) {
+    try {
+      const LocalazyApi = await LocalazyApiClientFactory();
+      const result = await LocalazyApi.webhooks.list({ project: projectId });
+      return result;
+    } catch (e) {
+      strapi.log.error(e);
+      return [];
+    }
+  },
+  async updateWebhooks(projectId: string, items: any[]) {
+    try {
+      const LocalazyApi = await LocalazyApiClientFactory();
+      await LocalazyApi.webhooks.update({ project: projectId, items });
+    } catch (e) {
+      strapi.log.error(e);
+      throw e;
+    }
+  },
   async getWebhooksSecret(projectId: string) {
     try {
       const LocalazyApi = await LocalazyApiClientFactory();

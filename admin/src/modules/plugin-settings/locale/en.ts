@@ -78,4 +78,34 @@ export default {
   bulk_action_include_to_translation: 'Include to translation',
   status_excluded: 'Excluded',
   status_included: 'Included',
+
+  webhook_setup_title: 'Webhook Configuration',
+  webhook_behavior_title: 'Webhook Behavior',
+  webhook_setup_description:
+    'To enable automatic downloads when translations are published in Localazy, a webhook needs to be configured in your Localazy project.',
+  webhook_setup_not_configured: 'Webhook is not configured',
+  webhook_setup_button: 'Set up webhook',
+  webhook_setup_reconfigure: 'Reconfigure webhook',
+  webhook_setup_success:
+    'Webhook configured successfully! Translations will be automatically downloaded when published in Localazy.',
+  webhook_setup_already_configured: 'Webhook is active and configured.',
+  webhook_setup_docs_link: 'Learn more about Localazy webhooks',
+  webhook_setup_loading: 'Checking webhook status...',
+  webhook_setup_error: 'Failed to set up webhook. Please try again or configure it manually in Localazy.',
+
+  webhook_setup_modal_title: 'Set up Localazy webhook',
+  webhook_setup_step1_title: '1. Verify your Strapi URL',
+  webhook_setup_step1_description:
+    'This is the URL that Localazy will call when translations are published. It must be publicly accessible from the internet.',
+  webhook_setup_step2_title: '2. Confirm the webhook endpoint',
+  webhook_setup_url_hint:
+    'The URL is prefilled from your Strapi server configuration. Edit it if your public URL is different.',
+  webhook_setup_ngrok_hint:
+    '💡 For local development, use a tunneling tool like ngrok (e.g. ngrok http 1337) to expose your local Strapi instance to the internet.',
+  webhook_setup_step3_title: '3. Click confirm to register',
+  webhook_setup_step3_description:
+    'This will register a webhook in your Localazy project that triggers on "Project Published" events. You can manage webhooks anytime in your Localazy project settings.',
+  webhook_setup_confirm: 'Confirm & set up webhook',
+  webhook_setup_local_warning:
+    'The detected URL points to a local/private address. Localazy will not be able to reach this URL. Use a tunneling tool or replace with your public URL.',
 };

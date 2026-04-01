@@ -9,6 +9,7 @@ import en_overview from './modules/overview/locale/en';
 import en_download from './modules/localazy-download/locale/en';
 import en_upload from './modules/localazy-upload/locale/en';
 import en_plugin_settings from './modules/plugin-settings/locale/en';
+import en_activity_logs from './modules/activity-logs/locale/en';
 
 const initI18nParams = () => {
   return {
@@ -26,13 +27,14 @@ const initI18nParams = () => {
           download: en_download,
           upload: en_upload,
           plugin_settings: en_plugin_settings,
+          activity_logs: en_activity_logs,
         },
       },
     },
   };
 };
 
-i18n
+void i18n
   // detect user language
   // pass the i18n instance to react-i18next.
   .use(initReactI18next)

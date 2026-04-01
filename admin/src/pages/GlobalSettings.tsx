@@ -20,6 +20,7 @@ import {
 import isEqual from 'lodash-es/isEqual';
 import set from 'lodash-es/set';
 import { LanguagesSelector } from '../modules/@common/components/LanguagesSelector';
+import { WebhookSetup } from '../modules/plugin-settings/components/WebhookSetup';
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import StrapiUsersService from '../modules/plugin-settings/services/strapi-users-service';
 import ProjectService from '../modules/@common/services/project-service';
@@ -112,7 +113,7 @@ const GlobalSettings: React.FC = () => {
 
       setIsLoading(false);
     }
-    fetchData();
+    void fetchData();
   }, []);
 
   return (
@@ -129,7 +130,7 @@ const GlobalSettings: React.FC = () => {
               startIcon={<Check />}
               disabled={!hasUnsavedChanges}
               onClick={() => {
-                saveGlobalSettings(formModel);
+                void saveGlobalSettings(formModel);
               }}
             >
               {t('plugin_settings.save')}
@@ -225,6 +226,23 @@ const GlobalSettings: React.FC = () => {
               <br />
               <Typography variant='delta' textColor='neutral800'>
                 {t('plugin_settings.download_settings')}
+              </Typography>
+              {/* Webhook Configuration — first, as it's the prerequisite */}
+              <br />
+              <br />
+              <Typography variant='omega' fontWeight='semiBold' textColor='neutral800'>
+                {t('plugin_settings.webhook_setup_title')}
+              </Typography>
+              <br />
+              <WebhookSetup />
+              <br />
+              <br />
+              <Divider />
+              {/* Webhook behavior settings */}
+              <br />
+              <br />
+              <Typography variant='omega' fontWeight='semiBold' textColor='neutral800'>
+                {t('plugin_settings.webhook_behavior_title')}
               </Typography>
               {/* Processing of download webhook */}
               <br />
