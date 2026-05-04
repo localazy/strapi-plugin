@@ -21,12 +21,13 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
     baseUrl = `${BASE_PLUGIN_PATH}`;
   }
 
-  const instance = axios.create({
-    baseURL: `${baseUrl}`,
-  });
+  const instance = axios.create();
 
   instance.interceptors.request.use(
     async (config) => {
+      // Honors a custom admin URL/path so requests are scoped under it (e.g. `/cms/localazy/...`).
+      const backendURL = ((window.strapi as { backendURL?: string } | undefined)?.backendURL || '').replace(/\/$/, '');
+      config.baseURL = `${backendURL}${baseUrl}`;
       config.headers.set({
         Accept: 'application/json',
         'Content-Type': 'application/json',
