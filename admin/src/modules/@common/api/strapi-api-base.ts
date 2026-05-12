@@ -29,13 +29,16 @@ const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
   const prefix = baseUrl ?? BASE_PLUGIN_PATH;
   const buildUrl = (url: string) => `${prefix}${url}`;
 
+  let cachedClient: ReturnType<typeof getFetchClient> | null = null;
+  const client = () => (cachedClient ??= getFetchClient());
+
   return {
-    get: (url: string, config?: RequestConfig) => getFetchClient().get(buildUrl(url), withPluginHeader(config)),
+    get: (url: string, config?: RequestConfig) => client().get(buildUrl(url), withPluginHeader(config)),
     post: (url: string, data?: any, config?: RequestConfig) =>
-      getFetchClient().post(buildUrl(url), data, withPluginHeader(config)),
+      client().post(buildUrl(url), data, withPluginHeader(config)),
     put: (url: string, data?: any, config?: RequestConfig) =>
-      getFetchClient().put(buildUrl(url), data, withPluginHeader(config)),
-    delete: (url: string, config?: RequestConfig) => getFetchClient().del(buildUrl(url), withPluginHeader(config)),
+      client().put(buildUrl(url), data, withPluginHeader(config)),
+    delete: (url: string, config?: RequestConfig) => client().del(buildUrl(url), withPluginHeader(config)),
   };
 };
 

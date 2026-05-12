@@ -10,7 +10,7 @@ export default class LocalazyUploadService {
 
       return result.data;
     } catch (e: any) {
-      throw e.data;
+      throw e.response?.data ?? e;
     }
   }
 }

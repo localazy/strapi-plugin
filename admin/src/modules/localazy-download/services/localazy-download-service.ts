@@ -10,7 +10,7 @@ export default class LocalazyDownloadService {
 
       return result.data;
     } catch (e: any) {
-      throw e.data;
+      throw e.response?.data ?? e;
     }
   }
 }
