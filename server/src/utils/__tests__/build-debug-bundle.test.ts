@@ -226,6 +226,23 @@ describe('buildDebugBundle', () => {
     expect(JSON.parse(files['browser.json'])).toEqual(payload);
   });
 
+  it('drops oversize browser payload and records a browser-payload-truncated marker', async () => {
+    const strapi = buildFakeStrapi();
+    const oversize = 'x'.repeat(CAPS.browserPayloadBytes + 1);
+    const encoded = Buffer.from(oversize).toString('base64');
+    const { zipBuffer } = await buildDebugBundle({
+      strapi,
+      sessionId: '_Abc123Def456Gh78',
+      browserPayloadEncoded: encoded,
+    });
+    const files = await readZipEntries(zipBuffer);
+    expect(JSON.parse(files['browser.json'])).toEqual({ captured: false });
+    const marker = JSON.parse(files['bundle-truncated.json']);
+    const browserMarker = marker.markers.find((m: any) => m.kind === 'browser-payload-truncated');
+    expect(browserMarker).toBeDefined();
+    expect(browserMarker.originalSizeBytes).toBe(oversize.length);
+  });
+
   it('caps total entries at 100, with failed tuples prioritised', async () => {
     const entries = [];
     // 80 passed
