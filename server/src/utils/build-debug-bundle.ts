@@ -1,6 +1,7 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
+import type { Core } from '@strapi/strapi';
 
 import type { ActivityLogSession } from '../db/model/activity-logs';
 import type { PluginSettings } from '../db/model/plugin-settings';
@@ -8,7 +9,6 @@ import type { Identity } from '../db/model/localazy-user';
 import type { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
 import {
   DEBUG_BUNDLE_ENV_ALLOWLIST,
-  DocumentTuple,
   EnvSnapshotEntry,
   extractUidsAndDocumentsFromSession,
   pickEnvAllowlist,
@@ -19,6 +19,13 @@ import {
   stripDocumentInternals,
   SerializedContentTypeSchema,
 } from './sanitize-debug-bundle';
+
+export class SessionNotFoundError extends Error {
+  constructor(sessionId: string) {
+    super(`Session ${sessionId} not found`);
+    this.name = 'SessionNotFoundError';
+  }
+}
 
 export const DEBUG_BUNDLE_SCHEMA_VERSION = 1;
 
@@ -46,7 +53,7 @@ export type BrowserPayload = {
 };
 
 export type BuildDebugBundleParams = {
-  strapi: any;
+  strapi: Core.Strapi;
   sessionId: string;
   browserPayloadEncoded?: string | null;
 };
@@ -70,8 +77,10 @@ const decodeBrowserPayload = (
   if (!encoded) return { payload: null, truncationMarkers: markers };
   try {
     const raw = Buffer.from(encoded, 'base64').toString('utf8');
-    if (Buffer.byteLength(raw, 'utf8') > CAPS.browserPayloadBytes) {
-      markers.push({ kind: 'browser-payload-truncated', originalSizeBytes: Buffer.byteLength(raw, 'utf8') });
+    const rawBytes = Buffer.byteLength(raw, 'utf8');
+    if (rawBytes > CAPS.browserPayloadBytes) {
+      markers.push({ kind: 'browser-payload-truncated', originalSizeBytes: rawBytes });
+      return { payload: null, truncationMarkers: markers };
     }
     const parsed = JSON.parse(raw) as BrowserPayload;
     if (parsed && Array.isArray(parsed.consoleErrors) && parsed.consoleErrors.length > CAPS.consoleErrorsLines) {
@@ -141,8 +150,10 @@ const buildErrorLog = (session: ActivityLogSession): { text: string; markers: Tr
   };
 };
 
-const readHostPackages = async (strapi: any): Promise<{ data: Record<string, unknown> | null; reason?: string }> => {
-  const appRoot: string | undefined = strapi?.dirs?.app?.root ?? strapi?.dirs?.root ?? process.cwd();
+const readHostPackages = async (
+  strapi: Core.Strapi
+): Promise<{ data: Record<string, unknown> | null; reason?: string }> => {
+  const appRoot: string | undefined = strapi?.dirs?.app?.root ?? process.cwd();
   if (!appRoot) return { data: null, reason: 'host-app-root-unknown' };
   try {
     const raw = await fs.readFile(path.join(appRoot, 'package.json'), 'utf8');
@@ -227,7 +238,7 @@ export const buildDebugBundle = async ({
 
   const session: ActivityLogSession | null = await activityLogsService.getSession(sessionId);
   if (!session) {
-    throw new Error(`Session ${sessionId} not found`);
+    throw new SessionNotFoundError(sessionId);
   }
 
   const sessionShortId = session.id.slice(0, 8);
@@ -308,13 +319,10 @@ export const buildDebugBundle = async ({
   }
 
   // 4. Per-UID content-type schemas + per-entry payloads.
+  // extractUidsAndDocumentsFromSession already emits failed tuples first.
   const tuples = extractUidsAndDocumentsFromSession(session);
-  const failedTuples = tuples.filter((t) => t.failed);
-  const passedTuples = tuples.filter((t) => !t.failed);
-  const prioritised: DocumentTuple[] = [...failedTuples, ...passedTuples];
-
-  const kept = prioritised.slice(0, CAPS.totalEntries);
-  const skipped = prioritised.slice(CAPS.totalEntries);
+  const kept = tuples.slice(0, CAPS.totalEntries);
+  const skipped = tuples.slice(CAPS.totalEntries);
   if (skipped.length > 0) {
     truncationMarkers.push({
       kind: 'entries-skipped',
@@ -334,7 +342,7 @@ export const buildDebugBundle = async ({
     let documentJson: unknown = null;
     try {
       const doc = await strapi
-        .documents(tuple.uid)
+        .documents(tuple.uid as Parameters<Core.Strapi['documents']>[0])
         .findOne({ documentId: tuple.documentId, locale: tuple.locale, populate: '*' });
       documentJson = doc ? stripDocumentInternals(doc) : null;
     } catch (err) {
@@ -355,7 +363,8 @@ export const buildDebugBundle = async ({
     } else {
       body = serialised;
     }
-    zip.file(`entries/${safeUidForPath(tuple.uid)}/${tuple.documentId}--${tuple.locale}.json`, body);
+    const safeDocId = tuple.documentId.replace(/[^a-zA-Z0-9_-]/g, '_');
+    zip.file(`entries/${safeUidForPath(tuple.uid)}/${safeDocId}--${tuple.locale}.json`, body);
   }
 
   // 5. README + truncation marker.

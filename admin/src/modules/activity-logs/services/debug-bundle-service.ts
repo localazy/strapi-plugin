@@ -45,7 +45,7 @@ export const downloadDebugBundle = async (
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, { method: 'GET', headers, credentials: 'include' });
+  const response = await fetch(url, { method: 'GET', headers });
 
   if (!response.ok) {
     let detail = `${response.status} ${response.statusText}`;

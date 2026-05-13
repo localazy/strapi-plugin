@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
-import { buildDebugBundle, CAPS, DEBUG_BUNDLE_SCHEMA_VERSION } from '../build-debug-bundle';
+import { buildDebugBundle, CAPS, DEBUG_BUNDLE_SCHEMA_VERSION, SessionNotFoundError } from '../build-debug-bundle';
 import type { ActivityLogSession } from '../../db/model/activity-logs';
+import type { Core } from '@strapi/strapi';
 
 type FakeServicesOverrides = {
   session?: ActivityLogSession | null;
@@ -103,7 +104,7 @@ const buildFakeStrapi = (overrides: FakeServicesOverrides = {}) => {
     documents,
     dirs: { app: { root: '/tmp/some-nonexistent-host-app-root-for-tests' } },
     log: { error: () => undefined, info: () => undefined, warn: () => undefined },
-  };
+  } as unknown as Core.Strapi;
 };
 
 const readZipEntries = async (buffer: Buffer): Promise<Record<string, string>> => {
@@ -326,6 +327,6 @@ describe('buildDebugBundle', () => {
 
   it('throws when the session does not exist', async () => {
     const strapi = buildFakeStrapi();
-    await expect(buildDebugBundle({ strapi, sessionId: 'no-such-session' })).rejects.toThrow(/not found/);
+    await expect(buildDebugBundle({ strapi, sessionId: 'no-such-session' })).rejects.toThrow(SessionNotFoundError);
   });
 });

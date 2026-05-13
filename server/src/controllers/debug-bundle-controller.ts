@@ -1,5 +1,5 @@
 import type { Core } from '@strapi/strapi';
-import { buildDebugBundle } from '../utils/build-debug-bundle';
+import { buildDebugBundle, SessionNotFoundError } from '../utils/build-debug-bundle';
 
 const DebugBundleController = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getBundle(ctx) {
@@ -16,7 +16,7 @@ const DebugBundleController = ({ strapi }: { strapi: Core.Strapi }) => ({
       ctx.set('Content-Disposition', `attachment; filename="${filename}"`);
       ctx.body = zipBuffer;
     } catch (err) {
-      if (err instanceof Error && err.message.includes('not found')) {
+      if (err instanceof SessionNotFoundError) {
         return ctx.notFound('Session not found');
       }
       strapi.log.error(`[localazy] failed to build debug bundle: ${err instanceof Error ? err.message : err}`);
