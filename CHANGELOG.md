@@ -1,4 +1,5 @@
 # 1.3.0 (2026-05-13)
+
 ### 🔀 Pull Requests
 
 - [migrate admin axios client to Strapi getFetchClient (LOC-4169) #122](https://github.com/localazy/strapi-plugin/pull/122)
