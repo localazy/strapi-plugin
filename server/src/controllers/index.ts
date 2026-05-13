@@ -6,6 +6,7 @@ import PluginSettingsController from './plugin-settings-controller';
 import LocalazyTransferController from './localazy-transfer-controller';
 import EntryExclusionController from './entry-exclusion-controller';
 import ActivityLogsController from './activity-logs-controller';
+import DebugBundleController from './debug-bundle-controller';
 
 export default {
   LocalazyUserController,
@@ -16,4 +17,5 @@ export default {
   LocalazyTransferController,
   EntryExclusionController,
   ActivityLogsController,
+  DebugBundleController,
 };

@@ -1,9 +1,17 @@
 import { Core } from '@strapi/strapi';
 import getStrapiStore from '../db/model/utils/get-strapi-store';
-import { KEY, ActivityLogs, ActivityLogSession, ActivityLogEntry, emptyActivityLogs } from '../db/model/activity-logs';
+import {
+  KEY,
+  ActivityLogs,
+  ActivityLogSession,
+  ActivityLogEntry,
+  AttemptedEntry,
+  emptyActivityLogs,
+} from '../db/model/activity-logs';
 import { generateRandomId } from '../utils/generate-random-id';
 
 const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+const ATTEMPTED_ENTRIES_CAP = 5000;
 
 // Simple mutex to prevent concurrent read-modify-write races on the store
 let writeLock: Promise<void> = Promise.resolve();
@@ -81,6 +89,47 @@ const ActivityLogsService = ({ strapi }: { strapi: Core.Strapi }) => ({
       };
 
       session.entries.push(entry);
+      await this.saveActivityLogs(logs);
+    });
+  },
+
+  async recordAttemptedEntry(sessionId: string, entry: Omit<AttemptedEntry, 'attemptedAt'>): Promise<void> {
+    return this.recordAttemptedEntries(sessionId, [entry]);
+  },
+
+  async recordAttemptedEntries(sessionId: string, entries: Array<Omit<AttemptedEntry, 'attemptedAt'>>): Promise<void> {
+    if (!entries.length) {
+      return;
+    }
+    return withLock(async () => {
+      const logs = await this.getActivityLogs();
+      const session = logs.sessions.find((s) => s.id === sessionId);
+
+      if (!session) {
+        return;
+      }
+
+      if (!session.attemptedEntries) {
+        session.attemptedEntries = [];
+      }
+
+      const now = Date.now();
+      const wasAtCap = session.attemptedEntries.length >= ATTEMPTED_ENTRIES_CAP;
+      const remaining = Math.max(0, ATTEMPTED_ENTRIES_CAP - session.attemptedEntries.length);
+      const accepted = entries.slice(0, remaining);
+      const dropped = entries.length - accepted.length;
+
+      for (const entry of accepted) {
+        session.attemptedEntries.push({ ...entry, attemptedAt: now });
+      }
+
+      // Warn once when the cap is first hit (don't spam on subsequent calls that find it already full).
+      if (dropped > 0 && !wasAtCap) {
+        strapi.log.warn(
+          `[localazy] attemptedEntries cap (${ATTEMPTED_ENTRIES_CAP}) reached for session ${sessionId}; ${dropped} record(s) dropped.`
+        );
+      }
+
       await this.saveActivityLogs(logs);
     });
   },

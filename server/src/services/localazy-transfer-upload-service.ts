@@ -62,6 +62,9 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
     const collectionsNames = getCollectionsNames(setup);
     const models = await StrapiService.getModels();
 
+    const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
+    const attemptedTuples: Array<{ uid: string; documentId: string; locale: string }> = [];
+
     let pickedFlattenStrapiContent: Record<string, string | { limit: number }> = {};
     for (const collectionName of collectionsNames) {
       const currentModel = models.find((model) => model.collectionName === collectionName);
@@ -143,6 +146,18 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       await activityLogsService.addEntry(sessionId, message);
       strapi.log.info(message);
 
+      // Record the (uid, documentId, locale) of every entry actually picked into the upload
+      // payload so the troubleshooting bundle can later materialize them.
+      if (strapiDefaultLocaleCode) {
+        for (const entry of entries) {
+          attemptedTuples.push({
+            uid: modelUid,
+            documentId: entry.documentId,
+            locale: strapiDefaultLocaleCode,
+          });
+        }
+      }
+
       /*
        * These fields are not omitted during the document service call,
        * even though they are specified in the `getFullPopulateLocalazyUploadObject` function.
@@ -169,7 +184,6 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       };
     }
 
-    const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
     const localazyLocaleCode = strapiDefaultLocaleCode
       ? isoStrapiToLocalazy(strapiDefaultLocaleCode)
       : config.default.LOCALAZY_DEFAULT_LOCALE;
@@ -200,6 +214,10 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
 
     try {
       await LocalazyUploadService.upload(importFile, uploadConfig);
+      await activityLogsService.recordAttemptedEntries(
+        sessionId,
+        attemptedTuples.map((t) => ({ ...t, status: 'success' }))
+      );
     } catch (error) {
       success = false;
       const errorMessage = `Upload to Localazy failed: ${error instanceof Error ? error.message : String(error)}`;
@@ -209,6 +227,10 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         message: errorMessage,
       });
       await activityLogsService.addEntry(sessionId, errorMessage);
+      await activityLogsService.recordAttemptedEntries(
+        sessionId,
+        attemptedTuples.map((t) => ({ ...t, status: 'failed', errorMessage }))
+      );
       await activityLogsService.finishSession(sessionId, 'failed', errorMessage);
       console.timeEnd('upload');
       return;

@@ -7,6 +7,7 @@ import LocalazyProjectRoutes from './localazy-project-routes';
 import LocalazyPublicTransferRoutes from './localazy-public-transfer-routes';
 import EntryExclusionRoutes from './entry-exclusion-routes';
 import ActivityLogsRoutes from './activity-logs-routes';
+import DebugBundleRoutes from './debug-bundle-routes';
 
 export default {
   'content-api': {
@@ -23,6 +24,7 @@ export default {
       ...LocalazyProjectRoutes,
       ...EntryExclusionRoutes,
       ...ActivityLogsRoutes,
+      ...DebugBundleRoutes,
     ],
   },
   LocalazyPublicTransferRoutes: {
