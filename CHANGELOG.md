@@ -1,4 +1,5 @@
 # 1.4.0 (2026-05-13)
+
 ### 🔀 Pull Requests
 
 - [per-session troubleshooting bundle on Activity Log detail (LOC-3997) #124](https://github.com/localazy/strapi-plugin/pull/124)
