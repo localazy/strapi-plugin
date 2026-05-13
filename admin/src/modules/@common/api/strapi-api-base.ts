@@ -1,59 +1,45 @@
 /**
- * axios with a custom config.
+ * Wrapper around Strapi's `getFetchClient` that preserves the existing
+ * `.get / .post / .put / .delete` call shape used by every plugin service.
+ *
+ * Auth (Authorization header) and the Strapi backend base URL are handled by
+ * `getFetchClient` itself; we only prepend the plugin path and attach the
+ * plugin-identifying header on every request.
  */
 
-import axios from 'axios';
+import { getFetchClient } from '@strapi/strapi/admin';
 import { PLUGIN_ID } from '../../../pluginId';
 
 const BASE_PLUGIN_PATH = `/${PLUGIN_ID}`;
-const JWT_TOKEN_NAME = 'jwtToken';
+const LOCALAZY_HEADER = { 'X-Localazy-Initiated-By': 'strapi-plugin-localazy' };
 
-const getToken = (): string => {
-  const jwtTokenCookie = document.cookie.split('; ').find((row) => row.startsWith(`${JWT_TOKEN_NAME}=`));
-  const jwtToken = jwtTokenCookie ? jwtTokenCookie.split('=')[1] : '';
-  const raw = jwtToken || localStorage.getItem(JWT_TOKEN_NAME) || sessionStorage.getItem(JWT_TOKEN_NAME) || '';
-  // Strip surrounding quotes if present (e.g. stored as "\"token\"")
-  return raw.replace(/^["']|["']$/g, '');
+type RequestConfig = {
+  params?: any;
+  signal?: AbortSignal;
+  headers?: Record<string, string>;
+  validateStatus?: ((status: number) => boolean) | null;
 };
+
+const withPluginHeader = (config?: RequestConfig): RequestConfig => ({
+  ...(config ?? {}),
+  headers: { ...(config?.headers ?? {}), ...LOCALAZY_HEADER },
+});
 
 const createStrapiApiAxiosInstance = (baseUrl: string | null = null) => {
-  if (baseUrl === null) {
-    baseUrl = `${BASE_PLUGIN_PATH}`;
-  }
+  const prefix = baseUrl ?? BASE_PLUGIN_PATH;
+  const buildUrl = (url: string) => `${prefix}${url}`;
 
-  const instance = axios.create();
+  let cachedClient: ReturnType<typeof getFetchClient> | null = null;
+  const client = () => (cachedClient ??= getFetchClient());
 
-  instance.interceptors.request.use(
-    async (config) => {
-      // Honors a custom admin URL/path so requests are scoped under it (e.g. `/cms/localazy/...`).
-      const backendURL = ((window.strapi as { backendURL?: string } | undefined)?.backendURL || '').replace(/\/$/, '');
-      config.baseURL = `${backendURL}${baseUrl}`;
-      config.headers.set({
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        // Add this header to identify the request as initiated by the plugin
-        'X-Localazy-Initiated-By': 'strapi-plugin-localazy',
-      });
-      const token = getToken();
-      if (token) {
-        config.headers.set('Authorization', `Bearer ${token}`);
-      }
-
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
-
-  instance.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      throw error;
-    }
-  );
-
-  return instance;
+  return {
+    get: (url: string, config?: RequestConfig) => client().get(buildUrl(url), withPluginHeader(config)),
+    post: (url: string, data?: any, config?: RequestConfig) =>
+      client().post(buildUrl(url), data, withPluginHeader(config)),
+    put: (url: string, data?: any, config?: RequestConfig) =>
+      client().put(buildUrl(url), data, withPluginHeader(config)),
+    delete: (url: string, config?: RequestConfig) => client().del(buildUrl(url), withPluginHeader(config)),
+  };
 };
 
-export { createStrapiApiAxiosInstance, getToken };
+export { createStrapiApiAxiosInstance };
