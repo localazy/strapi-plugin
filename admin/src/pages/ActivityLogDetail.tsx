@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from 'styled-components';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, useAuth, useNotification } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography, Field, Divider, Flex, Link } from '@strapi/design-system';
-import { ArrowLeft } from '@strapi/icons';
+import { Box, Button, Typography, Field, Divider, Flex, Link, Tooltip } from '@strapi/design-system';
+import { ArrowLeft, Download } from '@strapi/icons';
 import { useParams, NavLink } from 'react-router-dom';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import ActivityLogsService from '../modules/activity-logs/services/activity-logs-service';
+import { downloadDebugBundle } from '../modules/activity-logs/services/debug-bundle-service';
 import { formatTime } from '../modules/activity-logs/utils/format-utils';
 import SessionMetadata from '../modules/activity-logs/components/SessionMetadata';
 import HighlightMatch from '../modules/activity-logs/components/HighlightMatch';
@@ -23,9 +24,12 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { sessionId } = useParams<{ sessionId: string }>();
+  const token = useAuth('ActivityLogDetail', (state) => state.token);
+  const { toggleNotification } = useNotification();
 
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<SessionDetail | null>(null);
+  const [isBuildingBundle, setIsBuildingBundle] = useState(false);
   const { searchInput, searchQuery, onSearchChange } = useDebouncedSearch();
 
   useEffect(() => {
@@ -43,6 +47,31 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
     void fetchSession();
   }, [sessionId]);
 
+  const onDownloadBundle = async () => {
+    if (!sessionId || isBuildingBundle) return;
+    setIsBuildingBundle(true);
+    try {
+      await downloadDebugBundle(sessionId, token, {
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+      });
+      toggleNotification({
+        type: 'success',
+        message: t('activity_logs.download_bundle_success'),
+        timeout: 5_000,
+      });
+    } catch (e) {
+      console.error('Failed to build debug bundle:', e);
+      toggleNotification({
+        type: 'danger',
+        message: t('activity_logs.download_bundle_error'),
+      });
+    } finally {
+      setIsBuildingBundle(false);
+    }
+  };
+
   const filteredEntries = (session?.entries || []).filter((entry) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -58,6 +87,19 @@ const ActivityLogDetail: React.FC<ActivityLogDetailProps> = (props) => {
           <Link tag={NavLink} to={`/plugins/${PLUGIN_ID}/activity-logs`} startIcon={<ArrowLeft />}>
             {t('activity_logs.back_to_list')}
           </Link>
+        }
+        primaryAction={
+          <Tooltip label={t('activity_logs.download_bundle_warning')}>
+            <Button
+              variant='secondary'
+              startIcon={<Download />}
+              onClick={onDownloadBundle}
+              loading={isBuildingBundle}
+              disabled={!session || isBuildingBundle}
+            >
+              {t('activity_logs.download_bundle')}
+            </Button>
+          </Tooltip>
         }
       />
       {isLoading && <Loader />}

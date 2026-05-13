@@ -29,4 +29,8 @@ export default {
   date_from: 'From',
   date_to: 'To',
   retention_info: 'Activity logs are retained for the past year. Older entries are automatically removed.',
+  download_bundle: 'Download troubleshooting bundle',
+  download_bundle_warning: 'Bundle includes entry content — review before sharing.',
+  download_bundle_success: 'Troubleshooting bundle downloaded.',
+  download_bundle_error: 'Failed to build the troubleshooting bundle.',
 };
