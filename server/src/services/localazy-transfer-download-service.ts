@@ -482,6 +482,12 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   message,
                 });
                 await activityLogsService.addEntry(sessionId, message);
+                await activityLogsService.recordAttemptedEntry(sessionId, {
+                  uid,
+                  documentId,
+                  locale: isoStrapi,
+                  status: 'success',
+                });
                 await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
@@ -498,6 +504,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   sessionId,
                   `Failed to create ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
                 );
+                await activityLogsService.recordAttemptedEntry(sessionId, {
+                  uid,
+                  documentId,
+                  locale: isoStrapi,
+                  status: 'failed',
+                  errorMessage: e.message,
+                });
                 // NOT marked — will be retried on next sync
               }
             } else {
@@ -520,6 +533,12 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   message,
                 });
                 await activityLogsService.addEntry(sessionId, message);
+                await activityLogsService.recordAttemptedEntry(sessionId, {
+                  uid,
+                  documentId,
+                  locale: isoStrapi,
+                  status: 'success',
+                });
                 await markKeysProcessed(sourceKeys);
               } catch (e) {
                 success = false;
@@ -536,6 +555,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
                   sessionId,
                   `Failed to update ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
                 );
+                await activityLogsService.recordAttemptedEntry(sessionId, {
+                  uid,
+                  documentId,
+                  locale: isoStrapi,
+                  status: 'failed',
+                  errorMessage: e.message,
+                });
                 // NOT marked — will be retried on next sync
               }
             }
@@ -549,6 +575,13 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
               sessionId,
               `Error processing ${uid} [${documentId}] in ${isoStrapi}: ${e.message}`
             );
+            await activityLogsService.recordAttemptedEntry(sessionId, {
+              uid,
+              documentId,
+              locale: isoStrapi,
+              status: 'failed',
+              errorMessage: e.message,
+            });
             // NOT marked — will be retried on next sync
           }
         }

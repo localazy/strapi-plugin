@@ -3,14 +3,13 @@ import { promises as fs } from 'fs';
 import JSZip from 'jszip';
 import type { Core } from '@strapi/strapi';
 
-import type { ActivityLogSession } from '../db/model/activity-logs';
+import type { ActivityLogSession, AttemptedEntry } from '../db/model/activity-logs';
 import type { PluginSettings } from '../db/model/plugin-settings';
 import type { Identity } from '../db/model/localazy-user';
 import type { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
 import {
   DEBUG_BUNDLE_ENV_ALLOWLIST,
   EnvSnapshotEntry,
-  extractUidsAndDocumentsFromSession,
   pickEnvAllowlist,
   redactIdentity,
   RedactedIdentity,
@@ -43,7 +42,41 @@ export type TruncationMarker =
   | { kind: 'entry-too-large'; uid: string; documentId: string; locale: string; originalSizeBytes: number }
   | { kind: 'error-log-truncated'; originalSizeBytes: number }
   | { kind: 'browser-payload-truncated'; originalSizeBytes: number }
-  | { kind: 'console-errors-truncated'; originalCount: number };
+  | { kind: 'console-errors-truncated'; originalCount: number }
+  | { kind: 'attempted-entries-missing-legacy-session' };
+
+type SelectedAttemptedEntry = {
+  uid: string;
+  documentId: string;
+  locale: string;
+  status: AttemptedEntry['status'];
+  attemptedAt: number;
+};
+
+// Failed-first, then success — preserving insertion order within each group, deduped by
+// (uid, documentId, locale). On duplicates, failed wins: a retry that succeeded does not
+// promote the tuple out of the failed group.
+export const selectAttemptedEntries = (attempted: AttemptedEntry[]): SelectedAttemptedEntry[] => {
+  const failedByKey = new Map<string, SelectedAttemptedEntry>();
+  const successByKey = new Map<string, SelectedAttemptedEntry>();
+  for (const record of attempted) {
+    const key = `${record.uid}|${record.documentId}|${record.locale}`;
+    const selected: SelectedAttemptedEntry = {
+      uid: record.uid,
+      documentId: record.documentId,
+      locale: record.locale,
+      status: record.status,
+      attemptedAt: record.attemptedAt,
+    };
+    if (record.status === 'failed') {
+      successByKey.delete(key);
+      if (!failedByKey.has(key)) failedByKey.set(key, selected);
+    } else if (!failedByKey.has(key) && !successByKey.has(key)) {
+      successByKey.set(key, selected);
+    }
+  }
+  return [...failedByKey.values(), ...successByKey.values()];
+};
 
 export type BrowserPayload = {
   userAgent?: string;
@@ -319,10 +352,13 @@ export const buildDebugBundle = async ({
   }
 
   // 4. Per-UID content-type schemas + per-entry payloads.
-  // extractUidsAndDocumentsFromSession already emits failed tuples first.
-  const tuples = extractUidsAndDocumentsFromSession(session);
-  const kept = tuples.slice(0, CAPS.totalEntries);
-  const skipped = tuples.slice(CAPS.totalEntries);
+  // Source of truth: session.attemptedEntries (rev 6+). Pre-rev-6 sessions don't have it.
+  if (session.attemptedEntries === undefined) {
+    truncationMarkers.push({ kind: 'attempted-entries-missing-legacy-session' });
+  }
+  const selected = selectAttemptedEntries(session.attemptedEntries ?? []);
+  const kept = selected.slice(0, CAPS.totalEntries);
+  const skipped = selected.slice(CAPS.totalEntries);
   if (skipped.length > 0) {
     truncationMarkers.push({
       kind: 'entries-skipped',
@@ -344,7 +380,9 @@ export const buildDebugBundle = async ({
       const doc = await strapi
         .documents(tuple.uid as Parameters<Core.Strapi['documents']>[0])
         .findOne({ documentId: tuple.documentId, locale: tuple.locale, populate: '*' });
-      documentJson = doc ? stripDocumentInternals(doc) : null;
+      // The entry may have been deleted between attempt and bundle download; surface that
+      // explicitly rather than skipping — `__not_found` is itself useful repro information.
+      documentJson = doc ? stripDocumentInternals(doc) : { __not_found: true, attemptedAt: tuple.attemptedAt };
     } catch (err) {
       documentJson = { __error: err instanceof Error ? err.message : String(err) };
     }

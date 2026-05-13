@@ -1,5 +1,4 @@
 import type { Identity } from '../db/model/localazy-user';
-import type { ActivityLogEntry, ActivityLogSession } from '../db/model/activity-logs';
 
 export type RedactedIdentity = {
   userId: string;
@@ -20,13 +19,6 @@ export type SerializedContentTypeSchema = {
   options?: unknown;
   pluginOptions?: unknown;
   attributes?: unknown;
-};
-
-export type DocumentTuple = {
-  uid: string;
-  documentId: string;
-  locale: string;
-  failed: boolean;
 };
 
 // Query-string keys we treat as secrets in every URL that ends up in the bundle.
@@ -106,39 +98,4 @@ export const stripDocumentInternals = <T>(doc: T): T => {
     delete clone[field];
   }
   return clone as T;
-};
-
-// Match Strapi content-type UIDs like `api::article.article` or `plugin::users-permissions.user`
-// followed by `[<documentId>]` and `in <locale>`. This is the only signal in current activity-log
-// messages — see localazy-transfer-download-service messages (Created/Updated/Failed to.../Error processing).
-const UID_PATTERN = '(?<uid>(?:api|plugin)::[a-z0-9-]+\\.[a-z0-9-]+)';
-const TUPLE_REGEX = new RegExp(`${UID_PATTERN}\\s*\\[(?<documentId>[^\\]]+)\\]\\s+in\\s+(?<locale>[a-zA-Z0-9_-]+)`);
-
-const isFailureMessage = (message: string): boolean => /^(Failed|Error)\b/i.test(message);
-
-// Walk session entries, parse (uid, documentId, locale) tuples out of their message strings,
-// and emit them in **failed-first priority order**, then passed entries, deduped by key.
-// (A passed re-attempt of a previously-failed tuple stays in the failed group.)
-export const extractUidsAndDocumentsFromSession = (session: Pick<ActivityLogSession, 'entries'>): DocumentTuple[] => {
-  const failedByKey = new Map<string, DocumentTuple>();
-  const passedByKey = new Map<string, DocumentTuple>();
-
-  const visit = (entries: ActivityLogEntry[]) => {
-    for (const entry of entries) {
-      const match = TUPLE_REGEX.exec(entry.message);
-      if (!match?.groups) continue;
-      const { uid, documentId, locale } = match.groups as { uid: string; documentId: string; locale: string };
-      const key = `${uid}|${documentId}|${locale}`;
-      const tuple: DocumentTuple = { uid, documentId, locale, failed: isFailureMessage(entry.message) };
-      if (tuple.failed) {
-        passedByKey.delete(key);
-        if (!failedByKey.has(key)) failedByKey.set(key, tuple);
-      } else if (!failedByKey.has(key) && !passedByKey.has(key)) {
-        passedByKey.set(key, tuple);
-      }
-    }
-  };
-
-  visit(session.entries ?? []);
-  return [...failedByKey.values(), ...passedByKey.values()];
 };

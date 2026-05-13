@@ -38,6 +38,23 @@ const buildFakeStrapi = (overrides: FakeServicesOverrides = {}) => {
               timestamp: Date.UTC(2026, 0, 1, 12, 2, 0),
             },
           ],
+          attemptedEntries: [
+            {
+              uid: 'api::article.article',
+              documentId: 'doc-1',
+              locale: 'fr',
+              status: 'success',
+              attemptedAt: Date.UTC(2026, 0, 1, 12, 1, 0),
+            },
+            {
+              uid: 'api::article.article',
+              documentId: 'doc-2',
+              locale: 'es',
+              status: 'failed',
+              errorMessage: 'validation error',
+              attemptedAt: Date.UTC(2026, 0, 1, 12, 2, 0),
+            },
+          ],
         }
       : overrides.session;
 
@@ -244,19 +261,26 @@ describe('buildDebugBundle', () => {
   });
 
   it('caps total entries at 100, with failed tuples prioritised', async () => {
-    const entries = [];
-    // 80 passed
-    for (let i = 0; i < 80; i++) {
-      entries.push({
-        message: `Created entry for api::a.a [passed-${i}] in fr`,
-        timestamp: Date.UTC(2026, 0, 1, 12, 0, i),
+    const attemptedEntries: ActivityLogSession['attemptedEntries'] = [];
+    // 200 success records.
+    for (let i = 0; i < 200; i++) {
+      attemptedEntries!.push({
+        uid: 'api::a.a',
+        documentId: `passed-${i}`,
+        locale: 'fr',
+        status: 'success',
+        attemptedAt: Date.UTC(2026, 0, 1, 12, 0, i),
       });
     }
-    // 50 failed (more than the slack room left under the 100 cap → some passed must be dropped)
-    for (let i = 0; i < 50; i++) {
-      entries.push({
-        message: `Failed to update api::a.a [failed-${i}] in fr: boom`,
-        timestamp: Date.UTC(2026, 0, 1, 12, 1, i),
+    // 30 failed records (failed-first plus 70 success fills the 100 cap).
+    for (let i = 0; i < 30; i++) {
+      attemptedEntries!.push({
+        uid: 'api::a.a',
+        documentId: `failed-${i}`,
+        locale: 'fr',
+        status: 'failed',
+        errorMessage: 'boom',
+        attemptedAt: Date.UTC(2026, 0, 1, 12, 1, i),
       });
     }
     const session: ActivityLogSession = {
@@ -266,7 +290,8 @@ describe('buildDebugBundle', () => {
       startedAt: Date.UTC(2026, 0, 1, 12, 0, 0),
       initiatedBy: 'tester',
       summary: 'lots of failures',
-      entries,
+      entries: [],
+      attemptedEntries,
     };
     const strapi = buildFakeStrapi({
       session,
@@ -276,16 +301,135 @@ describe('buildDebugBundle', () => {
     const files = await readZipEntries(zipBuffer);
     const entryFiles = Object.keys(files).filter((n) => n.startsWith('entries/'));
     expect(entryFiles).toHaveLength(CAPS.totalEntries);
-    // All 50 failed must appear.
-    for (let i = 0; i < 50; i++) {
+    // All 30 failed must appear; locales come from the record (not a default).
+    for (let i = 0; i < 30; i++) {
       expect(entryFiles).toContain(`entries/api--a-a/failed-${i}--fr.json`);
     }
-    // bundle-truncated.json should list only passed tuples (failed ones must never be skipped)
+    // bundle-truncated.json should list only success tuples (failed ones must never be skipped)
     const marker = JSON.parse(files['bundle-truncated.json']);
     const skipped = marker.markers.find((m: any) => m.kind === 'entries-skipped');
     expect(skipped).toBeDefined();
     expect(skipped.tuples.every((t: any) => t.documentId.startsWith('passed-'))).toBe(true);
-    expect(skipped.tuples).toHaveLength(30);
+    expect(skipped.tuples).toHaveLength(130);
+  });
+
+  it('materializes a pure-success upload-style session', async () => {
+    const attemptedEntries: ActivityLogSession['attemptedEntries'] = [];
+    for (let i = 0; i < 50; i++) {
+      attemptedEntries!.push({
+        uid: 'api::a.a',
+        documentId: `doc-${i}`,
+        locale: 'en',
+        status: 'success',
+        attemptedAt: Date.UTC(2026, 0, 1, 12, 0, i),
+      });
+    }
+    const session: ActivityLogSession = {
+      id: '_Abc123Def456Gh78',
+      eventType: 'upload',
+      status: 'completed',
+      startedAt: Date.UTC(2026, 0, 1, 12, 0, 0),
+      initiatedBy: 'tester',
+      summary: 'upload ok',
+      entries: [],
+      attemptedEntries,
+    };
+    const strapi = buildFakeStrapi({
+      session,
+      contentTypes: { 'api::a.a': { kind: 'collectionType', attributes: {} } },
+    });
+    const { zipBuffer } = await buildDebugBundle({ strapi, sessionId: '_Abc123Def456Gh78' });
+    const files = await readZipEntries(zipBuffer);
+    const entryFiles = Object.keys(files).filter((n) => n.startsWith('entries/'));
+    expect(entryFiles).toHaveLength(50);
+    expect(entryFiles).toContain('entries/api--a-a/doc-0--en.json');
+    expect(entryFiles).toContain('entries/api--a-a/doc-49--en.json');
+  });
+
+  it('handles legacy sessions (attemptedEntries undefined) with a marker and no entries', async () => {
+    const session: ActivityLogSession = {
+      id: '_Abc123Def456Gh78',
+      eventType: 'download',
+      status: 'completed',
+      startedAt: Date.UTC(2026, 0, 1, 12, 0, 0),
+      initiatedBy: 'tester',
+      summary: 'legacy',
+      entries: [],
+      // attemptedEntries intentionally undefined
+    };
+    const strapi = buildFakeStrapi({ session });
+    const { zipBuffer } = await buildDebugBundle({ strapi, sessionId: '_Abc123Def456Gh78' });
+    const files = await readZipEntries(zipBuffer);
+    const entryFiles = Object.keys(files).filter((n) => n.startsWith('entries/'));
+    expect(entryFiles).toHaveLength(0);
+    const marker = JSON.parse(files['bundle-truncated.json']);
+    expect(marker.markers.some((m: any) => m.kind === 'attempted-entries-missing-legacy-session')).toBe(true);
+  });
+
+  it('writes __not_found placeholder when findOne returns null for an attempted tuple', async () => {
+    const session: ActivityLogSession = {
+      id: '_Abc123Def456Gh78',
+      eventType: 'download',
+      status: 'failed',
+      startedAt: Date.UTC(2026, 0, 1, 12, 0, 0),
+      initiatedBy: 'tester',
+      summary: 'deleted between attempt and bundle',
+      entries: [],
+      attemptedEntries: [
+        {
+          uid: 'api::article.article',
+          documentId: 'ghost',
+          locale: 'fr',
+          status: 'failed',
+          errorMessage: 'gone',
+          attemptedAt: Date.UTC(2026, 0, 1, 12, 1, 0),
+        },
+      ],
+    };
+    const strapi = buildFakeStrapi({
+      session,
+      documents: (_uid: string) => ({
+        findOne: async () => null,
+      }),
+    });
+    const { zipBuffer } = await buildDebugBundle({ strapi, sessionId: '_Abc123Def456Gh78' });
+    const files = await readZipEntries(zipBuffer);
+    const body = JSON.parse(files['entries/api--article-article/ghost--fr.json']);
+    expect(body).toEqual({ __not_found: true, attemptedAt: Date.UTC(2026, 0, 1, 12, 1, 0) });
+  });
+
+  it('dedupes (uid, documentId, locale) and keeps failed status on retry success', async () => {
+    const session: ActivityLogSession = {
+      id: '_Abc123Def456Gh78',
+      eventType: 'download',
+      status: 'completed',
+      startedAt: Date.UTC(2026, 0, 1, 12, 0, 0),
+      initiatedBy: 'tester',
+      summary: '',
+      entries: [],
+      attemptedEntries: [
+        {
+          uid: 'api::a.a',
+          documentId: 'd1',
+          locale: 'fr',
+          status: 'failed',
+          errorMessage: 'boom',
+          attemptedAt: 1,
+        },
+        { uid: 'api::a.a', documentId: 'd1', locale: 'fr', status: 'success', attemptedAt: 2 },
+        { uid: 'api::a.a', documentId: 'd2', locale: 'fr', status: 'success', attemptedAt: 3 },
+      ],
+    };
+    const strapi = buildFakeStrapi({
+      session,
+      contentTypes: { 'api::a.a': { kind: 'collectionType', attributes: {} } },
+    });
+    const { zipBuffer } = await buildDebugBundle({ strapi, sessionId: '_Abc123Def456Gh78' });
+    const files = await readZipEntries(zipBuffer);
+    const entryFiles = Object.keys(files)
+      .filter((n) => n.startsWith('entries/'))
+      .sort();
+    expect(entryFiles).toEqual(['entries/api--a-a/d1--fr.json', 'entries/api--a-a/d2--fr.json']);
   });
 
   it('emits an entry-too-large truncation marker when a document exceeds the per-entry cap', async () => {

@@ -1,6 +1,5 @@
 import {
   DEBUG_BUNDLE_ENV_ALLOWLIST,
-  extractUidsAndDocumentsFromSession,
   pickEnvAllowlist,
   redactIdentity,
   scrubUrlSecrets,
@@ -132,74 +131,6 @@ describe('sanitize-debug-bundle', () => {
     it('leaves user-authored fields intact', () => {
       const result = stripDocumentInternals({ title: 't', body: 'b' });
       expect(result).toEqual({ title: 't', body: 'b' });
-    });
-  });
-
-  describe('extractUidsAndDocumentsFromSession', () => {
-    const passedEntry = (message: string, ts: number) => ({ message, timestamp: ts });
-
-    it('parses created/updated/failed messages into tuples', () => {
-      const tuples = extractUidsAndDocumentsFromSession({
-        entries: [
-          passedEntry('Upload started', 1),
-          passedEntry('Created entry for api::article.article [doc-1] in fr', 2),
-          passedEntry('Updated api::article.article [doc-2] in es', 3),
-          passedEntry('Failed to create api::article.article [doc-3] in de: schema mismatch', 4),
-        ],
-      });
-      expect(tuples).toEqual([
-        { uid: 'api::article.article', documentId: 'doc-3', locale: 'de', failed: true },
-        { uid: 'api::article.article', documentId: 'doc-1', locale: 'fr', failed: false },
-        { uid: 'api::article.article', documentId: 'doc-2', locale: 'es', failed: false },
-      ]);
-    });
-
-    it('emits failed tuples before passed tuples in the output', () => {
-      const tuples = extractUidsAndDocumentsFromSession({
-        entries: [
-          passedEntry('Created entry for api::a.a [d1] in fr', 1),
-          passedEntry('Created entry for api::a.a [d2] in fr', 2),
-          passedEntry('Failed to update api::a.a [d3] in es: boom', 3),
-          passedEntry('Error processing api::a.a [d4] in de: oh no', 4),
-        ],
-      });
-      expect(tuples.slice(0, 2).every((t) => t.failed)).toBe(true);
-      expect(tuples.slice(2).every((t) => !t.failed)).toBe(true);
-      expect(tuples.map((t) => t.documentId)).toEqual(['d3', 'd4', 'd1', 'd2']);
-    });
-
-    it('keeps a tuple in the failed group even if it was also created/updated successfully later', () => {
-      const tuples = extractUidsAndDocumentsFromSession({
-        entries: [
-          passedEntry('Failed to create api::a.a [d1] in fr: boom', 1),
-          passedEntry('Created entry for api::a.a [d1] in fr', 2), // retry succeeded
-          passedEntry('Created entry for api::a.a [d2] in fr', 3),
-        ],
-      });
-      const d1 = tuples.find((t) => t.documentId === 'd1');
-      expect(d1).toEqual({ uid: 'api::a.a', documentId: 'd1', locale: 'fr', failed: true });
-      expect(tuples).toHaveLength(2);
-      expect(tuples[0]).toEqual(d1);
-      expect(tuples[1]).toEqual({ uid: 'api::a.a', documentId: 'd2', locale: 'fr', failed: false });
-    });
-
-    it('ignores messages without a parseable tuple', () => {
-      const tuples = extractUidsAndDocumentsFromSession({
-        entries: [
-          passedEntry('Upload finished', 1),
-          passedEntry('Excluding 3 entries for model api::a.a from upload', 2),
-        ],
-      });
-      expect(tuples).toEqual([]);
-    });
-
-    it('recognises plugin::foo.bar UIDs', () => {
-      const tuples = extractUidsAndDocumentsFromSession({
-        entries: [passedEntry('Created entry for plugin::users-permissions.user [u1] in fr', 1)],
-      });
-      expect(tuples).toEqual([
-        { uid: 'plugin::users-permissions.user', documentId: 'u1', locale: 'fr', failed: false },
-      ]);
     });
   });
 });
