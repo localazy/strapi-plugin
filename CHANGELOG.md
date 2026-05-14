@@ -1,3 +1,22 @@
+# 1.4.0 (2026-05-13)
+
+### 🔀 Pull Requests
+
+- [per-session troubleshooting bundle on Activity Log detail (LOC-3997) #124](https://github.com/localazy/strapi-plugin/pull/124)
+
+### ✨ Features
+
+- per-session troubleshooting bundle on Activity Log detail (LOC-3997) ([bc3d7f1](https://github.com/localazy/strapi-plugin/commit/bc3d7f1)) ([#124](https://github.com/localazy/strapi-plugin/pull/124))
+
+### 🐛 Bug Fixes
+
+- add jszip transitive deps to package-lock.json ([bc3d7f1](https://github.com/localazy/strapi-plugin/commit/bc3d7f1)) ([#124](https://github.com/localazy/strapi-plugin/pull/124))
+- address review feedback on troubleshooting bundle (round 1) ([bc3d7f1](https://github.com/localazy/strapi-plugin/commit/bc3d7f1)) ([#124](https://github.com/localazy/strapi-plugin/pull/124))
+
+### 🧪 Tests
+
+- cover oversize browser-payload truncation (round 2 should-fix) ([bc3d7f1](https://github.com/localazy/strapi-plugin/commit/bc3d7f1)) ([#124](https://github.com/localazy/strapi-plugin/pull/124))
+
 # 1.3.0 (2026-05-13)
 
 ### 🔀 Pull Requests
