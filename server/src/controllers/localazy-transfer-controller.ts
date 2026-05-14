@@ -39,6 +39,16 @@ const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
       // Determine fullSync mode
       let fullSync = ctx.request.body?.fullSync === true;
 
+      // UI callers send their per-session language pick in the body so
+      // `read + transfer` users (who cannot persist to plugin-settings) can
+      // still scope the download. Only string[] is accepted; anything else
+      // falls back to the persisted `download.uiLanguages` setting.
+      const rawUiLanguages = ctx.request.body?.uiLanguages;
+      const requestedUiLanguages: string[] | undefined =
+        Array.isArray(rawUiLanguages) && rawUiLanguages.every((code) => typeof code === 'string')
+          ? (rawUiLanguages as string[])
+          : undefined;
+
       // For webhook-initiated requests, respect the webhook incremental sync setting
       const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
       if (requestInitiatorHelper.isInitiatedByLocalazyWebhook()) {
@@ -57,6 +67,7 @@ const LocalazyTransferController = ({ strapi }: { strapi: Core.Strapi }) => ({
           LocalazyTransferDownloadService.download({
             notificationService: JobNotificationService,
             fullSync,
+            requestedUiLanguages,
           }),
         1000
       );
