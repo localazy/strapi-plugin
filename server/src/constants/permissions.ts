@@ -15,8 +15,16 @@ export const PERMISSION_UIDS = {
 
 export type PermissionUid = (typeof PERMISSION_UIDS)[keyof typeof PERMISSION_UIDS];
 
-type ActionRecord = {
-  section: 'plugins' | 'settings';
+type PluginsSectionAction = {
+  section: 'plugins';
+  subCategory?: string;
+  pluginName: string;
+  displayName: string;
+  uid: string;
+};
+
+type SettingsSectionAction = {
+  section: 'settings';
   category: string;
   subCategory?: string;
   pluginName: string;
@@ -24,22 +32,25 @@ type ActionRecord = {
   uid: string;
 };
 
+type ActionRecord = PluginsSectionAction | SettingsSectionAction;
+
 /**
  * Actions registered with `strapi.service('admin::permission').actionProvider.registerMany`
  * during bootstrap. `pluginName` is prepended as `plugin::<pluginName>.` so the resulting
  * UIDs become the ones in `PERMISSION_UIDS` above.
+ *
+ * Strapi's action validator (@strapi/admin) rejects `category` on `plugins`-section
+ * entries and requires it on `settings`-section entries — keep this split intact.
  */
 export const LOCALAZY_RBAC_ACTIONS: ActionRecord[] = [
   {
     section: 'plugins',
-    category: 'Localazy',
     pluginName: PLUGIN_NAME,
     displayName: 'Read',
     uid: 'read',
   },
   {
     section: 'plugins',
-    category: 'Localazy',
     pluginName: PLUGIN_NAME,
     displayName: 'Transfer',
     uid: 'transfer',

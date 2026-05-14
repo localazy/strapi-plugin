@@ -20,8 +20,11 @@ const registerRbacActions = async (strapi: Core.Strapi) => {
 
     await actionProvider.registerMany(LOCALAZY_RBAC_ACTIONS);
   } catch (error) {
-    strapi.log.warn(
-      `[${PLUGIN_NAME}] Failed to register RBAC actions: ${error instanceof Error ? error.message : String(error)}`
+    // A failure here drops EVERY plugin permission from the role editor —
+    // surface it loudly. registerMany validates the whole array up-front, so
+    // one bad entry kills all four.
+    strapi.log.error(
+      `[${PLUGIN_NAME}] Failed to register RBAC actions — plugin permissions will not appear in role editor: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 };

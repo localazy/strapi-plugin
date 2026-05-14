@@ -15,14 +15,12 @@ describe('Localazy RBAC permission registry', () => {
     expect(LOCALAZY_RBAC_ACTIONS).toMatchInlineSnapshot(`
 [
   {
-    "category": "Localazy",
     "displayName": "Read",
     "pluginName": "localazy",
     "section": "plugins",
     "uid": "read",
   },
   {
-    "category": "Localazy",
     "displayName": "Transfer",
     "pluginName": "localazy",
     "section": "plugins",
@@ -53,6 +51,20 @@ describe('Localazy RBAC permission registry', () => {
       expect(action.pluginName).toBe('localazy');
       expect(action.section).toMatch(/^(plugins|settings)$/);
       expect(action.uid).not.toMatch(/^plugin::/);
+    }
+  });
+
+  // Strapi's @strapi/admin yup schema rejects `category` on `plugins` and requires
+  // it on `settings`. registerMany() validates the full array up-front, so a single
+  // mis-shaped entry silently drops ALL of our permissions from the role editor.
+  it('matches the Strapi action-provider section invariants', () => {
+    for (const action of LOCALAZY_RBAC_ACTIONS) {
+      if (action.section === 'plugins') {
+        expect(action).not.toHaveProperty('category');
+      } else {
+        expect(action).toHaveProperty('category');
+        expect((action as { category: string }).category).toBeTruthy();
+      }
     }
   });
 
