@@ -4,12 +4,16 @@ import { useTranslation } from 'react-i18next';
 
 import type { PanelComponent } from '@strapi/content-manager/strapi-admin';
 import { Typography, Toggle } from '@strapi/design-system';
+import { useRBAC } from '@strapi/strapi/admin';
 import EntryExclusionService from '../modules/entry-exclusion/services/entry-exclusion-service';
+import { PERMISSIONS } from '../constants/permissions';
 
 import '../i18n';
 
 const LocalazyPanel: PanelComponent = () => {
   const { t } = useTranslation();
+
+  const { allowedActions } = useRBAC([...PERMISSIONS.READ, ...PERMISSIONS.TRANSFER]);
 
   const location = useLocation();
   const [isExcluded, setIsExcluded] = useState(false);
@@ -41,7 +45,7 @@ const LocalazyPanel: PanelComponent = () => {
   // Load the current exclusion state when we have the entry information
   useEffect(() => {
     const loadExclusionState = async () => {
-      if (!contentType || !documentId) {
+      if (!contentType || !documentId || !allowedActions.canRead) {
         setIsLoading(false);
         return;
       }
@@ -59,7 +63,11 @@ const LocalazyPanel: PanelComponent = () => {
     };
 
     void loadExclusionState();
-  }, [contentType, documentId]);
+  }, [contentType, documentId, allowedActions.canRead]);
+
+  if (!allowedActions.canRead) {
+    return null;
+  }
 
   // Handle toggle change
   const handleToggleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +100,7 @@ const LocalazyPanel: PanelComponent = () => {
           checked={isExcluded}
           onLabel='True'
           offLabel='False'
-          disabled={isLoading || !contentType || !documentId}
+          disabled={isLoading || !contentType || !documentId || !allowedActions.canTransfer}
           onChange={handleToggleChange}
         />
       </div>

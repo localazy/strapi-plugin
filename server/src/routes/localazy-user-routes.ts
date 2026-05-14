@@ -1,4 +1,11 @@
+import { PERMISSION_UIDS } from '../constants/permissions';
+
 const ROUTE_PREFIX = '/user';
+
+const readPolicy = [{ name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.READ] } }];
+const settingsUpdatePolicy = [
+  { name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.SETTINGS_UPDATE] } },
+];
 
 const LocalazyUserRoutes = [
   {
@@ -6,7 +13,7 @@ const LocalazyUserRoutes = [
     path: `${ROUTE_PREFIX}`,
     handler: 'LocalazyUserController.getUser',
     config: {
-      policies: [],
+      policies: readPolicy,
     },
   },
   {
@@ -14,7 +21,7 @@ const LocalazyUserRoutes = [
     path: `${ROUTE_PREFIX}`,
     handler: 'LocalazyUserController.updateUser',
     config: {
-      policies: [],
+      policies: settingsUpdatePolicy,
     },
   },
   {
@@ -22,7 +29,7 @@ const LocalazyUserRoutes = [
     path: `${ROUTE_PREFIX}`,
     handler: 'LocalazyUserController.deleteUser',
     config: {
-      policies: [],
+      policies: settingsUpdatePolicy,
     },
   },
 ];

@@ -1,6 +1,7 @@
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';
 import { Localazy } from './modules/@common/components/Icons/Localazy';
+import { PERMISSIONS } from './constants/permissions';
 import React from 'react';
 
 export default {
@@ -81,7 +82,7 @@ export default {
       });
 
       if (contentManagerPlugin?.apis?.addBulkAction) {
-        const { useNotification } = await import('@strapi/strapi/admin');
+        const { useNotification, useRBAC } = await import('@strapi/strapi/admin');
         await import('./i18n');
         const { useTranslation } = await import('react-i18next');
 
@@ -89,6 +90,11 @@ export default {
           const { documents, model } = props;
           const { toggleNotification } = useNotification();
           const { t } = useTranslation();
+          const { allowedActions } = useRBAC(PERMISSIONS.TRANSFER);
+
+          if (!allowedActions.canTransfer) {
+            return null;
+          }
 
           return {
             label: t('plugin_settings.bulk_action_exclude_from_translation'),
@@ -133,6 +139,11 @@ export default {
         const IncludeToTranslationAction = ({ documents, model }: any) => {
           const { toggleNotification } = useNotification();
           const { t } = useTranslation();
+          const { allowedActions } = useRBAC(PERMISSIONS.TRANSFER);
+
+          if (!allowedActions.canTransfer) {
+            return null;
+          }
 
           return {
             label: t('plugin_settings.bulk_action_include_to_translation'),
@@ -194,6 +205,7 @@ const addMenuLink = (app: any) => {
       defaultMessage: 'Localazy',
     },
     Component: () => import('./pages/LocalazyApp'),
+    permissions: PERMISSIONS.READ,
   });
 };
 
@@ -216,7 +228,7 @@ const addSettingsSection = (app: any) => {
         },
         to: `${PLUGIN_ID}/global-settings`,
         Component: () => import('./pages/LocalazyGlobalSettings'),
-        permissions: [],
+        permissions: PERMISSIONS.SETTINGS_READ,
       },
       // Content Transfer Setup
       {
@@ -227,7 +239,7 @@ const addSettingsSection = (app: any) => {
         },
         to: `${PLUGIN_ID}/content-transfer-setup`,
         Component: () => import('./pages/LocalazyContentTransferSetup'),
-        permissions: [],
+        permissions: PERMISSIONS.SETTINGS_READ,
       },
     ]
   );

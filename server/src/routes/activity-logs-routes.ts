@@ -1,4 +1,9 @@
+import { PERMISSION_UIDS } from '../constants/permissions';
+
 const ROUTE_PREFIX = '/activity-logs';
+
+const readPolicy = [{ name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.READ] } }];
+const transferPolicy = [{ name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.TRANSFER] } }];
 
 const ActivityLogsRoutes = [
   {
@@ -6,7 +11,7 @@ const ActivityLogsRoutes = [
     path: `${ROUTE_PREFIX}`,
     handler: 'ActivityLogsController.getSessions',
     config: {
-      policies: [],
+      policies: readPolicy,
     },
   },
   {
@@ -14,7 +19,7 @@ const ActivityLogsRoutes = [
     path: `${ROUTE_PREFIX}/export`,
     handler: 'ActivityLogsController.exportSessions',
     config: {
-      policies: [],
+      policies: readPolicy,
     },
   },
   {
@@ -22,7 +27,7 @@ const ActivityLogsRoutes = [
     path: `${ROUTE_PREFIX}/:sessionId`,
     handler: 'ActivityLogsController.getSession',
     config: {
-      policies: [],
+      policies: readPolicy,
     },
   },
   {
@@ -30,7 +35,7 @@ const ActivityLogsRoutes = [
     path: `${ROUTE_PREFIX}`,
     handler: 'ActivityLogsController.clearSessions',
     config: {
-      policies: [],
+      policies: transferPolicy,
     },
   },
 ];

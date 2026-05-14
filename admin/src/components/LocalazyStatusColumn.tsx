@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
+import { useRBAC } from '@strapi/strapi/admin';
 import EntryExclusionService from '../modules/entry-exclusion/services/entry-exclusion-service';
+import { PERMISSIONS } from '../constants/permissions';
 import '../i18n';
 
 // TODO: define props interface
 const LocalazyStatusColumn = ({ data, model }: any) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { allowedActions } = useRBAC(PERMISSIONS.READ);
 
   const [isExcluded, setIsExcluded] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkStatus = async () => {
-      if (!data?.documentId || !model) {
+      if (!data?.documentId || !model || !allowedActions.canRead) {
         setIsLoading(false);
         return;
       }
@@ -31,7 +34,11 @@ const LocalazyStatusColumn = ({ data, model }: any) => {
     };
 
     void checkStatus();
-  }, [data?.documentId, model]);
+  }, [data?.documentId, model, allowedActions.canRead]);
+
+  if (!allowedActions.canRead) {
+    return null;
+  }
 
   if (isLoading) {
     return <span style={{ color: theme.colors.neutral600, fontSize: '12px' }}>...</span>;
