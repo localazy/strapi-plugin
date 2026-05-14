@@ -105,7 +105,7 @@ const Upload: React.FC<UploadProps> = (props: UploadProps) => {
       setModelChanged(modelChangedResult);
       setLocalesIncompatible(!localesCompatibleResult);
 
-      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.UPLOAD });
 
       setIsLoading(false);
     }

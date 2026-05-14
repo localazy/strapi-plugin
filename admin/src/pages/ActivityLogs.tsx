@@ -38,7 +38,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const debouncedSaveSortPrefs = useCallback((prefs: Record<string, { key: string; direction: string }>) => {
     if (saveSortTimerRef.current) clearTimeout(saveSortTimerRef.current);
     saveSortTimerRef.current = setTimeout(() => {
-      void PluginSettingsService.updatePluginSettings({ activityLogsSort: prefs });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ activityLogsSort: prefs });
     }, 1000);
   }, []);
 
@@ -102,7 +102,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
       void fetchSessions('upload');
     };
     void init();
-    void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
+    void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
   }, []);
 
   return (

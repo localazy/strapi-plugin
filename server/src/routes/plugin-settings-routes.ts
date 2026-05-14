@@ -38,9 +38,19 @@ const PluginSettingsRoutes = [
     path: `${ROUTE_PREFIX}/plugin-settings`,
     handler: 'PluginSettingsController.updatePluginSettings',
     config: {
-      // Stores per-user UI prefs (last visited route). Read-only users still need
-      // to persist their own UI state, so this sits behind `read` rather than the
-      // destructive `settings.update` grain used by content-transfer-setup.
+      // Persists destructive Global Settings (webhookConfig, download.*, upload.*).
+      // UI-pref-only writes use `PUT /plugin-settings/ui-prefs` (read-gated) below.
+      policies: settingsUpdatePolicy,
+    },
+  },
+  {
+    method: 'PUT',
+    path: `${ROUTE_PREFIX}/ui-prefs`,
+    handler: 'PluginSettingsController.updatePluginSettingsUiPrefs',
+    config: {
+      // Per-user UI state (last visited route, sort prefs). Service-side filters
+      // the body to a fixed allowlist so a `read`-only caller cannot reach the
+      // destructive fields that share the same plugin-settings store.
       policies: readPolicy,
     },
   },

@@ -18,6 +18,10 @@ const PluginSettingsController = ({ strapi: _strapi }: { strapi: Core.Strapi }) 
     ctx.body = await getPluginSettingsService().updatePluginSettings(ctx.request.body);
   },
 
+  async updatePluginSettingsUiPrefs(ctx) {
+    ctx.body = await getPluginSettingsService().updatePluginSettingsUiPrefs(ctx.request.body);
+  },
+
   async getSyncCursor(ctx) {
     ctx.body = await getPluginSettingsService().getSyncCursor();
   },

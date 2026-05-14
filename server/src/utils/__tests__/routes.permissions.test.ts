@@ -41,7 +41,8 @@ const EXPECTED_ROUTE_ACTIONS: Record<string, string> = {
   'GET /plugin-settings/content-transfer-setup': PERMISSION_UIDS.SETTINGS_READ,
   'PUT /plugin-settings/content-transfer-setup': PERMISSION_UIDS.SETTINGS_UPDATE,
   'GET /plugin-settings/plugin-settings': PERMISSION_UIDS.READ,
-  'PUT /plugin-settings/plugin-settings': PERMISSION_UIDS.READ,
+  'PUT /plugin-settings/plugin-settings': PERMISSION_UIDS.SETTINGS_UPDATE,
+  'PUT /plugin-settings/ui-prefs': PERMISSION_UIDS.READ,
   'GET /plugin-settings/sync-cursor': PERMISSION_UIDS.READ,
   // entry-exclusion-routes
   'GET /entry-exclusion/:contentType/:documentId': PERMISSION_UIDS.READ,

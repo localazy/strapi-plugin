@@ -140,7 +140,7 @@ const Download: React.FC<DownloadProps> = (props) => {
 
       setFormModel(globalSettings);
 
-      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
 
       setIsLoading(false);
     }
