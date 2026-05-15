@@ -18,8 +18,6 @@ interface LoginButtonProps {
 
 const LoginButton = (props: LoginButtonProps) => {
   const { t } = useTranslation();
-  // useRBAC derives action names from the last dotted segment of the UID,
-  // so `plugin::localazy.settings.update` resolves to `canUpdate`.
   const { allowedActions } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
   const canConnect = !!allowedActions.canUpdate;
 

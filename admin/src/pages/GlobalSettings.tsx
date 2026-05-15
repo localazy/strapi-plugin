@@ -44,17 +44,10 @@ const GlobalSettings: React.FC = () => {
     allowedActions: { canUpdate: canUpdateSettings },
   } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
 
-  /**
-   * `admin::users.read` is required to populate the webhook-author dropdown
-   * (it powers `/admin/users`). It's a core Strapi permission our plugin
-   * can't grant, so we check separately and skip the request when missing.
-   * Issued as its own `useRBAC` call because it collapses to `canRead` and
-   * would collide with any other `*.read` permission in the same call.
-   *
-   * `useRBAC` resolves async (it hits `/admin/permissions/check`), so we
-   * gate the initial fetch on `isLoading` settling — otherwise the effect
-   * would always observe the default `false` and skip the users request.
-   */
+  // `admin::users.read` powers the webhook-author dropdown (`/admin/users`).
+  // It's a core Strapi action, so we check it separately and skip the fetch
+  // when missing. `useRBAC` resolves async via `/admin/permissions/check`;
+  // the effect below waits on `isLoading` before reading `canRead`.
   const {
     allowedActions: { canRead: canReadAdminUsers },
     isLoading: isLoadingAdminUsersRBAC,
@@ -117,9 +110,6 @@ const GlobalSettings: React.FC = () => {
   };
 
   useEffect(() => {
-    // Wait for the admin::users.read check to resolve before firing the
-    // fetch — otherwise the effect always sees the default `false` and
-    // skips the users request even for roles that do have the permission.
     if (isLoadingAdminUsersRBAC) {
       return;
     }
@@ -127,11 +117,6 @@ const GlobalSettings: React.FC = () => {
     async function fetchData() {
       setIsLoading(true);
 
-      // `/admin/users` is gated by Strapi's core `admin::users.read` permission,
-      // which our plugin can't grant. Skip the request entirely when the role
-      // doesn't have it — the UI surfaces a note in the webhook-author block.
-      // Keep the catch as a defensive fallback (older Strapi versions, stale
-      // RBAC cache) so a 403 here doesn't blank the whole settings page.
       const [project, globalSettings, users] = await Promise.all([
         ProjectService.getConnectedProject(),
         PluginSettingsService.getPluginSettings(),
@@ -152,9 +137,7 @@ const GlobalSettings: React.FC = () => {
       setIsLoading(false);
     }
     void fetchData();
-    // Re-run only when the RBAC check transitions from loading → resolved.
-    // `canReadAdminUsers` is read off the same hook and is stable once
-    // `isLoadingAdminUsersRBAC` is false, so omitting it is intentional.
+    // `canReadAdminUsers` is stable once `isLoadingAdminUsersRBAC` is false.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingAdminUsersRBAC]);
 
@@ -324,13 +307,11 @@ const GlobalSettings: React.FC = () => {
                 >
                   {(() => {
                     const savedAuthorId = formModel?.download?.webhookAuthorId;
-                    // Without `admin::users.read` the users list is empty, so
-                    // the SingleSelect would have no option matching the
-                    // saved id and fall back to placeholder. Inject a stub
-                    // option so the saved author is at least visible by id.
-                    // Compare as strings — the stored id can be a number
-                    // (from the API) or a string (after `SingleSelect`'s
-                    // `onChange`), and `===` would mismatch across types.
+                    // Fall back to a stub option when the saved id is not in
+                    // the users list (e.g. role lacks `admin::users.read`),
+                    // so the SingleSelect still renders the configured author.
+                    // String-compare: the id can be a number (from the API)
+                    // or a string (after `SingleSelect`'s `onChange`).
                     const needsFallback =
                       savedAuthorId != null && !users.some((user) => String(user.id) === String(savedAuthorId));
                     return (

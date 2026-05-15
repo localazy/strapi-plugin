@@ -16,8 +16,6 @@ const LogoutButton: React.FC<LogoutButtonProps> = (props) => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const { setIdentity } = useLocalazyIdentity();
-  // useRBAC derives action names from the last dotted segment of the UID,
-  // so `plugin::localazy.settings.update` resolves to `canUpdate`.
   const { allowedActions } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
   const canDisconnect = !!allowedActions.canUpdate;
 

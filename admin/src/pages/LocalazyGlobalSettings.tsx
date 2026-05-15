@@ -11,9 +11,7 @@ import Loader from '../modules/@common/components/PluginPageLoader';
 import { PERMISSIONS } from '../constants/permissions';
 
 const LocalazyGlobalSettings = () => {
-  // Strapi's `addSettingsLink` permissions only hide the menu entry; the route
-  // is still reachable by URL, so gate the page itself the same way App.tsx
-  // gates upload/download.
+  // `addSettingsLink` permissions only hide the menu entry, not the route.
   const {
     allowedActions: { canRead: canReadSettings },
     isLoading: isLoadingPermissions,
