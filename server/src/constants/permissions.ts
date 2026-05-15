@@ -15,60 +15,57 @@ export const PERMISSION_UIDS = {
 
 export type PermissionUid = (typeof PERMISSION_UIDS)[keyof typeof PERMISSION_UIDS];
 
-type PluginsSectionAction = {
+type ActionRecord = {
   section: 'plugins';
-  subCategory?: string;
+  subCategory: string;
   pluginName: string;
   displayName: string;
   uid: string;
 };
-
-type SettingsSectionAction = {
-  section: 'settings';
-  category: string;
-  subCategory?: string;
-  pluginName: string;
-  displayName: string;
-  uid: string;
-};
-
-type ActionRecord = PluginsSectionAction | SettingsSectionAction;
 
 /**
  * Actions registered with `strapi.service('admin::permission').actionProvider.registerMany`
  * during bootstrap. `pluginName` is prepended as `plugin::<pluginName>.` so the resulting
  * UIDs become the ones in `PERMISSION_UIDS` above.
  *
- * Strapi's action validator (@strapi/admin) rejects `category` on `plugins`-section
- * entries and requires it on `settings`-section entries — keep this split intact.
+ * All four actions live under `section: 'plugins'` so they appear together in the
+ * role editor's Plugins tab under "Localazy", grouped by `subCategory`. A previous
+ * split (settings-section for the two settings.* actions) caused them to land in a
+ * different tab — admins inspecting Plugins → Localazy only saw Read + Transfer and
+ * thought the other two were missing.
+ *
+ * Strapi's @strapi/admin yup validator (a) rejects `category` on `plugins`-section
+ * entries — `category` is only valid in `settings` section — and (b) allows
+ * `subCategory` on both `plugins` and `settings`. So we use `subCategory` alone for
+ * grouping here.
  */
 export const LOCALAZY_RBAC_ACTIONS: ActionRecord[] = [
   {
     section: 'plugins',
+    subCategory: 'General',
     pluginName: PLUGIN_NAME,
     displayName: 'Read',
     uid: 'read',
   },
   {
     section: 'plugins',
+    subCategory: 'General',
     pluginName: PLUGIN_NAME,
     displayName: 'Transfer',
     uid: 'transfer',
   },
   {
-    section: 'settings',
-    category: 'Localazy',
+    section: 'plugins',
     subCategory: 'Settings',
     pluginName: PLUGIN_NAME,
-    displayName: 'Read',
+    displayName: 'Read settings',
     uid: 'settings.read',
   },
   {
-    section: 'settings',
-    category: 'Localazy',
+    section: 'plugins',
     subCategory: 'Settings',
     pluginName: PLUGIN_NAME,
-    displayName: 'Update',
+    displayName: 'Update settings',
     uid: 'settings.update',
   },
 ];

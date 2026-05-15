@@ -18,27 +18,27 @@ describe('Localazy RBAC permission registry', () => {
     "displayName": "Read",
     "pluginName": "localazy",
     "section": "plugins",
+    "subCategory": "General",
     "uid": "read",
   },
   {
     "displayName": "Transfer",
     "pluginName": "localazy",
     "section": "plugins",
+    "subCategory": "General",
     "uid": "transfer",
   },
   {
-    "category": "Localazy",
-    "displayName": "Read",
+    "displayName": "Read settings",
     "pluginName": "localazy",
-    "section": "settings",
+    "section": "plugins",
     "subCategory": "Settings",
     "uid": "settings.read",
   },
   {
-    "category": "Localazy",
-    "displayName": "Update",
+    "displayName": "Update settings",
     "pluginName": "localazy",
-    "section": "settings",
+    "section": "plugins",
     "subCategory": "Settings",
     "uid": "settings.update",
   },
@@ -49,22 +49,22 @@ describe('Localazy RBAC permission registry', () => {
   it('declares every action under the localazy plugin namespace', () => {
     for (const action of LOCALAZY_RBAC_ACTIONS) {
       expect(action.pluginName).toBe('localazy');
-      expect(action.section).toMatch(/^(plugins|settings)$/);
+      expect(action.section).toBe('plugins');
       expect(action.uid).not.toMatch(/^plugin::/);
     }
   });
 
-  // Strapi's @strapi/admin yup schema rejects `category` on `plugins` and requires
-  // it on `settings`. registerMany() validates the full array up-front, so a single
+  // Strapi's @strapi/admin yup schema rejects `category` on `plugins`-section
+  // entries and registerMany() validates the full array up-front — a single
   // mis-shaped entry silently drops ALL of our permissions from the role editor.
-  it('matches the Strapi action-provider section invariants', () => {
+  // Keeping every action in `plugins` (with `subCategory` for grouping, no
+  // `category` field) sidesteps the rejection and keeps all four visible in the
+  // Plugins tab of the role editor under "Localazy".
+  it('matches the Strapi action-provider plugins-section invariants', () => {
     for (const action of LOCALAZY_RBAC_ACTIONS) {
-      if (action.section === 'plugins') {
-        expect(action).not.toHaveProperty('category');
-      } else {
-        expect(action).toHaveProperty('category');
-        expect((action as { category: string }).category).toBeTruthy();
-      }
+      expect(action.section).toBe('plugins');
+      expect(action).not.toHaveProperty('category');
+      expect(action.subCategory).toBeTruthy();
     }
   });
 
