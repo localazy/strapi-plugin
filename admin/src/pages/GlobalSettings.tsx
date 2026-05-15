@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import cloneDeep from 'lodash-es/cloneDeep';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, useRBAC } from '@strapi/strapi/admin';
 import { Check } from '@strapi/icons';
 import {
   Field,
@@ -25,6 +25,7 @@ import PluginSettingsService from '../modules/plugin-settings/services/plugin-se
 import StrapiUsersService from '../modules/plugin-settings/services/strapi-users-service';
 import ProjectService from '../modules/@common/services/project-service';
 import { AdminPanelUser } from '../modules/plugin-settings/models/admin-panel-user';
+import { PERMISSIONS } from '../constants/permissions';
 // TODO: ADD TYPES
 
 // import and load resources
@@ -35,6 +36,13 @@ const GlobalSettings: React.FC = () => {
    * Translation function
    */
   const { t } = useTranslation();
+
+  /**
+   * Settings.update gate — controls are read-only without it.
+   */
+  const {
+    allowedActions: { canUpdate: canUpdateSettings },
+  } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
 
   /**
    * Project Languages without default language
@@ -96,10 +104,14 @@ const GlobalSettings: React.FC = () => {
     async function fetchData() {
       setIsLoading(true);
 
+      // `/admin/users` is gated by Strapi's core `admin::users.read` permission,
+      // which our plugin can't grant. A role with only plugin `settings.read`
+      // gets a 403 there, so isolate that call from the others — losing the
+      // user list shouldn't blank the whole settings page.
       const [project, globalSettings, users] = await Promise.all([
         ProjectService.getConnectedProject(),
         PluginSettingsService.getPluginSettings(),
-        StrapiUsersService.getAdminPanelUsers(),
+        StrapiUsersService.getAdminPanelUsers().catch(() => [] as AdminPanelUser[]),
       ]);
 
       const projectLanguagesWithoutDefaultLanguage =
@@ -123,12 +135,12 @@ const GlobalSettings: React.FC = () => {
         subtitle={t('plugin_settings.global_settings_description')}
         primaryAction={
           <Flex gap={2}>
-            <Button variant='secondary' disabled={!hasUnsavedChanges} onClick={onCancelClick}>
+            <Button variant='secondary' disabled={!canUpdateSettings || !hasUnsavedChanges} onClick={onCancelClick}>
               {t('plugin_settings.cancel')}
             </Button>
             <Button
               startIcon={<Check />}
-              disabled={!hasUnsavedChanges}
+              disabled={!canUpdateSettings || !hasUnsavedChanges}
               onClick={() => {
                 void saveGlobalSettings(formModel);
               }}
@@ -171,6 +183,7 @@ const GlobalSettings: React.FC = () => {
                 <Toggle
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.upload?.allowAutomated === 'boolean' ? formModel.upload.allowAutomated : false
                   }
@@ -192,7 +205,8 @@ const GlobalSettings: React.FC = () => {
                   value={formModel?.upload?.automatedTriggers || []}
                   onChange={(values: any) => patchFormModel('upload.automatedTriggers', values)}
                   disabled={
-                    typeof formModel?.upload?.allowAutomated === 'boolean' ? !formModel.upload.allowAutomated : true
+                    !canUpdateSettings ||
+                    (typeof formModel?.upload?.allowAutomated === 'boolean' ? !formModel.upload.allowAutomated : true)
                   }
                   multi
                   withTags
@@ -211,6 +225,7 @@ const GlobalSettings: React.FC = () => {
                   hint={t('plugin_settings.deprecate_source_keys_on_delete_info')}
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.upload?.allowDeprecate === 'boolean' ? formModel.upload.allowDeprecate : false
                   }
@@ -234,7 +249,7 @@ const GlobalSettings: React.FC = () => {
                 {t('plugin_settings.webhook_setup_title')}
               </Typography>
               <br />
-              <WebhookSetup />
+              <WebhookSetup disabled={!canUpdateSettings} />
               <br />
               <br />
               <Divider />
@@ -253,6 +268,7 @@ const GlobalSettings: React.FC = () => {
                   hint={t('plugin_settings.processing_of_download_webhook_info')}
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.download?.processDownloadWebhook === 'boolean'
                       ? formModel.download.processDownloadWebhook
@@ -274,6 +290,7 @@ const GlobalSettings: React.FC = () => {
                   onClear={() => patchFormModel('download.webhookAuthorId', null)}
                   value={formModel?.download?.webhookAuthorId || null}
                   onChange={(value: any) => patchFormModel('download.webhookAuthorId', value)}
+                  disabled={!canUpdateSettings}
                 >
                   {users.map((user) => (
                     <SingleSelectOption key={user.id} value={user.id}>
@@ -293,6 +310,7 @@ const GlobalSettings: React.FC = () => {
                 label={t('plugin_settings.webhook_languages')}
                 hint={t('plugin_settings.webhook_languages_info')}
                 placeholder={t('plugin_settings.webhook_languages_placeholder')}
+                disabled={!canUpdateSettings}
               />
               {/* Webhook incremental sync */}
               <br />
@@ -302,6 +320,7 @@ const GlobalSettings: React.FC = () => {
                 <Toggle
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.download?.webhookIncrementalSync === 'boolean'
                       ? formModel.download.webhookIncrementalSync

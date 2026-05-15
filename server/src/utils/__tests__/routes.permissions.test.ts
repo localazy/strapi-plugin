@@ -38,7 +38,10 @@ const EXPECTED_ROUTE_ACTIONS: Record<string, string> = {
   'POST /transfer/upload': PERMISSION_UIDS.TRANSFER,
   'POST /transfer/download': PERMISSION_UIDS.TRANSFER,
   // plugin-settings-routes
-  'GET /plugin-settings/content-transfer-setup': PERMISSION_UIDS.SETTINGS_READ,
+  // GET is `read` (not `settings.read`) so transfer-only roles can still open
+  // Upload/Download (they call this to detect "model changed"). The PUT below
+  // remains `settings.update`-gated.
+  'GET /plugin-settings/content-transfer-setup': PERMISSION_UIDS.READ,
   'PUT /plugin-settings/content-transfer-setup': PERMISSION_UIDS.SETTINGS_UPDATE,
   'GET /plugin-settings/plugin-settings': PERMISSION_UIDS.READ,
   'PUT /plugin-settings/plugin-settings': PERMISSION_UIDS.SETTINGS_UPDATE,

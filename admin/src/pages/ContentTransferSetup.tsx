@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash-es/isEqual';
 import cloneDeep from 'lodash-es/cloneDeep';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, useRBAC } from '@strapi/strapi/admin';
 import { Check } from '@strapi/icons';
 import { Box, Button, Alert, Flex, Divider, Typography } from '@strapi/design-system';
 import set from 'lodash-es/set';
@@ -15,6 +15,7 @@ import hasModelChanged from '../modules/plugin-settings/functions/has-model-chan
 import buildContentTransferSetupSchema from '../modules/plugin-settings/functions/build-content-transfer-setup-schema';
 import { Tree } from '../modules/plugin-settings/components/Tree';
 import { ContentTransferSetupEmpty } from '../modules/plugin-settings/components/ContentTransferSetupEmpty';
+import { PERMISSIONS } from '../constants/permissions';
 
 // import and load resources
 import '../i18n';
@@ -26,6 +27,13 @@ const ContentTransferSetup: React.FC = () => {
    * Translation function
    */
   const { t } = useTranslation();
+
+  /**
+   * Settings.update gate — read-only for users without it.
+   */
+  const {
+    allowedActions: { canUpdate: canUpdateSettings },
+  } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
 
   /**
    * Component state
@@ -175,12 +183,12 @@ const ContentTransferSetup: React.FC = () => {
         subtitle={t('plugin_settings.content_transfer_setup_description')}
         primaryAction={
           <Flex gap={2}>
-            <Button variant='secondary' disabled={!hasUnsavedChanges} onClick={onCancelClick}>
+            <Button variant='secondary' disabled={!canUpdateSettings || !hasUnsavedChanges} onClick={onCancelClick}>
               {t('plugin_settings.cancel')}
             </Button>
             <Button
               startIcon={<Check />}
-              disabled={!hasUnsavedChanges}
+              disabled={!canUpdateSettings || !hasUnsavedChanges}
               onClick={() => {
                 void saveContentTransferSetup(formModel);
               }}
@@ -225,7 +233,12 @@ const ContentTransferSetup: React.FC = () => {
             {formModel.map((tree, index) => {
               return (
                 <Box key={`box_tree_${index}`} marginBottom={3}>
-                  <Tree onTreeItemClick={onTreeItemClick} objects={tree} initiallyExpanded={index === 0} />
+                  <Tree
+                    onTreeItemClick={onTreeItemClick}
+                    objects={tree}
+                    initiallyExpanded={index === 0}
+                    disabled={!canUpdateSettings}
+                  />
                 </Box>
               );
             })}

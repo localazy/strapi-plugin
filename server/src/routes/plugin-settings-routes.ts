@@ -3,7 +3,6 @@ import { PERMISSION_UIDS } from '../constants/permissions';
 const ROUTE_PREFIX = '/plugin-settings';
 
 const readPolicy = [{ name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.READ] } }];
-const settingsReadPolicy = [{ name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.SETTINGS_READ] } }];
 const settingsUpdatePolicy = [
   { name: 'admin::hasPermissions', config: { actions: [PERMISSION_UIDS.SETTINGS_UPDATE] } },
 ];
@@ -14,7 +13,11 @@ const PluginSettingsRoutes = [
     path: `${ROUTE_PREFIX}/content-transfer-setup`,
     handler: 'PluginSettingsController.getContentTransferSetup',
     config: {
-      policies: settingsReadPolicy,
+      // Upload/Download pages call this to detect "model changed" before
+      // transferring. Gating on `settings.read` would lock transfer-only
+      // roles out of the transfer pages, so the read is open to any plugin
+      // user. The destructive PUT below stays on `settings.update`.
+      policies: readPolicy,
     },
   },
   {

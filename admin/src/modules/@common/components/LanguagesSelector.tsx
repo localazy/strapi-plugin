@@ -11,6 +11,7 @@ interface LanguageSelectorProps {
   projectLanguages: any[];
   preselectedLanguages: any[];
   onChange: (values: any) => void;
+  disabled?: boolean;
 }
 
 const LanguagesSelector: React.FC<LanguageSelectorProps> = (props: LanguageSelectorProps) => {
@@ -46,6 +47,7 @@ const LanguagesSelector: React.FC<LanguageSelectorProps> = (props: LanguageSelec
         onClear={() => setSelectedLanguages([])}
         value={selectedLanguages || []}
         onChange={(values: any) => onChange(values)}
+        disabled={props.disabled}
         multi
         withTags
       >

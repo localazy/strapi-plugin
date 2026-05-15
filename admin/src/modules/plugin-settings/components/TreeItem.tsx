@@ -7,9 +7,17 @@ interface TreeItemProps {
   children?: any;
   passedKey: string;
   onTreeItemClick: (key: any, currentValue: any) => void;
+  disabled?: boolean;
 }
 
-const TreeItem: React.FC<TreeItemProps> = ({ label, value, children, passedKey = '', onTreeItemClick }) => {
+const TreeItem: React.FC<TreeItemProps> = ({
+  label,
+  value,
+  children,
+  passedKey = '',
+  onTreeItemClick,
+  disabled = false,
+}) => {
   const onChange = (key: any, currentValue: any) => {
     onTreeItemClick(key, currentValue);
   };
@@ -17,7 +25,7 @@ const TreeItem: React.FC<TreeItemProps> = ({ label, value, children, passedKey =
   return (
     <>
       {typeof value === 'boolean' && (
-        <Checkbox checked={value} onCheckedChange={() => onChange([passedKey], value)}>
+        <Checkbox checked={value} disabled={disabled} onCheckedChange={() => onChange([passedKey], value)}>
           {label || '-'}
         </Checkbox>
       )}

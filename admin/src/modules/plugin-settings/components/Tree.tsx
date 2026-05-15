@@ -14,9 +14,10 @@ interface TreeProps {
   objects: any[];
   onTreeItemClick: (key: string[], currentValue: boolean) => void;
   initiallyExpanded: boolean;
+  disabled?: boolean;
 }
 
-const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded = false }) => {
+const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded = false, disabled = false }) => {
   const { t } = useTranslation();
 
   const [, setIsExpanded] = useState(initiallyExpanded);
@@ -82,7 +83,7 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
               <Box key={passedKey} marginTop={6} marginBottom={6} marginLeft={6}>
                 {isSubbranchObject && (
                   <Checkbox
-                    disabled={hasAllNullValue}
+                    disabled={disabled || hasAllNullValue}
                     checked={getCheckedState(hasTruthyValue, hasFalsyValue)}
                     onCheckedChange={() => onTreeItemClick(flattenedKeys, hasTruthyValue)}
                   >
@@ -96,7 +97,7 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
                     </Flex>
                   </Checkbox>
                 )}
-                <TreeItem onTreeItemClick={onTreeItemClick} passedKey={passedKey}>
+                <TreeItem onTreeItemClick={onTreeItemClick} passedKey={passedKey} disabled={disabled}>
                   {createTree(key, value, passedKey)}
                 </TreeItem>
               </Box>
@@ -106,7 +107,16 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
       );
     }
 
-    return <TreeItem onTreeItemClick={onTreeItemClick} key={path} passedKey={path} label={name} value={branch} />;
+    return (
+      <TreeItem
+        onTreeItemClick={onTreeItemClick}
+        key={path}
+        passedKey={path}
+        label={name}
+        value={branch}
+        disabled={disabled}
+      />
+    );
   };
 
   return (
@@ -127,6 +137,7 @@ const Tree: React.FC<TreeProps> = ({ objects, onTreeItemClick, initiallyExpanded
                       label={`switch_tree_${key}`}
                       onCheckedChange={() => onTreeItemClick([`${key}.__model__`], value.__model__)}
                       checked={!!value.__model__}
+                      disabled={disabled}
                       style={{ marginRight: '1rem' }}
                     />
                   </Flex>

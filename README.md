@@ -73,16 +73,23 @@ localazy: {
 
 ## 🔐 Access control (RBAC)
 
-The plugin registers four Strapi permission actions, visible under
-**Settings → Administration Panel → Roles → Plugins → Localazy** and
-**Settings → Administration Panel → Roles → Settings → Localazy**:
+The plugin registers four Strapi permission actions, all visible under
+**Settings → Administration Panel → Roles → Plugins → Localazy** (grouped
+by `General` and `Settings` sub-categories):
 
-| Action                                                              | Unlocks                                                                                                                                                                                                                                                   |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Localazy → Read` (`plugin::localazy.read`)                         | Localazy menu link, Overview, Activity Logs (list + detail), Content-Manager side panel & Localazy status column, read endpoints (identity, project, models, plugin settings, sync cursor, activity logs, troubleshooting bundle, entry-exclusion state). |
-| `Localazy → Transfer` (`plugin::localazy.transfer`)                 | Upload, Download, Entry Exclusion mutations (incl. Content-Manager bulk actions), Activity Log session clearing.                                                                                                                                          |
-| `Localazy → Settings → Read` (`plugin::localazy.settings.read`)     | Localazy Settings pages (Global Settings, Content Transfer Setup) and reading their config.                                                                                                                                                               |
-| `Localazy → Settings → Update` (`plugin::localazy.settings.update`) | **Connecting / disconnecting the Localazy account**, webhook setup, updating Content Transfer Setup, and updating Global Settings.                                                                                                                        |
+| Action                                                              | Unlocks                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Localazy → Read` (`plugin::localazy.read`)                         | Localazy menu link, Overview, Activity Logs (list + detail), Content-Manager side panel & Localazy status column, read endpoints (identity, project, models, plugin settings, **content-transfer-setup**, sync cursor, activity logs, troubleshooting bundle, entry-exclusion state). |
+| `Localazy → Transfer` (`plugin::localazy.transfer`)                 | Upload, Download, Entry Exclusion mutations (incl. Content-Manager bulk actions), Activity Log session clearing. Reading the content-transfer-setup is bundled under `Read` above so transfer-only roles can still open the Upload/Download pages.                                    |
+| `Localazy → Settings → Read` (`plugin::localazy.settings.read`)     | Adds the Localazy Settings menu links (Global Settings, Content Transfer Setup) to the admin sidebar. Form controls render read-only — Save, Cancel, the Content Transfer Setup tree, and the webhook setup buttons are disabled without `Settings → Update`.                         |
+| `Localazy → Settings → Update` (`plugin::localazy.settings.update`) | **Connecting / disconnecting the Localazy account**, webhook setup, updating Content Transfer Setup, and updating Global Settings.                                                                                                                                                    |
+
+> **Note:** the **Webhook author** picker in _Localazy Settings → Global
+> Settings_ populates from Strapi's core `/admin/users` endpoint, which is
+> gated by Strapi's own `admin::users.read` permission — independent of the
+> plugin's actions. A role with only the plugin's `Settings → Read` will
+> still see the rest of the page; the author dropdown silently falls back
+> to an empty list.
 
 Server is the enforcement perimeter — all admin-typed plugin routes are
 gated by `admin::hasPermissions`, so UI gates are convenience only.
