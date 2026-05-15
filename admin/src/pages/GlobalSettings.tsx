@@ -45,6 +45,22 @@ const GlobalSettings: React.FC = () => {
   } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
 
   /**
+   * `admin::users.read` is required to populate the webhook-author dropdown
+   * (it powers `/admin/users`). It's a core Strapi permission our plugin
+   * can't grant, so we check separately and skip the request when missing.
+   * Issued as its own `useRBAC` call because it collapses to `canRead` and
+   * would collide with any other `*.read` permission in the same call.
+   *
+   * `useRBAC` resolves async (it hits `/admin/permissions/check`), so we
+   * gate the initial fetch on `isLoading` settling — otherwise the effect
+   * would always observe the default `false` and skip the users request.
+   */
+  const {
+    allowedActions: { canRead: canReadAdminUsers },
+    isLoading: isLoadingAdminUsersRBAC,
+  } = useRBAC([{ action: 'admin::users.read', subject: null }]);
+
+  /**
    * Project Languages without default language
    */
   const [projectLanguages, setProjectLanguages] = useState<any[]>([]);
@@ -101,17 +117,27 @@ const GlobalSettings: React.FC = () => {
   };
 
   useEffect(() => {
+    // Wait for the admin::users.read check to resolve before firing the
+    // fetch — otherwise the effect always sees the default `false` and
+    // skips the users request even for roles that do have the permission.
+    if (isLoadingAdminUsersRBAC) {
+      return;
+    }
+
     async function fetchData() {
       setIsLoading(true);
 
       // `/admin/users` is gated by Strapi's core `admin::users.read` permission,
-      // which our plugin can't grant. A role with only plugin `settings.read`
-      // gets a 403 there, so isolate that call from the others — losing the
-      // user list shouldn't blank the whole settings page.
+      // which our plugin can't grant. Skip the request entirely when the role
+      // doesn't have it — the UI surfaces a note in the webhook-author block.
+      // Keep the catch as a defensive fallback (older Strapi versions, stale
+      // RBAC cache) so a 403 here doesn't blank the whole settings page.
       const [project, globalSettings, users] = await Promise.all([
         ProjectService.getConnectedProject(),
         PluginSettingsService.getPluginSettings(),
-        StrapiUsersService.getAdminPanelUsers().catch(() => [] as AdminPanelUser[]),
+        canReadAdminUsers
+          ? StrapiUsersService.getAdminPanelUsers().catch(() => [] as AdminPanelUser[])
+          : Promise.resolve([] as AdminPanelUser[]),
       ]);
 
       const projectLanguagesWithoutDefaultLanguage =
@@ -126,7 +152,11 @@ const GlobalSettings: React.FC = () => {
       setIsLoading(false);
     }
     void fetchData();
-  }, []);
+    // Re-run only when the RBAC check transitions from loading → resolved.
+    // `canReadAdminUsers` is read off the same hook and is stable once
+    // `isLoadingAdminUsersRBAC` is false, so omitting it is intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingAdminUsersRBAC]);
 
   return (
     <>
@@ -290,16 +320,44 @@ const GlobalSettings: React.FC = () => {
                   onClear={() => patchFormModel('download.webhookAuthorId', null)}
                   value={formModel?.download?.webhookAuthorId || null}
                   onChange={(value: any) => patchFormModel('download.webhookAuthorId', value)}
-                  disabled={!canUpdateSettings}
+                  disabled={!canUpdateSettings || !canReadAdminUsers}
                 >
-                  {users.map((user) => (
-                    <SingleSelectOption key={user.id} value={user.id}>
-                      {getUserLabel(user)}
-                    </SingleSelectOption>
-                  ))}
+                  {(() => {
+                    const savedAuthorId = formModel?.download?.webhookAuthorId;
+                    // Without `admin::users.read` the users list is empty, so
+                    // the SingleSelect would have no option matching the
+                    // saved id and fall back to placeholder. Inject a stub
+                    // option so the saved author is at least visible by id.
+                    // Compare as strings — the stored id can be a number
+                    // (from the API) or a string (after `SingleSelect`'s
+                    // `onChange`), and `===` would mismatch across types.
+                    const needsFallback =
+                      savedAuthorId != null && !users.some((user) => String(user.id) === String(savedAuthorId));
+                    return (
+                      <>
+                        {needsFallback && (
+                          <SingleSelectOption key={`fallback-${savedAuthorId}`} value={savedAuthorId}>
+                            {t('plugin_settings.webhook_author_unknown_user', { id: savedAuthorId })}
+                          </SingleSelectOption>
+                        )}
+                        {users.map((user) => (
+                          <SingleSelectOption key={user.id} value={user.id}>
+                            {getUserLabel(user)}
+                          </SingleSelectOption>
+                        ))}
+                      </>
+                    );
+                  })()}
                 </SingleSelect>
                 <Field.Hint />
               </Field.Root>
+              {!canReadAdminUsers && (
+                <Box paddingTop={2}>
+                  <Typography variant='pi' textColor='warning600'>
+                    {t('plugin_settings.webhook_author_permission_required')}
+                  </Typography>
+                </Box>
+              )}
               {/* Webhook languages selector */}
               <br />
               <br />

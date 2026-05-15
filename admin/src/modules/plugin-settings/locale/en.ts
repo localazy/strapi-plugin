@@ -32,6 +32,9 @@ export default {
   webhook_author_info:
     'Select the author signed under the webhook actions (required by Strapi for certain actions, e.g. creating a locale).',
   webhook_author_placeholder: 'Select webhook actions author',
+  webhook_author_permission_required:
+    'You need the Strapi “Users and Roles → Users → Read” permission (admin::users.read) to view and pick a webhook author.',
+  webhook_author_unknown_user: 'User #{{id}}',
   webhook_languages: 'Allowed webhook languages',
   webhook_languages_info:
     'Select the languages from Localazy. Translations of selected languages would be downloaded. If no language is selected, all translations will be downloaded.',
