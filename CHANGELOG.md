@@ -1,4 +1,5 @@
 # 1.6.0 (2026-07-01)
+
 ### 🔀 Pull Requests
 
 - [RBAC support — four plugin permissions + admin route gates (LOC-4200) #127](https://github.com/localazy/strapi-plugin/pull/127)
