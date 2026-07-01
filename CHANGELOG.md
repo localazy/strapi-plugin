@@ -1,3 +1,25 @@
+# 1.6.0 (2026-07-01)
+### 🔀 Pull Requests
+
+- [RBAC support — four plugin permissions + admin route gates (LOC-4200) #127](https://github.com/localazy/strapi-plugin/pull/127)
+
+### ✨ Features
+
+- RBAC support — register four plugin permissions + gate all admin routes (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+
+### 🐛 Bug Fixes
+
+- address David's RBAC follow-ups on LOC-4200 ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+- drop category from plugins-section RBAC actions so they register (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+- gate destructive plugin-settings PUT behind settings.update (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+- gate settings routes and webhook-author select by RBAC (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+- send Download ui-languages with transfer request (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+- surface all four RBAC permissions in the Plugins tab (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+
+### 🧰 Other Commits
+
+- trim verbose RBAC code comments (LOC-4200) ([d06cd79](https://github.com/localazy/strapi-plugin/commit/d06cd79)) ([#127](https://github.com/localazy/strapi-plugin/pull/127))
+
 # 1.4.0 (2026-05-13)
 
 ### 🔀 Pull Requests
