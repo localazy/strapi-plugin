@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from '@strapi/design-system';
+import { Button, Tooltip } from '@strapi/design-system';
 import { useTranslation } from 'react-i18next';
+import { useRBAC } from '@strapi/strapi/admin';
 import { getOAuthAuthorizationUrl } from '@localazy/generic-connector-client';
 import LocalazyLoginService from '../services/localazy-login-service';
 import { getStrapiDefaultLocale } from '../../@common/utils/get-default-locale';
 import { isoStrapiToLocalazy } from '../../@common/utils/iso-locales-utils';
 import config from '../../../config';
 import { LocalazyIdentity } from '../../user/model/localazy-identity';
+import { PERMISSIONS } from '../../../constants/permissions';
 import { Locales } from '@localazy/api-client';
 
 interface LoginButtonProps {
@@ -16,6 +18,8 @@ interface LoginButtonProps {
 
 const LoginButton = (props: LoginButtonProps) => {
   const { t } = useTranslation();
+  const { allowedActions } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
+  const canConnect = !!allowedActions.canUpdate;
 
   const [isLoading, setIsLoading] = useState(false);
   const login = async () => {
@@ -42,11 +46,21 @@ const LoginButton = (props: LoginButtonProps) => {
     props.onResultFetched(pollResult);
   };
 
+  const button = (
+    <Button variant='default' size='L' loading={isLoading} onClick={login} disabled={!canConnect}>
+      {t('login.login_with_localazy')}
+    </Button>
+  );
+
   return (
     <div>
-      <Button variant='default' size='L' loading={isLoading} onClick={login}>
-        {t('login.login_with_localazy')}
-      </Button>
+      {canConnect ? (
+        button
+      ) : (
+        <Tooltip label={t('login.requires_settings_update_permission')}>
+          <span>{button}</span>
+        </Tooltip>
+      )}
     </div>
   );
 };

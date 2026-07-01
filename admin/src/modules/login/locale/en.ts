@@ -5,4 +5,6 @@ export default {
     'You have to own a Localazy account for the plugin to work properly.',
   read_the_documentation: 'Read the documentation',
   logout_from_localazy: 'Disconnect from Localazy',
+  requires_settings_update_permission:
+    'Requires Localazy "settings.update" permission. Ask an admin to grant it under Settings → Roles → Plugins → Localazy.',
 };

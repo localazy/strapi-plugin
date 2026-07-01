@@ -46,6 +46,19 @@ export default class PluginSettingsService {
     }
   }
 
+  // Read-gated counterpart for per-user UI prefs (last visited route, sort
+  // prefs). Server filters the body to a fixed allowlist; sending anything else
+  // is silently dropped, so callers must only pass UI-pref fields here.
+  static async updatePluginSettingsUiPrefs(data: { defaultRoute?: string; activityLogsSort?: any }) {
+    try {
+      const result = await axiosInstance.put(`${BASE_PATH}/ui-prefs`, data);
+
+      return result.data;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   static async getSyncCursor() {
     try {
       const result = await axiosInstance.get(`${BASE_PATH}/sync-cursor`);

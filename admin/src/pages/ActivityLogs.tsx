@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, useRBAC } from '@strapi/strapi/admin';
 import { useTranslation } from 'react-i18next';
 import { Box, Flex, Button, Typography, Tabs, Dialog, Alert, Field, DatePicker } from '@strapi/design-system';
 import { Trash, Download, Information } from '@strapi/icons';
@@ -11,6 +11,7 @@ import SessionsTable from '../modules/activity-logs/components/SessionsTable';
 import PluginSettingsService from '../modules/plugin-settings/services/plugin-settings-service';
 import { PLUGIN_ID } from '../pluginId';
 import { PLUGIN_ROUTES } from '../modules/@common/utils/redirect-to-plugin-route';
+import { PERMISSIONS } from '../constants/permissions';
 import useDebouncedSearch from '../modules/activity-logs/hooks/use-debounced-search';
 import type { SessionItem, SortKey, SortDirection } from '../modules/activity-logs/models/activity-logs';
 
@@ -22,6 +23,9 @@ export type ActivityLogsProps = {
 const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const {
+    allowedActions: { canTransfer },
+  } = useRBAC(PERMISSIONS.TRANSFER);
 
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState<SessionItem[]>([]);
@@ -38,7 +42,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
   const debouncedSaveSortPrefs = useCallback((prefs: Record<string, { key: string; direction: string }>) => {
     if (saveSortTimerRef.current) clearTimeout(saveSortTimerRef.current);
     saveSortTimerRef.current = setTimeout(() => {
-      void PluginSettingsService.updatePluginSettings({ activityLogsSort: prefs });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ activityLogsSort: prefs });
     }, 1000);
   }, []);
 
@@ -102,7 +106,7 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
       void fetchSessions('upload');
     };
     void init();
-    void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
+    void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.ACTIVITY_LOGS });
   }, []);
 
   return (
@@ -115,7 +119,12 @@ const ActivityLogs: React.FC<ActivityLogsProps> = (props) => {
             <Button variant='secondary' startIcon={<Download />} onClick={onExportLogs}>
               {t('activity_logs.export_logs')}
             </Button>
-            <Button variant='danger-light' startIcon={<Trash />} onClick={() => setShowClearConfirm(true)}>
+            <Button
+              variant='danger-light'
+              startIcon={<Trash />}
+              disabled={!canTransfer}
+              onClick={() => setShowClearConfirm(true)}
+            >
               {t('activity_logs.clear_logs')}
             </Button>
           </Flex>

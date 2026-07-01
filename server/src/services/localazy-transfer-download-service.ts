@@ -26,7 +26,10 @@ import { Language, Locales } from '@localazy/api-client';
 import { SyncCursor } from '../db/model/sync-cursor';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
-const getFilteredLanguagesCodesForDownload = async (languagesCodes: string[]): Promise<string[]> => {
+const getFilteredLanguagesCodesForDownload = async (
+  languagesCodes: string[],
+  requestedUiLanguages?: string[]
+): Promise<string[]> => {
   const pluginSettingsServiceHelper = new PluginSettingsServiceHelper();
   const requestInitiatorHelper = new RequestInitiatorHelper(strapi);
   await pluginSettingsServiceHelper.setup();
@@ -35,8 +38,10 @@ const getFilteredLanguagesCodesForDownload = async (languagesCodes: string[]): P
     // called by a webhook
     localLanguagesCodes = pluginSettingsServiceHelper.getWebhookLanguagesCodes();
   } else if (requestInitiatorHelper.isInitiatedByLocalazyPluginUI()) {
-    // called by a user from the UI
-    localLanguagesCodes = pluginSettingsServiceHelper.getUiLanguagesCodes();
+    // called by a user from the UI — prefer the per-request pick over the
+    // persisted `download.uiLanguages` so `read + transfer` users (who cannot
+    // write that field) can still scope their download.
+    localLanguagesCodes = requestedUiLanguages ?? pluginSettingsServiceHelper.getUiLanguagesCodes();
   } else {
     strapi.log.warn('Called by an unknown initiator.');
     return languagesCodes;
@@ -53,9 +58,11 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
   async download({
     notificationService,
     fullSync = false,
+    requestedUiLanguages,
   }: {
     notificationService: JobNotificationServiceType;
     fullSync?: boolean;
+    requestedUiLanguages?: string[];
   }) {
     console.time('download');
     const syncMode = fullSync ? 'Full sync' : 'Incremental sync';
@@ -160,7 +167,7 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
      */
     let languagesCodes = projectLanguagesWithoutSourceLanguage.map((language) => language.code);
     // process filtered languages only / keep all if empty!
-    languagesCodes = await getFilteredLanguagesCodesForDownload(languagesCodes);
+    languagesCodes = await getFilteredLanguagesCodesForDownload(languagesCodes, requestedUiLanguages);
 
     /**
      * Iterate over languages and create the ones that are not present in Strapi

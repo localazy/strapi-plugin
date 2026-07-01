@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import cloneDeep from 'lodash-es/cloneDeep';
-import { Layouts } from '@strapi/strapi/admin';
+import { Layouts, useRBAC } from '@strapi/strapi/admin';
 import { Check } from '@strapi/icons';
 import {
   Field,
@@ -25,6 +25,7 @@ import PluginSettingsService from '../modules/plugin-settings/services/plugin-se
 import StrapiUsersService from '../modules/plugin-settings/services/strapi-users-service';
 import ProjectService from '../modules/@common/services/project-service';
 import { AdminPanelUser } from '../modules/plugin-settings/models/admin-panel-user';
+import { PERMISSIONS } from '../constants/permissions';
 // TODO: ADD TYPES
 
 // import and load resources
@@ -35,6 +36,22 @@ const GlobalSettings: React.FC = () => {
    * Translation function
    */
   const { t } = useTranslation();
+
+  /**
+   * Settings.update gate — controls are read-only without it.
+   */
+  const {
+    allowedActions: { canUpdate: canUpdateSettings },
+  } = useRBAC(PERMISSIONS.SETTINGS_UPDATE);
+
+  // `admin::users.read` powers the webhook-author dropdown (`/admin/users`).
+  // It's a core Strapi action, so we check it separately and skip the fetch
+  // when missing. `useRBAC` resolves async via `/admin/permissions/check`;
+  // the effect below waits on `isLoading` before reading `canRead`.
+  const {
+    allowedActions: { canRead: canReadAdminUsers },
+    isLoading: isLoadingAdminUsersRBAC,
+  } = useRBAC([{ action: 'admin::users.read', subject: null }]);
 
   /**
    * Project Languages without default language
@@ -93,13 +110,19 @@ const GlobalSettings: React.FC = () => {
   };
 
   useEffect(() => {
+    if (isLoadingAdminUsersRBAC) {
+      return;
+    }
+
     async function fetchData() {
       setIsLoading(true);
 
       const [project, globalSettings, users] = await Promise.all([
         ProjectService.getConnectedProject(),
         PluginSettingsService.getPluginSettings(),
-        StrapiUsersService.getAdminPanelUsers(),
+        canReadAdminUsers
+          ? StrapiUsersService.getAdminPanelUsers().catch(() => [] as AdminPanelUser[])
+          : Promise.resolve([] as AdminPanelUser[]),
       ]);
 
       const projectLanguagesWithoutDefaultLanguage =
@@ -114,7 +137,9 @@ const GlobalSettings: React.FC = () => {
       setIsLoading(false);
     }
     void fetchData();
-  }, []);
+    // `canReadAdminUsers` is stable once `isLoadingAdminUsersRBAC` is false.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingAdminUsersRBAC]);
 
   return (
     <>
@@ -123,12 +148,12 @@ const GlobalSettings: React.FC = () => {
         subtitle={t('plugin_settings.global_settings_description')}
         primaryAction={
           <Flex gap={2}>
-            <Button variant='secondary' disabled={!hasUnsavedChanges} onClick={onCancelClick}>
+            <Button variant='secondary' disabled={!canUpdateSettings || !hasUnsavedChanges} onClick={onCancelClick}>
               {t('plugin_settings.cancel')}
             </Button>
             <Button
               startIcon={<Check />}
-              disabled={!hasUnsavedChanges}
+              disabled={!canUpdateSettings || !hasUnsavedChanges}
               onClick={() => {
                 void saveGlobalSettings(formModel);
               }}
@@ -171,6 +196,7 @@ const GlobalSettings: React.FC = () => {
                 <Toggle
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.upload?.allowAutomated === 'boolean' ? formModel.upload.allowAutomated : false
                   }
@@ -192,7 +218,8 @@ const GlobalSettings: React.FC = () => {
                   value={formModel?.upload?.automatedTriggers || []}
                   onChange={(values: any) => patchFormModel('upload.automatedTriggers', values)}
                   disabled={
-                    typeof formModel?.upload?.allowAutomated === 'boolean' ? !formModel.upload.allowAutomated : true
+                    !canUpdateSettings ||
+                    (typeof formModel?.upload?.allowAutomated === 'boolean' ? !formModel.upload.allowAutomated : true)
                   }
                   multi
                   withTags
@@ -211,6 +238,7 @@ const GlobalSettings: React.FC = () => {
                   hint={t('plugin_settings.deprecate_source_keys_on_delete_info')}
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.upload?.allowDeprecate === 'boolean' ? formModel.upload.allowDeprecate : false
                   }
@@ -234,7 +262,7 @@ const GlobalSettings: React.FC = () => {
                 {t('plugin_settings.webhook_setup_title')}
               </Typography>
               <br />
-              <WebhookSetup />
+              <WebhookSetup disabled={!canUpdateSettings} />
               <br />
               <br />
               <Divider />
@@ -253,6 +281,7 @@ const GlobalSettings: React.FC = () => {
                   hint={t('plugin_settings.processing_of_download_webhook_info')}
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.download?.processDownloadWebhook === 'boolean'
                       ? formModel.download.processDownloadWebhook
@@ -274,15 +303,42 @@ const GlobalSettings: React.FC = () => {
                   onClear={() => patchFormModel('download.webhookAuthorId', null)}
                   value={formModel?.download?.webhookAuthorId || null}
                   onChange={(value: any) => patchFormModel('download.webhookAuthorId', value)}
+                  disabled={!canUpdateSettings || !canReadAdminUsers}
                 >
-                  {users.map((user) => (
-                    <SingleSelectOption key={user.id} value={user.id}>
-                      {getUserLabel(user)}
-                    </SingleSelectOption>
-                  ))}
+                  {(() => {
+                    const savedAuthorId = formModel?.download?.webhookAuthorId;
+                    // Fall back to a stub option when the saved id is not in
+                    // the users list (e.g. role lacks `admin::users.read`),
+                    // so the SingleSelect still renders the configured author.
+                    // String-compare: the id can be a number (from the API)
+                    // or a string (after `SingleSelect`'s `onChange`).
+                    const needsFallback =
+                      savedAuthorId != null && !users.some((user) => String(user.id) === String(savedAuthorId));
+                    return (
+                      <>
+                        {needsFallback && (
+                          <SingleSelectOption key={`fallback-${savedAuthorId}`} value={savedAuthorId}>
+                            {t('plugin_settings.webhook_author_unknown_user', { id: savedAuthorId })}
+                          </SingleSelectOption>
+                        )}
+                        {users.map((user) => (
+                          <SingleSelectOption key={user.id} value={user.id}>
+                            {getUserLabel(user)}
+                          </SingleSelectOption>
+                        ))}
+                      </>
+                    );
+                  })()}
                 </SingleSelect>
                 <Field.Hint />
               </Field.Root>
+              {!canReadAdminUsers && (
+                <Box paddingTop={2}>
+                  <Typography variant='pi' textColor='warning600'>
+                    {t('plugin_settings.webhook_author_permission_required')}
+                  </Typography>
+                </Box>
+              )}
               {/* Webhook languages selector */}
               <br />
               <br />
@@ -293,6 +349,7 @@ const GlobalSettings: React.FC = () => {
                 label={t('plugin_settings.webhook_languages')}
                 hint={t('plugin_settings.webhook_languages_info')}
                 placeholder={t('plugin_settings.webhook_languages_placeholder')}
+                disabled={!canUpdateSettings}
               />
               {/* Webhook incremental sync */}
               <br />
@@ -302,6 +359,7 @@ const GlobalSettings: React.FC = () => {
                 <Toggle
                   offLabel={t('plugin_settings.off')}
                   onLabel={t('plugin_settings.on')}
+                  disabled={!canUpdateSettings}
                   checked={
                     typeof formModel?.download?.webhookIncrementalSync === 'boolean'
                       ? formModel.download.webhookIncrementalSync

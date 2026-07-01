@@ -9,9 +9,20 @@ import EntryExclusionRoutes from './entry-exclusion-routes';
 import ActivityLogsRoutes from './activity-logs-routes';
 import DebugBundleRoutes from './debug-bundle-routes';
 
+type AdminRoute = (typeof StrapiRoutes)[number];
+
+// StrapiRoutes is also exposed under the content-api group (API-token auth, no admin
+// userAbility on ctx.state). Strip the admin policies for that copy so existing
+// content-api callers keep working unchanged.
+const withoutAdminPolicies = (routes: AdminRoute[]): AdminRoute[] =>
+  routes.map((route) => ({
+    ...route,
+    config: { ...route.config, policies: [] },
+  }));
+
 export default {
   'content-api': {
-    routes: [...StrapiRoutes],
+    routes: withoutAdminPolicies(StrapiRoutes),
   },
   admin: {
     type: 'admin',

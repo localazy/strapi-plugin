@@ -9,7 +9,11 @@ const LOCALAZY_DOCS_URL = 'https://localazy.com/docs/general/webhooks';
 
 type WebhookState = 'loading' | 'configured' | 'not_configured';
 
-function WebhookSetup() {
+interface WebhookSetupProps {
+  disabled?: boolean;
+}
+
+function WebhookSetup({ disabled = false }: WebhookSetupProps = {}) {
   const { t } = useTranslation();
 
   const [state, setState] = useState<WebhookState>('loading');
@@ -98,7 +102,7 @@ function WebhookSetup() {
             </Typography>
           </Box>
           <Box marginTop={3}>
-            <Button variant='tertiary' onClick={() => setShowModal(true)}>
+            <Button variant='tertiary' disabled={disabled} onClick={() => setShowModal(true)}>
               {t('plugin_settings.webhook_setup_reconfigure')}
             </Button>
           </Box>
@@ -117,7 +121,9 @@ function WebhookSetup() {
             {t('plugin_settings.webhook_setup_description')}
           </Typography>
           <Flex gap={3} marginTop={3} alignItems='center'>
-            <Button onClick={() => setShowModal(true)}>{t('plugin_settings.webhook_setup_button')}</Button>
+            <Button disabled={disabled} onClick={() => setShowModal(true)}>
+              {t('plugin_settings.webhook_setup_button')}
+            </Button>
             <Link href={LOCALAZY_DOCS_URL} isExternal startIcon={<LinkIcon />}>
               {t('plugin_settings.webhook_setup_docs_link')}
             </Link>

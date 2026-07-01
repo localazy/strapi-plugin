@@ -39,7 +39,7 @@ const Overview: React.FC<OverviewProps> = ({ title, subtitle, isLoadingProp = fa
       const project = await ProjectService.getConnectedProject();
       setConnectedProject(project);
 
-      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.OVERVIEW });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.OVERVIEW });
 
       setIsLoading(false);
     }

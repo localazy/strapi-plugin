@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import cloneDeep from 'lodash-es/cloneDeep';
-import set from 'lodash-es/set';
 import { Layouts } from '@strapi/strapi/admin';
 import { Box, Button, Alert, Flex, Divider, Typography, Dialog } from '@strapi/design-system';
 import { Download as DownloadIcon } from '@strapi/icons';
@@ -63,20 +61,16 @@ const Download: React.FC<DownloadProps> = (props) => {
   const [projectLanguages, setProjectLanguages] = useState([]);
 
   /**
-   * Global Settings form model
+   * Per-session UI language pick. Sent with each download request rather than
+   * persisted to plugin-settings, so callers without `settings.update` (e.g.
+   * `read + transfer`) can still influence the download — the persisted
+   * `download.uiLanguages` field is only writable via `settings.update`-gated
+   * routes and we must not call them from this `transfer`-gated page.
    */
-  const [formModel, setFormModel] = useState<any>({});
+  const [uiLanguages, setUiLanguages] = useState<string[]>([]);
 
-  const onDownloadLanguagesChange = (languages: any[]) => {
-    const newFormModel = cloneDeep(formModel);
-    set(newFormModel, 'download.uiLanguages', languages);
-    setFormModel(newFormModel);
-
-    try {
-      void PluginSettingsService.updatePluginSettings(newFormModel);
-    } catch (e: any) {
-      console.error(e.message);
-    }
+  const onDownloadLanguagesChange = (languages: string[]) => {
+    setUiLanguages(languages);
   };
 
   const onDownloadClick = async (fullSync = false) => {
@@ -86,7 +80,7 @@ const Download: React.FC<DownloadProps> = (props) => {
       success: false,
       report: [],
     });
-    const result = await LocalazyDownloadService.download({ fullSync });
+    const result = await LocalazyDownloadService.download({ fullSync, uiLanguages });
     const { streamIdentifier } = result;
     downloadAlertsService.setStreamIdentifier(streamIdentifier);
     downloadAlertsService.onDownload((data: any) => {
@@ -138,9 +132,12 @@ const Download: React.FC<DownloadProps> = (props) => {
         project?.languages?.filter((language) => language.id !== project.sourceLanguage) || [];
       setProjectLanguages(projectLanguagesWithoutDefaultLanguage as any);
 
-      setFormModel(globalSettings);
+      // Seed the per-session pick from the last persisted value (if any) so
+      // the UI still feels stateful for users with `settings.update`, but the
+      // pick now travels with the download request itself.
+      setUiLanguages(Array.isArray(globalSettings?.download?.uiLanguages) ? globalSettings.download.uiLanguages : []);
 
-      void PluginSettingsService.updatePluginSettings({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
+      void PluginSettingsService.updatePluginSettingsUiPrefs({ defaultRoute: PLUGIN_ROUTES.DOWNLOAD });
 
       setIsLoading(false);
     }
@@ -199,7 +196,7 @@ const Download: React.FC<DownloadProps> = (props) => {
             <Typography variant='omega'>{t('download.make_sure_note_c')}</Typography>
             <Box paddingTop={6}>
               <LanguagesSelector
-                preselectedLanguages={formModel?.download?.uiLanguages || []}
+                preselectedLanguages={uiLanguages}
                 projectLanguages={projectLanguages}
                 onChange={(languages) => onDownloadLanguagesChange(languages)}
                 label={t('download.ui_languages')}

@@ -5,6 +5,12 @@ import { KEY as PLUGIN_SETTINGS_KEY, PluginSettings, emptyPluginSettings } from 
 import { KEY as SYNC_CURSOR_KEY, SyncCursor, emptySyncCursor } from '../db/model/sync-cursor';
 import getStrapiStore from '../db/model/utils/get-strapi-store';
 import { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
+
+// Fields settable via the `read`-gated UI-prefs endpoint. Anything outside this
+// allowlist must go through `updatePluginSettings` (gated by `settings.update`).
+const UI_PREF_FIELDS = ['defaultRoute', 'activityLogsSort'] as const;
+type UiPrefField = (typeof UI_PREF_FIELDS)[number];
+export type PluginSettingsUiPrefs = Partial<Pick<PluginSettings, UiPrefField>>;
 const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
   async getContentTransferSetup(): Promise<ContentTransferSetup> {
     const pluginStore = getStrapiStore(strapi);
@@ -49,6 +55,22 @@ const PluginSettingsService = ({ strapi }: { strapi: Core.Strapi }) => ({
     });
 
     return newSettings;
+  },
+
+  // Counterpart to `updatePluginSettings` for the `read`-gated UI-prefs route.
+  // Drops any field outside `UI_PREF_FIELDS` server-side so a `read`-only caller
+  // cannot reach `webhookConfig` / `download.*` / `upload.*` via the merge.
+  async updatePluginSettingsUiPrefs(prefs: PluginSettingsUiPrefs): Promise<PluginSettings> {
+    const sanitized: PluginSettingsUiPrefs = {};
+    if (prefs && typeof prefs === 'object') {
+      for (const field of UI_PREF_FIELDS) {
+        if (field in prefs) {
+          (sanitized as Record<string, unknown>)[field] = (prefs as Record<string, unknown>)[field];
+        }
+      }
+    }
+
+    return this.updatePluginSettings(sanitized);
   },
 
   async getSyncCursor(): Promise<SyncCursor> {

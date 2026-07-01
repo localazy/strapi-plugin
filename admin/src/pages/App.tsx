@@ -8,13 +8,14 @@ import PluginSettingsService from '../modules/plugin-settings/services/plugin-se
 import { useHeaderTitle } from '../modules/@common/utils/use-header-title';
 import { useHeaderSubtitle } from '../modules/@common/utils/use-header-subtitle';
 import Login from './Login';
-import { Layouts, Page } from '@strapi/strapi/admin';
+import { Layouts, Page, useRBAC } from '@strapi/strapi/admin';
 import SideNav from '../modules/@common/components/SideNav';
 import Overview from './Overview';
 import { getDefaultTheme } from '../modules/strapi/utils/get-default-theme';
 import Loader from '../modules/@common/components/PluginPageLoader';
 import { HeadingFixGlobalStyle } from '../modules/@common/styles/heading-fix';
 import PluginErrorBoundary from '../components/PluginErrorBoundary';
+import { PERMISSIONS } from '../constants/permissions';
 
 // import and load resources
 import '../i18n';
@@ -30,6 +31,11 @@ const App = () => {
   const { isLoggedIn, isFetchingIdentity } = useLocalazyIdentity();
   const headerTitle = useHeaderTitle();
   const headerSubtitle = useHeaderSubtitle();
+
+  const {
+    allowedActions: { canRead, canTransfer },
+    isLoading: isLoadingPermissions,
+  } = useRBAC([...PERMISSIONS.READ, ...PERMISSIONS.TRANSFER]);
 
   const normalizedPath = location.pathname.replace(/\/+$/, '');
   const pluginRoot = `/plugins/${PLUGIN_ID}`;
@@ -56,6 +62,34 @@ const App = () => {
     void fetchData();
   }, [isLoggedIn, isFetchingIdentity, normalizedPath]);
 
+  if (isLoadingPermissions) {
+    return (
+      <DesignSystemProvider theme={getDefaultTheme()}>
+        <HeadingFixGlobalStyle />
+        <Box background='neutral100'>
+          <Layouts.Root>
+            <Loader />
+          </Layouts.Root>
+        </Box>
+      </DesignSystemProvider>
+    );
+  }
+
+  if (!canRead) {
+    return (
+      <DesignSystemProvider theme={getDefaultTheme()}>
+        <HeadingFixGlobalStyle />
+        <Box background='neutral100'>
+          <Layouts.Root>
+            <Page.NoPermissions />
+          </Layouts.Root>
+        </Box>
+      </DesignSystemProvider>
+    );
+  }
+
+  const transferElement = (page: JSX.Element) => (canTransfer ? page : <Page.NoPermissions />);
+
   return (
     <DesignSystemProvider theme={getDefaultTheme()}>
       <HeadingFixGlobalStyle />
@@ -72,8 +106,14 @@ const App = () => {
                 path={`overview`}
                 element={<Overview title={headerTitle} subtitle={headerSubtitle} isLoadingProp={false} />}
               />
-              <Route path={`upload`} element={<Upload title={headerTitle} subtitle={headerSubtitle} />} />
-              <Route path={`download`} element={<Download title={headerTitle} subtitle={headerSubtitle} />} />
+              <Route
+                path={`upload`}
+                element={transferElement(<Upload title={headerTitle} subtitle={headerSubtitle} />)}
+              />
+              <Route
+                path={`download`}
+                element={transferElement(<Download title={headerTitle} subtitle={headerSubtitle} />)}
+              />
               <Route path={`activity-logs`} element={<ActivityLogs title={headerTitle} subtitle={headerSubtitle} />} />
               <Route
                 path={`activity-logs/:sessionId`}
