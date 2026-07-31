@@ -1,4 +1,12 @@
-import { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, findModel } from '../model-utils';
+import {
+  getAttribute,
+  isComponent,
+  isDynamicZone,
+  isRepeatable,
+  isRelation,
+  isBlocks,
+  findModel,
+} from '../model-utils';
 
 describe('model-utils', () => {
   describe('getAttribute', () => {
@@ -81,6 +89,18 @@ describe('model-utils', () => {
       expect(isRelation({ type: 'string' })).toBe(false);
       expect(isRelation({ type: 'component' })).toBe(false);
       expect(isRelation({ type: 'dynamiczone' })).toBe(false);
+    });
+  });
+
+  describe('isBlocks', () => {
+    it('should return true for blocks attributes', () => {
+      expect(isBlocks({ type: 'blocks' })).toBe(true);
+    });
+
+    it('should return false for non-blocks attributes', () => {
+      expect(isBlocks({ type: 'string' })).toBe(false);
+      expect(isBlocks({ type: 'richtext' })).toBe(false);
+      expect(isBlocks({ type: 'json' })).toBe(false);
     });
   });
 

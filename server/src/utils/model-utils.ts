@@ -25,9 +25,13 @@ const isRelation = (attributeObj) => {
   return attributeObj.type === 'relation' && attributeObj.target !== 'plugin::upload.file';
 };
 
+const isBlocks = (attributeObj) => {
+  return attributeObj.type === 'blocks';
+};
+
 const findModel = (models, uid) => {
   const model = models.find((model) => model.uid === uid);
   return model;
 };
 
-export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, findModel };
+export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, isBlocks, findModel };

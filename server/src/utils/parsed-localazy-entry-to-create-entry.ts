@@ -1,6 +1,7 @@
 import { set, get } from 'lodash-es';
 import { resetArrayKeysDeep } from './reset-array-keys-deep';
-import { getAttribute, isComponent, isDynamicZone, isRepeatable, findModel } from './model-utils';
+import { getAttribute, isComponent, isDynamicZone, isRepeatable, isBlocks, findModel } from './model-utils';
+import { parseBlocksFieldValue } from './blocks-field-serialization';
 
 /**
  * Items positioning is done by the `toCreateEntry` function
@@ -172,7 +173,14 @@ export const parsedLocalazyEntryToCreateEntry = (
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
           }
-          set(createEntry, newPrefix, value);
+          // Blocks fields travel as a single serialized string ("one story = one key"); rebuild the
+          // AST and store it verbatim (what's stored is what's rendered). Skip malformed payloads
+          // rather than write an invalid document.
+          const valueToSet = isBlocks(attribute) ? parseBlocksFieldValue(value) : value;
+          if (valueToSet === undefined) {
+            return;
+          }
+          set(createEntry, newPrefix, valueToSet);
 
           if (component) {
             const componentKeyToSet = `${newPrefixBase}.__component`;
