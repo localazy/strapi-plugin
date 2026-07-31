@@ -1,4 +1,5 @@
 import { isEmpty } from 'lodash-es';
+import { BLOCKS_ATTRIBUTE_TYPE } from './blocks-to-translatable';
 
 const getAttribute = (model, attribute) => {
   if (isEmpty(model)) {
@@ -26,7 +27,7 @@ const isRelation = (attributeObj) => {
 };
 
 const isBlocks = (attributeObj) => {
-  return attributeObj.type === 'blocks';
+  return attributeObj.type === BLOCKS_ATTRIBUTE_TYPE;
 };
 
 const findModel = (models, uid) => {

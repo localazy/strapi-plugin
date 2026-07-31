@@ -1,7 +1,7 @@
 import { set, get } from 'lodash-es';
 import { resetArrayKeysDeep } from './reset-array-keys-deep';
 import { getAttribute, isComponent, isDynamicZone, isRepeatable, isBlocks, findModel } from './model-utils';
-import { parseBlocksFieldValue } from './blocks-field-serialization';
+import { overlayBlocksTranslation } from './blocks-to-translatable';
 
 /**
  * Items positioning is done by the `toCreateEntry` function
@@ -173,10 +173,11 @@ export const parsedLocalazyEntryToCreateEntry = (
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
           }
-          // Blocks fields travel as a single serialized string ("one story = one key"); rebuild the
-          // AST and store it verbatim (what's stored is what's rendered). Skip malformed payloads
-          // rather than write an invalid document.
-          const valueToSet = isBlocks(attribute) ? parseBlocksFieldValue(value) : value;
+          // A blocks field arrives as a text-only skeleton (one segment per text node). Rebuild the
+          // full AST by overlaying the translated text onto the source-locale AST, so structure and
+          // formatting are restored from the source. Skip when there is no source AST to overlay
+          // onto rather than write an invalid document.
+          const valueToSet = isBlocks(attribute) ? overlayBlocksTranslation(get(baseEntry, newPrefix), value) : value;
           if (valueToSet === undefined) {
             return;
           }
