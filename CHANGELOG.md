@@ -1,4 +1,5 @@
 # 1.7.0 (2026-08-03)
+
 ### 🔀 Pull Requests
 
 - [support Strapi Blocks (rich text) fields in content transfer (LOC-4580) #129](https://github.com/localazy/strapi-plugin/pull/129)
