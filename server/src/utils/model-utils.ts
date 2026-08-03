@@ -1,4 +1,5 @@
 import { isEmpty } from 'lodash-es';
+import { BLOCKS_ATTRIBUTE_TYPE } from './blocks-to-translatable';
 
 const getAttribute = (model, attribute) => {
   if (isEmpty(model)) {
@@ -25,9 +26,13 @@ const isRelation = (attributeObj) => {
   return attributeObj.type === 'relation' && attributeObj.target !== 'plugin::upload.file';
 };
 
+const isBlocks = (attributeObj) => {
+  return attributeObj.type === BLOCKS_ATTRIBUTE_TYPE;
+};
+
 const findModel = (models, uid) => {
   const model = models.find((model) => model.uid === uid);
   return model;
 };
 
-export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, findModel };
+export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, isBlocks, findModel };

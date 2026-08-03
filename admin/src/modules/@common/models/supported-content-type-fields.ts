@@ -1,4 +1,4 @@
-export type SupportedContentTypeField = 'string' | 'text' | 'richtext' | 'email' | 'json';
+export type SupportedContentTypeField = 'string' | 'text' | 'richtext' | 'email' | 'json' | 'blocks';
 
 export const SUPPORTED_CONTENT_TYPE_FIELDS: SupportedContentTypeField[] = [
   'string',
@@ -6,4 +6,5 @@ export const SUPPORTED_CONTENT_TYPE_FIELDS: SupportedContentTypeField[] = [
   'richtext',
   'email',
   'json',
+  'blocks',
 ];

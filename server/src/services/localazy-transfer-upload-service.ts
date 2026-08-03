@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi';
 import { flattenObject } from '../utils/flatten-object';
+import { projectBlocksFields } from '../utils/blocks-to-translatable';
 import {
   getCollectionsNames,
   findSetupModelByCollectionName,
@@ -165,8 +166,11 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
       entries = omitDeep(entries, ['locale', 'createdAt', 'updatedAt', 'publishedAt']);
 
       entries.forEach((entry) => {
+        const projectedEntry = projectBlocksFields(entry, strapi.getModel(modelUid), (uid) =>
+          strapi.getModel(uid as any)
+        );
         const flatten = flattenObject({
-          [modelUid]: entry,
+          [modelUid]: projectedEntry,
         });
         // get only enabled fields; "__component" will be filtered out inside of the function
         const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
