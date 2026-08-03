@@ -1,3 +1,13 @@
+# 1.7.0 (2026-08-03)
+### 🔀 Pull Requests
+
+- [support Strapi Blocks (rich text) fields in content transfer (LOC-4580) #129](https://github.com/localazy/strapi-plugin/pull/129)
+
+### ✨ Features
+
+- blocks transfer as per-node text segments with structure overlay ([2d86d46](https://github.com/localazy/strapi-plugin/commit/2d86d46)) ([#129](https://github.com/localazy/strapi-plugin/pull/129))
+- support Strapi Blocks (rich text) fields in content transfer ([2d86d46](https://github.com/localazy/strapi-plugin/commit/2d86d46)) ([#129](https://github.com/localazy/strapi-plugin/pull/129))
+
 # 1.6.0 (2026-07-01)
 
 ### 🔀 Pull Requests
