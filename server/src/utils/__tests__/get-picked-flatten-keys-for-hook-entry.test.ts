@@ -77,7 +77,11 @@ jest.mock('../../core', () => ({
   getLocalazyPubAPIService: () => ({
     getProject: async () => ({ sourceLanguage: 1, languages: [{ id: 1, code: 'cs' }] }),
   }),
-  getStrapiI18nService: () => ({ getLocales: async () => [{ code: 'cs', isDefault: true }] }),
+  // as Strapi's i18n returns them: locale rows carry no `isDefault`, the default comes separately
+  getStrapiI18nService: () => ({
+    getLocales: async () => [{ code: 'en' }, { code: 'cs' }],
+    getDefaultLocaleCode: async () => 'cs',
+  }),
   getEntryExclusionService: () => ({ getContentTypeExclusions: async () => excluded }),
 }));
 

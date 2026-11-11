@@ -144,11 +144,11 @@ export default async (params: HookParams) => {
   const projectSourceLanguageCode = sourceLanguage.code;
 
   // Strapi default locale not compatible with project source language
-  const strapiLocales = await StrapiI18nService.getLocales();
-  const defaultLocale = strapiLocales.find((locale) => locale.isDefault);
+  // `locales.find()` returns plain rows without `isDefault`; ask i18n for the default locale itself
+  const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
 
-  const strapiDefaultLocale = defaultLocale
-    ? isoStrapiToLocalazy(defaultLocale.code)
+  const strapiDefaultLocale = strapiDefaultLocaleCode
+    ? isoStrapiToLocalazy(strapiDefaultLocaleCode)
     : config.default.LOCALAZY_DEFAULT_LOCALE;
   if (strapiDefaultLocale !== projectSourceLanguageCode) {
     strapi.log.warn("Localazy Plugin: Source locales do not match; the operation won't proceed");
