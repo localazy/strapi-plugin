@@ -1,4 +1,5 @@
 ## 1.7.1 (2026-11-11)
+
 ### 🔀 Pull Requests
 
 - [write downloaded blocks/json fields and component lists correctly (nested, incremental, structure changes) #131](https://github.com/localazy/strapi-plugin/pull/131)
