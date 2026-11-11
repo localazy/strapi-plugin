@@ -1,8 +1,5 @@
 import { cloneDeep, isPlainObject } from 'lodash-es';
-import { projectBlocksFields } from '../blocks-to-translatable';
-import { flattenObject } from '../flatten-object';
-import { pickEntries } from '../pick-entries';
-import { getPickPathsWithComponents } from '../transfer-setup-utils';
+import { getUploadKeysForEntries } from '../get-upload-keys-for-entries';
 import { collectDownloadedContent, DownloadedLocalazyKey } from '../collect-downloaded-content';
 import { buildLocalizedCreateEntry } from '../build-localized-create-entry';
 import { parsedLocalazyEntryToUpdateEntry } from '../parsed-localazy-entry-to-update-entry';
@@ -259,10 +256,12 @@ const normalize = (value: any): any => {
 // ---------------------------------------------------------------------------------------------
 
 const upload = (sourceEntry: any): Record<string, string> => {
-  const projected = projectBlocksFields(sourceEntry, getModel(uid), getModel);
-  const flat = flattenObject({ [uid]: projected });
-  const pickPaths = getPickPathsWithComponents(setupModel).map((path) => `${uid}.${path}`);
-  const picked = pickEntries(flat, pickPaths);
+  const picked = getUploadKeysForEntries({
+    entries: [sourceEntry],
+    modelUid: uid,
+    transferSetupModelProps: setupModel,
+    getModel,
+  });
   // Localazy stores no empty source strings
   return Object.fromEntries(Object.entries(picked).filter(([, v]) => typeof v === 'string' && v !== '')) as any;
 };
