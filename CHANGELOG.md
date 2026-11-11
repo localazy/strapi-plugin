@@ -1,4 +1,5 @@
 ## 1.7.2 (2026-11-11)
+
 ### 🔀 Pull Requests
 
 - [automated upload works for non-English sources and matches the manual upload; webhook dialog URL #133](https://github.com/localazy/strapi-plugin/pull/133)
