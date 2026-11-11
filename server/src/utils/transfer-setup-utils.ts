@@ -15,7 +15,8 @@ const findSetupModelByCollectionUid = (contentTransferSetup, strapiContentTypesM
   const modelContentTransferSetup = contentTransferSetup.setup.find(
     (model) => Object.keys(model)[0] === currentModel.collectionName
   );
-  return modelContentTransferSetup[currentModel.collectionName];
+  // a model that is not part of the Content Transfer Setup (anymore) has no setup
+  return modelContentTransferSetup?.[currentModel.collectionName];
 };
 
 const getCollectionsNames = (setup) => {

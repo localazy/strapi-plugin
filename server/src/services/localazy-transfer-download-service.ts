@@ -1,11 +1,7 @@
-import { findSetupModelByCollectionUid } from '../utils/transfer-setup-utils';
 import config from '../config';
 import { isoLocalazyToStrapi } from '../utils/iso-locales-utils';
-import {
-  shouldSetDownloadedProperty,
-  ShouldSetDownloadedPropertyReturnType,
-} from '../functions/should-set-downloaded-property';
-import { set, get, isEmpty } from 'lodash-es';
+import { collectDownloadedContent, DownloadedLocalazyKey } from '../utils/collect-downloaded-content';
+import { isEmpty } from 'lodash-es';
 import RequestInitiatorHelper from '../utils/request-initiator-helper';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
 import { EventType } from '../constants/events';
@@ -22,7 +18,7 @@ import {
   getEntryExclusionService,
   getActivityLogsService,
 } from '../core';
-import { Language, Locales } from '@localazy/api-client';
+import { Locales } from '@localazy/api-client';
 import { SyncCursor } from '../db/model/sync-cursor';
 import { JobNotificationServiceType } from './helpers/job-notification-service';
 
@@ -282,15 +278,9 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
     /**
      * Parse Localazy content
      */
-    type ParsedLocalazyContent = Record<Language['code'], Record<UID.ContentType, Record<string, any>>>;
-
-    const parsedLocalazyContent: ParsedLocalazyContent = {};
     const strapiContentTypesModels = await StrapiService.getModels();
-    const jsonFields = [];
 
-    // Track which Localazy keys contribute to each Strapi entry: "isoStrapi:uid:documentId" → [{lang, id, event}]
-    const entryKeySourceMap: Record<string, Array<{ lang: string; id: string; event: number | undefined }>> = {};
-
+    const languagesToParse: Array<{ isoStrapi: string; keys: DownloadedLocalazyKey[] }> = [];
     for (const [isoLocalazy, keys] of Object.entries<any>(localazyContent)) {
       const isoStrapi = isoLocalazyToStrapi(isoLocalazy);
       if (!isoStrapi) {
@@ -299,100 +289,17 @@ const LocalazyTransferDownloadService = ({ strapi }: { strapi: Core.Strapi }) =>
         });
         continue;
       }
-
-      for (const localazyEntry of keys) {
-        const key = localazyEntry.key[0];
-        const value = localazyEntry.value;
-        const localazyKeyId: string = localazyEntry.id;
-        const localazyKeyEvent: number | undefined = localazyEntry.event;
-
-        // Skip keys already processed at the same or newer event for this language
-        const storedEvent = processedKeys[isoStrapi]?.[localazyKeyId];
-        if (storedEvent !== undefined && localazyKeyEvent !== undefined && localazyKeyEvent <= storedEvent) {
-          continue;
-        }
-
-        const parsedKey = StrapiI18nService.parseLocalazyKey(key);
-
-        // Track source key for this entry
-        const entryKey = `${isoStrapi}:${parsedKey.uid}:${parsedKey.id}`;
-        if (!entryKeySourceMap[entryKey]) {
-          entryKeySourceMap[entryKey] = [];
-        }
-        entryKeySourceMap[entryKey].push({ lang: isoStrapi, id: localazyKeyId, event: localazyKeyEvent });
-
-        const modelContentTransferSetup = findSetupModelByCollectionUid(
-          contentTransferSetup,
-          strapiContentTypesModels,
-          parsedKey.uid
-        );
-
-        if (typeof modelContentTransferSetup !== 'undefined') {
-          const shouldSetDownloadedPropertyResult = shouldSetDownloadedProperty(
-            modelContentTransferSetup,
-            parsedKey.rest
-          );
-          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.NO) {
-            continue;
-          }
-
-          let parsedKeyRestWithoutComponents = parsedKey.rest;
-          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.JSON) {
-            const setKey = [isoStrapi, parsedKey.uid, parsedKey.id];
-
-            // handle dynamic zones and components here
-            let updatedParsedKeyRestWithoutComponents = parsedKeyRestWithoutComponents;
-            let segmentsToAdd = [];
-            for (const segment of parsedKeyRestWithoutComponents) {
-              const hasEntry = get(modelContentTransferSetup, [...segmentsToAdd, segment]);
-              const hasEntryNotFinal = hasEntry && typeof hasEntry !== 'boolean';
-              // const isDZ = Array.isArray(hasEntry) && hasEntry.every((entry) => entry.__component__);
-              // processed till here in iterations and `segment` is numeric
-              const isComponent = parseInt(segment) > 0;
-
-              if (hasEntryNotFinal || (!hasEntry && isComponent)) {
-                segmentsToAdd.push(segment);
-                setKey.push(segment);
-                updatedParsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents.slice(1);
-              } else {
-                break;
-              }
-            }
-            parsedKeyRestWithoutComponents = updatedParsedKeyRestWithoutComponents;
-
-            let foundJsonFieldIndex = jsonFields.findIndex((jsonField) => {
-              return jsonField.setKey.join() === setKey.join();
-            });
-            if (foundJsonFieldIndex === -1) {
-              jsonFields.push({
-                setKey,
-                jsonKey: parsedKeyRestWithoutComponents[0],
-                jsonValue: {},
-              });
-            }
-
-            foundJsonFieldIndex = foundJsonFieldIndex === -1 ? jsonFields.length - 1 : foundJsonFieldIndex;
-            const foundJsonField = jsonFields[foundJsonFieldIndex];
-            // rest from index 1
-            const restSliced = parsedKeyRestWithoutComponents.slice(1);
-            set(foundJsonField, ['jsonValue', ...restSliced], value);
-            jsonFields[foundJsonFieldIndex] = foundJsonField;
-          }
-
-          if (shouldSetDownloadedPropertyResult === ShouldSetDownloadedPropertyReturnType.YES) {
-            const setKey = [isoStrapi, parsedKey.uid, parsedKey.id, ...parsedKeyRestWithoutComponents];
-            set(parsedLocalazyContent, setKey, value);
-          }
-        }
-      }
+      languagesToParse.push({ isoStrapi, keys });
     }
 
-    /**
-     * Set json fields if applicable
-     */
-    for (const jsonField of jsonFields) {
-      set(parsedLocalazyContent, [...jsonField.setKey, jsonField.jsonKey], jsonField.jsonValue);
-    }
+    // Track which Localazy keys contribute to each Strapi entry: "isoStrapi:uid:documentId" → [{lang, id, event}]
+    const { parsedLocalazyContent, entryKeySourceMap } = collectDownloadedContent({
+      languages: languagesToParse,
+      processedKeys,
+      contentTransferSetup,
+      models: strapiContentTypesModels,
+      parseLocalazyKey: (key) => StrapiI18nService.parseLocalazyKey(key),
+    });
 
     /**
      * Iterate over parsed Localazy content and insert/update content in Strapi
