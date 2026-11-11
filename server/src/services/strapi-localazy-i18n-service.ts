@@ -1,9 +1,6 @@
-import { parsedLocalazyEntryToCreateEntry } from '../utils/parsed-localazy-entry-to-create-entry';
+import { buildLocalizedCreateEntry } from '../utils/build-localized-create-entry';
 import { parsedLocalazyEntryToUpdateEntry } from '../utils/parsed-localazy-entry-to-update-entry';
-import { omitDeep } from '../utils/omit-deep';
-import { merge } from 'lodash-es';
 import { Core, UID } from '@strapi/strapi';
-import { dropDocumentIdExceptMedia } from '../utils/drop-property-deep';
 import { getStrapiI18nService /*, getStrapiService*/ } from '../core';
 // TODO: ADD TYPES
 
@@ -15,7 +12,7 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
     // Strapi i18n Service
     const StrapiI18nService = getStrapiI18nService();
 
-    const { createEntry } = parsedLocalazyEntryToCreateEntry(
+    const mergedCreateEntry = buildLocalizedCreateEntry(
       strapiContentTypesModels,
       translatedModel,
       baseEntry,
@@ -23,22 +20,6 @@ const StrapiLocalazyI18nService = ({ strapi }: { strapi: Core.Strapi }) => ({
       isoStrapi
     );
 
-    const omitKeys = ['locale', 'localizations', 'createdAt', 'createdBy', 'updatedAt', 'updatedBy', 'publishedAt'];
-
-    let filteredBaseEntry = omitDeep(baseEntry, omitKeys);
-    // TODO: Deal with relations - must be omitted
-    // Drop documentId from all objects except media objects (images, files, etc.)
-    filteredBaseEntry = dropDocumentIdExceptMedia(filteredBaseEntry);
-
-    /**
-     * Items positioning is done by the `toCreateEntry` function
-     * that's why can entry can be merged now
-     */
-    let mergedCreateEntry: Record<string, any> = {};
-    merge(mergedCreateEntry, filteredBaseEntry, createEntry);
-    mergedCreateEntry = omitDeep(mergedCreateEntry, omitKeys);
-
-    mergedCreateEntry.locale = isoStrapi;
     const createdEntry = await StrapiI18nService.createLocalizationForAnExistingEntry(
       uid,
       baseEntry,
