@@ -1,3 +1,19 @@
+## 1.7.1 (2026-11-11)
+
+### 🔀 Pull Requests
+
+- [write downloaded blocks/json fields and component lists correctly (nested, incremental, structure changes) #131](https://github.com/localazy/strapi-plugin/pull/131)
+
+### 🐛 Bug Fixes
+
+- regroup downloaded json/blocks leaves per field, also in nested components ([e094d23](https://github.com/localazy/strapi-plugin/commit/e094d23)) ([#131](https://github.com/localazy/strapi-plugin/pull/131))
+- resolve relations in dynamic zones and repeatable components before updating ([e094d23](https://github.com/localazy/strapi-plugin/commit/e094d23)) ([#131](https://github.com/localazy/strapi-plugin/pull/131))
+- write downloaded lists, blocks and json values in place of the source structure ([e094d23](https://github.com/localazy/strapi-plugin/commit/e094d23)) ([#131](https://github.com/localazy/strapi-plugin/pull/131))
+
+### 🧪 Tests
+
+- upload → translate → download round trip across all json/blocks placements ([e094d23](https://github.com/localazy/strapi-plugin/commit/e094d23)) ([#131](https://github.com/localazy/strapi-plugin/pull/131))
+
 # 1.7.0 (2026-08-03)
 
 ### 🔀 Pull Requests
