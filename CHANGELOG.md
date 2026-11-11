@@ -1,3 +1,15 @@
+## 1.7.2 (2026-11-11)
+
+### 🔀 Pull Requests
+
+- [automated upload works for non-English sources and matches the manual upload; webhook dialog URL #133](https://github.com/localazy/strapi-plugin/pull/133)
+
+### 🐛 Bug Fixes
+
+- automated upload and deprecation send the same keys as the manual upload ([e350b79](https://github.com/localazy/strapi-plugin/commit/e350b79)) ([#133](https://github.com/localazy/strapi-plugin/pull/133))
+- automated upload works when the source language is not English ([e350b79](https://github.com/localazy/strapi-plugin/commit/e350b79)) ([#133](https://github.com/localazy/strapi-plugin/pull/133))
+- webhook setup pre-fills the plugin's real webhook URL ([e350b79](https://github.com/localazy/strapi-plugin/commit/e350b79)) ([#133](https://github.com/localazy/strapi-plugin/pull/133))
+
 ## 1.7.1 (2026-11-11)
 
 ### 🔀 Pull Requests
