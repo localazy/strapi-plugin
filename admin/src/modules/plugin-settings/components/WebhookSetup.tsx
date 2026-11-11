@@ -4,7 +4,8 @@ import { Box, Flex, Typography, Field, Button, Alert, Link, Loader, Dialog } fro
 import { Check, WarningCircle, Information, Link as LinkIcon } from '@strapi/icons';
 import ProjectService from '../../@common/services/project-service';
 
-const WEBHOOK_PATH = '/api/localazy/public/transfer/download';
+// the plugin's public route (server/src/routes/localazy-public-transfer-routes.ts); not under `/api`
+const WEBHOOK_PATH = '/localazy/public/transfer/download';
 const LOCALAZY_DOCS_URL = 'https://localazy.com/docs/general/webhooks';
 
 type WebhookState = 'loading' | 'configured' | 'not_configured';

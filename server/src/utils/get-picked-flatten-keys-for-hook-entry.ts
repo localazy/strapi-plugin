@@ -1,10 +1,9 @@
 import { isoStrapiToLocalazy } from './iso-locales-utils';
 import config from '../config';
 import { omitDeep } from './omit-deep';
-import { flattenObject } from './flatten-object';
-import { pickEntries } from './pick-entries';
 import { getCharacterLimitsMetadata } from './get-character-limits-metadata';
 import { findSetupModelByCollectionName, getPickPaths } from './transfer-setup-utils';
+import { getUploadKeysForEntries } from './get-upload-keys-for-entries';
 import PluginSettingsServiceHelper from '../services/helpers/plugin-settings-service-helper';
 import { ContentTransferSetup } from '../models/plugin/content-transfer-setup';
 import { UID } from '@strapi/strapi';
@@ -13,6 +12,7 @@ import {
   getStrapiI18nService,
   getLocalazyUserService,
   getLocalazyPubAPIService,
+  getEntryExclusionService,
 } from '../core';
 import type { Context } from '@strapi/types/dist/modules/documents/middleware';
 import type { HookParams } from '../models/plugin/hook-params';
@@ -144,11 +144,11 @@ export default async (params: HookParams) => {
   const projectSourceLanguageCode = sourceLanguage.code;
 
   // Strapi default locale not compatible with project source language
-  const strapiLocales = await StrapiI18nService.getLocales();
-  const defaultLocale = strapiLocales.find((locale) => locale.isDefault);
+  // `locales.find()` returns plain rows without `isDefault`; ask i18n for the default locale itself
+  const strapiDefaultLocaleCode = await StrapiI18nService.getDefaultLocaleCode();
 
-  const strapiDefaultLocale = defaultLocale
-    ? isoStrapiToLocalazy(defaultLocale.code)
+  const strapiDefaultLocale = strapiDefaultLocaleCode
+    ? isoStrapiToLocalazy(strapiDefaultLocaleCode)
     : config.default.LOCALAZY_DEFAULT_LOCALE;
   if (strapiDefaultLocale !== projectSourceLanguageCode) {
     strapi.log.warn("Localazy Plugin: Source locales do not match; the operation won't proceed");
@@ -167,7 +167,11 @@ export default async (params: HookParams) => {
    * Prepare the data structure and upload it to Localazy
    */
   const modelUid = context.contentType.uid;
-  const entries = await getEventEntries(params);
+  // entries excluded from translation are not uploaded (nor deprecated), as in the manual upload
+  const excludedEntries = await getEntryExclusionService().getContentTypeExclusions(modelUid);
+  const entries = (await getEventEntries(params)).filter(
+    (entry) => !!entry && !excludedEntries.includes(entry.documentId)
+  );
 
   if (entries.length === 0) {
     return;
@@ -186,20 +190,14 @@ export default async (params: HookParams) => {
     strapi.log.warn(`No fields for collection ${contextModel} transfer are enabled.`);
     return;
   }
-  const pickPathsWithUid = pickPaths.map((pickPath) => `${modelUid}.${pickPath}`);
 
-  // flatten Strapi content
-  let flatten = {};
-  for (const reducedEntry of reducedEntries) {
-    flatten = {
-      ...flatten,
-      ...flattenObject({
-        [modelUid]: reducedEntry,
-      }),
-    };
-  }
-  // get only enabled fields; "__component" will be filtered out inside of the function
-  const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
+  // the same keys as the manual upload (blocks projected to text leaves, dynamic zones included)
+  const pickedFlatten = getUploadKeysForEntries({
+    entries: reducedEntries,
+    modelUid,
+    transferSetupModelProps: currentTransferSetupModel,
+    getModel: (uid) => strapi.getModel(uid as any),
+  });
 
   // Add character limit metadata for fields that have maxLength defined in the content type schema
   const characterLimitsMetadata = getCharacterLimitsMetadata(pickedFlatten, modelUid);

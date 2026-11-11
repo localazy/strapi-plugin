@@ -1,13 +1,11 @@
 import type { Core } from '@strapi/strapi';
-import { flattenObject } from '../utils/flatten-object';
-import { projectBlocksFields } from '../utils/blocks-to-translatable';
+import { getUploadKeysForEntries } from '../utils/get-upload-keys-for-entries';
 import {
   getCollectionsNames,
   findSetupModelByCollectionName,
   isCollectionTransferEnabled,
   getPickPathsWithComponents,
 } from '../utils/transfer-setup-utils';
-import { pickEntries } from '../utils/pick-entries';
 import { getCharacterLimitsMetadata } from '../utils/get-character-limits-metadata';
 import config from '../config';
 import { isoStrapiToLocalazy } from '../utils/iso-locales-utils';
@@ -100,12 +98,6 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
         continue;
       }
 
-      /**
-       * Contains the paths to the fields with the model uid.
-       * These paths will be used (selected) from the content and then uploaded to Localazy.
-       */
-      const pickPathsWithUid = pickPaths.map((pickPath) => `${modelUid}.${pickPath}`);
-
       // https://docs.strapi.io/dev-docs/api/document-service#examples-1;
       let entries = await strapi.documents(modelUid).findMany({
         locUploadPLevel: 6,
@@ -165,20 +157,15 @@ const LocalazyTransferUploadService = ({ strapi }: { strapi: Core.Strapi }) => (
        */
       entries = omitDeep(entries, ['locale', 'createdAt', 'updatedAt', 'publishedAt']);
 
-      entries.forEach((entry) => {
-        const projectedEntry = projectBlocksFields(entry, strapi.getModel(modelUid), (uid) =>
-          strapi.getModel(uid as any)
-        );
-        const flatten = flattenObject({
-          [modelUid]: projectedEntry,
-        });
-        // get only enabled fields; "__component" will be filtered out inside of the function
-        const pickedFlatten = pickEntries(flatten, pickPathsWithUid);
-        pickedFlattenStrapiContent = {
-          ...pickedFlattenStrapiContent,
-          ...pickedFlatten,
-        };
-      });
+      pickedFlattenStrapiContent = {
+        ...pickedFlattenStrapiContent,
+        ...getUploadKeysForEntries({
+          entries,
+          modelUid,
+          transferSetupModelProps: currentTransferSetupModel,
+          getModel: (uid) => strapi.getModel(uid as any),
+        }),
+      };
 
       // Add character limit metadata for fields that have maxLength defined in the content type schema
       const characterLimitsMetadata = getCharacterLimitsMetadata(pickedFlattenStrapiContent, modelUid);
