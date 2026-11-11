@@ -30,9 +30,13 @@ const isBlocks = (attributeObj) => {
   return attributeObj.type === BLOCKS_ATTRIBUTE_TYPE;
 };
 
+const isJson = (attributeObj) => {
+  return attributeObj.type === 'json';
+};
+
 const findModel = (models, uid) => {
   const model = models.find((model) => model.uid === uid);
   return model;
 };
 
-export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, isBlocks, findModel };
+export { getAttribute, isComponent, isDynamicZone, isRepeatable, isRelation, isBlocks, isJson, findModel };

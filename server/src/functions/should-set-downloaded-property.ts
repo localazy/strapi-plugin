@@ -36,68 +36,85 @@ export enum ShouldSetDownloadedPropertyReturnType {
   JSON = 'json',
 }
 
+/**
+ * Locate the field a downloaded key belongs to, using the Content Transfer Setup.
+ *
+ * - `YES`: the key is a plain field enabled for transfer (the field is the key's last segment).
+ * - `JSON`: the key is one leaf of an enabled `json` or `blocks` field, which the upload flattens
+ *   into one key per leaf; `fieldSegmentIndex` is the index in `parsedKeyRest` of the segment
+ *   naming that field. Everything before it is the path to the entry or component owning the
+ *   field (dynamic zone `id;component` segments and component ids included); everything after it
+ *   is the leaf's path inside the field's value, e.g. for
+ *   `beats[3;about.timeline].stops[10].notes[0].children[0].text` the field is `notes` (index 4)
+ *   of stop 10 of timeline 3, and for `tags[0]` or `years.2024` it is `tags` / `years` (index 0).
+ * - `NO`: anything else (field disabled or unknown, component gone, model not set up).
+ */
+export const locateDownloadedField = (
+  modelContentTransferSetup: ModelContentTransferSetup,
+  parsedKeyRest: string[]
+): { type: ShouldSetDownloadedPropertyReturnType; fieldSegmentIndex: number } => {
+  const notFound = { type: ShouldSetDownloadedPropertyReturnType.NO, fieldSegmentIndex: -1 };
+  if (!modelContentTransferSetup.__model__) {
+    return notFound;
+  }
+
+  let setupModel: unknown = modelContentTransferSetup;
+  let startIndex = 0;
+
+  if (hasDynamicZoneKeySegment(parsedKeyRest)) {
+    const dynamicZoneKeySegmentIndex = getDynamicZoneKeySegmentIndex(parsedKeyRest);
+    const componentName = getComponentNameFromDynamicZoneKeySegment(parsedKeyRest[dynamicZoneKeySegmentIndex]);
+    const dzContentTransferSetupModel = get(
+      modelContentTransferSetup,
+      getDynamicZonePropertyName(parsedKeyRest)
+    ) as ModelContentTransferSetupDZFields[];
+    if (!Array.isArray(dzContentTransferSetupModel)) {
+      return notFound;
+    }
+    setupModel = dzContentTransferSetupModel.find((c) => c.__component__ === componentName);
+    if (!setupModel) {
+      return notFound;
+    }
+    startIndex = dynamicZoneKeySegmentIndex + 1;
+  }
+
+  // positions of the named (non-numeric) segments; numeric ones are array positions or component ids
+  const namedSegmentIndexes: number[] = [];
+  for (let index = startIndex; index < parsedKeyRest.length; index++) {
+    if (isNaN(parseInt(parsedKeyRest[index]))) {
+      namedSegmentIndexes.push(index);
+    }
+  }
+
+  // the longest named path enabled in the setup is the field
+  for (let length = namedSegmentIndexes.length; length > 0; length--) {
+    const fieldPath = namedSegmentIndexes.slice(0, length).map((index) => parsedKeyRest[index]);
+    if (get(setupModel, fieldPath) === true) {
+      const fieldSegmentIndex = namedSegmentIndexes[length - 1];
+      // anything after the field's own segment is a path inside a json/blocks value
+      const type =
+        fieldSegmentIndex === parsedKeyRest.length - 1
+          ? ShouldSetDownloadedPropertyReturnType.YES
+          : ShouldSetDownloadedPropertyReturnType.JSON;
+      return { type, fieldSegmentIndex };
+    }
+  }
+
+  return notFound;
+};
+
 export const shouldSetDownloadedProperty = (
   modelContentTransferSetup: ModelContentTransferSetup,
   parsedKeyRest: string[]
 ): ShouldSetDownloadedPropertyReturnType => {
-  if (!modelContentTransferSetup.__model__) {
-    return ShouldSetDownloadedPropertyReturnType.NO;
-  }
+  return locateDownloadedField(modelContentTransferSetup, parsedKeyRest).type;
+};
 
-  if (hasDynamicZoneKeySegment(parsedKeyRest)) {
-    const dynamicZonePropertyName = getDynamicZonePropertyName(parsedKeyRest);
-    const componentName = getComponentNameFromDynamicZoneKeySegment(getDynamicZoneKeySegment(parsedKeyRest));
-
-    const dzContentTransferSetupModel = get(
-      modelContentTransferSetup,
-      dynamicZonePropertyName
-    ) as ModelContentTransferSetupDZFields[];
-    if (!Array.isArray(dzContentTransferSetupModel)) {
-      return ShouldSetDownloadedPropertyReturnType.NO;
-    }
-
-    const dzContentTransferSetupComponentModel = dzContentTransferSetupModel.find(
-      (c) => c.__component__ === componentName
-    );
-
-    if (!dzContentTransferSetupComponentModel) {
-      return ShouldSetDownloadedPropertyReturnType.NO;
-    }
-
-    const dynamicZoneKeySegmentIndex = getDynamicZoneKeySegmentIndex(parsedKeyRest);
-    const slicedParsedKeyRest = parsedKeyRest.slice(dynamicZoneKeySegmentIndex + 1);
-    const filteredSlicedParsedKeyRest = slicedParsedKeyRest.filter((segment) => isNaN(parseInt(segment)));
-
-    if (get(dzContentTransferSetupComponentModel, filteredSlicedParsedKeyRest) === true) {
-      return ShouldSetDownloadedPropertyReturnType.YES;
-    }
-
-    // json fields
-    while (filteredSlicedParsedKeyRest.length > 0) {
-      // last segment out
-      filteredSlicedParsedKeyRest.pop();
-      if (get(dzContentTransferSetupComponentModel, filteredSlicedParsedKeyRest) === true) {
-        return ShouldSetDownloadedPropertyReturnType.JSON;
-      }
-    }
-
-    return ShouldSetDownloadedPropertyReturnType.NO;
-  } else {
-    const filteredParsedKeyRest = parsedKeyRest.filter((partialKey) => isNaN(parseInt(partialKey)));
-
-    if (get(modelContentTransferSetup, filteredParsedKeyRest) === true) {
-      return ShouldSetDownloadedPropertyReturnType.YES;
-    }
-
-    // json fields
-    while (filteredParsedKeyRest.length > 0) {
-      // last segment out
-      filteredParsedKeyRest.pop();
-      if (get(modelContentTransferSetup, filteredParsedKeyRest) === true) {
-        return ShouldSetDownloadedPropertyReturnType.JSON;
-      }
-    }
-
-    return ShouldSetDownloadedPropertyReturnType.NO;
-  }
+/** Index of the `json`/`blocks` field's own segment in `parsedKeyRest`, or -1 (see `locateDownloadedField`). */
+export const getJsonFieldSegmentIndex = (
+  modelContentTransferSetup: ModelContentTransferSetup,
+  parsedKeyRest: string[]
+): number => {
+  const { type, fieldSegmentIndex } = locateDownloadedField(modelContentTransferSetup, parsedKeyRest);
+  return type === ShouldSetDownloadedPropertyReturnType.JSON ? fieldSegmentIndex : -1;
 };

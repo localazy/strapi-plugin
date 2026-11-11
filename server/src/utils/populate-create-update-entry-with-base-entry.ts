@@ -1,5 +1,14 @@
 import { cloneDeep, set, get, isEmpty } from 'lodash-es';
-import { getAttribute, isComponent, isRepeatable, isDynamicZone, isRelation, findModel } from './model-utils';
+import {
+  getAttribute,
+  isComponent,
+  isRepeatable,
+  isDynamicZone,
+  isRelation,
+  isBlocks,
+  isJson,
+  findModel,
+} from './model-utils';
 
 const doesExistInPopulatedLocalizedEntry = (val) => {
   if (Array.isArray(val)) {
@@ -64,17 +73,19 @@ export const populateCreateUpdateEntryWithBaseEntry = async (
           }
         }
       } else if (!component && isRepeatableComponent && isDZ) {
-        Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
+        // awaited in sequence: items can hold relations resolved asynchronously, which must be in
+        // place before the populated entry is returned (and handed to Strapi)
+        for (const [partialBaseEntryItemIndex, partialBaseEntryItem] of Object.entries(partialBaseEntry)) {
           const component = partialBaseEntryItem.__component;
           const model = findModel(models, component);
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
           await populateEntry(partialBaseEntryItem, model, partialBaseEntryItemIndex, newPrefix);
-        });
+        }
       } else if (component && isRepeatableComponent) {
-        Object.entries(partialBaseEntry).forEach(async ([partialBaseEntryItemIndex, partialBaseEntryItem]) => {
+        for (const [partialBaseEntryItemIndex, partialBaseEntryItem] of Object.entries(partialBaseEntry)) {
           const newPrefix = `${prefix}.${partialBaseEntryItemIndex}`;
           await populateEntry(partialBaseEntryItem, model, partialBaseEntryItemIndex, newPrefix);
-        });
+        }
       }
     } else if (typeof partialBaseEntry === 'object') {
       // is object
@@ -206,7 +217,8 @@ export const populateCreateUpdateEntryWithBaseEntry = async (
             } else {
               set(populatedEntry, newPrefix, value);
             }
-          } else {
+          } else if (!isBlocks(attribute) && !isJson(attribute)) {
+            // a json/blocks value is complete as it is, not a structure of the model to populate
             await populateEntry(value, model, objectKey, newPrefix);
           }
         }

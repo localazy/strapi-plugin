@@ -1,10 +1,17 @@
 import { set, get } from 'lodash-es';
-import { resetArrayKeysDeep } from './reset-array-keys-deep';
-import { getAttribute, isComponent, isDynamicZone, isRepeatable, isBlocks, findModel } from './model-utils';
+import { getAttribute, isComponent, isDynamicZone, isRepeatable, isBlocks, isJson, findModel } from './model-utils';
 import { overlayBlocksTranslation } from './blocks-to-translatable';
+import { overlayJsonTranslation } from './overlay-json-translation';
 
 /**
- * Items positioning is done by the `toCreateEntry` function
+ * Items positioning is done by the `toCreateEntry` function: repeatable component and dynamic
+ * zone items are placed at their position in `baseEntry` (the source-locale entry), so arrays may
+ * have holes for items without downloaded values. They are not compacted, because callers merge
+ * the result onto a complete entry (the source entry, or the current localization), and shifting
+ * items would put translations into the wrong item.
+ *
+ * `rebuiltFieldPaths` lists where blocks and json fields were written; each holds a complete value
+ * rebuilt from the source value (see `overlayBlocksTranslation`, `overlayJsonTranslation`).
  */
 export const parsedLocalazyEntryToCreateEntry = (
   models: any,
@@ -14,8 +21,8 @@ export const parsedLocalazyEntryToCreateEntry = (
   locale = ''
 ) => {
   const createEntry: Record<string, any> = {};
-  const repeatableComponentsKeystoFilter = [];
   const dynamicZoneComponentKeys = [];
+  const rebuiltFieldPaths: string[] = [];
 
   const toCreateEntry = (
     entry: any,
@@ -33,10 +40,6 @@ export const parsedLocalazyEntryToCreateEntry = (
       Object.entries(entry).forEach(([baseEntryItemId, value]) => {
         if (value !== null) {
           if (component && isRepeatableComponent) {
-            // used for indices filtering in repeatable components
-            if (!repeatableComponentsKeystoFilter.includes(prefix)) {
-              repeatableComponentsKeystoFilter.push(prefix);
-            }
             const baseEntryRepeatableItemId = parseInt(baseEntryItemId);
             const baseEntryRepeateableGroup = get(baseEntry, prefix);
             if (baseEntryRepeateableGroup !== undefined) {
@@ -60,10 +63,6 @@ export const parsedLocalazyEntryToCreateEntry = (
           }
 
           if (!component && isRepeatableComponent) {
-            // used for indices filtering in dynamic zones
-            if (!repeatableComponentsKeystoFilter.includes(prefix)) {
-              repeatableComponentsKeystoFilter.push(prefix);
-            }
             const baseEntryRepeatableItemId = parseInt(baseEntryItemId);
             const baseEntryRepeateableGroup = get(baseEntry, prefix);
             if (baseEntryRepeateableGroup !== undefined) {
@@ -173,15 +172,24 @@ export const parsedLocalazyEntryToCreateEntry = (
             newPrefixBase = `${dzParamKey}.${baseEntryDZIndex}`;
             newPrefix = `${newPrefixBase}.${objectKey}`;
           }
-          // A blocks field arrives as a text-only skeleton (one segment per text node). Rebuild the
-          // full AST by overlaying the translated text onto the source-locale AST, so structure and
-          // formatting are restored from the source. Skip when there is no source AST to overlay
-          // onto rather than write an invalid document.
-          const valueToSet = isBlocks(attribute) ? overlayBlocksTranslation(get(baseEntry, newPrefix), value) : value;
+          // A blocks or json field arrives as its translated leaves. Rebuild the full value by
+          // overlaying them onto the source-locale value, so structure, formatting and
+          // non-translatable values come from the source. Skip when there is no source value to
+          // overlay onto rather than write an invalid one.
+          const isRebuiltField = isBlocks(attribute) || isJson(attribute);
+          let valueToSet = value;
+          if (isBlocks(attribute)) {
+            valueToSet = overlayBlocksTranslation(get(baseEntry, newPrefix), value);
+          } else if (isJson(attribute)) {
+            valueToSet = overlayJsonTranslation(get(baseEntry, newPrefix), value);
+          }
           if (valueToSet === undefined) {
             return;
           }
           set(createEntry, newPrefix, valueToSet);
+          if (isRebuiltField) {
+            rebuiltFieldPaths.push(newPrefix);
+          }
 
           if (component) {
             const componentKeyToSet = `${newPrefixBase}.__component`;
@@ -209,6 +217,5 @@ export const parsedLocalazyEntryToCreateEntry = (
     createEntry.locale = locale;
   }
 
-  resetArrayKeysDeep(createEntry, repeatableComponentsKeystoFilter);
-  return { createEntry, dynamicZoneComponentKeys };
+  return { createEntry, dynamicZoneComponentKeys, rebuiltFieldPaths };
 };
